@@ -485,7 +485,7 @@ class StatsTracker:
 
     def reset_all(self):
         for table in ("login_attempts", "events", "daily_stats", "accounts", "sessions"):
-            _supa_delete(table, {})
+            _supa_delete(table, {"id": "gte.0"})
 
     def get_summary_report(self, bot_name=None):
         today = self.get_today_stats(bot_name=bot_name)
