@@ -253,7 +253,7 @@ def api_action_account():
         bot = body.get("bot", None)
         if not name:
             return json.dumps({"ok": False, "error": "Missing account name"})
-        tracker.set_account_status(name, status)
+        tracker.set_account_status(name, status, bot_name=bot)
         return json.dumps({"ok": True, "message": f"Account '{name}' set to {status}"})
     except Exception as e:
         return json.dumps({"ok": False, "error": str(e)})

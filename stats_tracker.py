@@ -297,11 +297,12 @@ class StatsTracker:
                 "last_active": ts, "status": "active"
             }, on_conflict="name,bot_name")
 
-    def set_account_status(self, account_name, status):
+    def set_account_status(self, account_name, status, bot_name=None):
         ts = _iso_now()
+        bn = bot_name or self._bot_name
         with _lock:
             _supa_upsert("accounts", {
-                "name": account_name, "bot_name": self._bot_name,
+                "name": account_name, "bot_name": bn,
                 "status": status, "last_active": ts
             }, on_conflict="name,bot_name")
         self.log_event("status_change", account_name=account_name, details={"status": status})
