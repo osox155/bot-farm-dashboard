@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bot Farm — Login</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: #0f0f13;
+    color: #e4e4e7;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+  .login-card {
+    background: #1a1a23;
+    border: 1px solid #2a2a3e;
+    border-radius: 12px;
+    padding: 40px;
+    width: 360px;
+    text-align: center;
+  }
+  h1 { font-size: 20px; margin-bottom: 8px; }
+  p { color: #888; margin-bottom: 24px; font-size: 14px; }
+  input[type="password"] {
+    width: 100%;
+    padding: 12px 16px;
+    background: #0f0f13;
+    border: 1px solid #2a2a3e;
+    border-radius: 8px;
+    color: #e4e4e7;
+    font-size: 15px;
+    outline: none;
+    margin-bottom: 16px;
+  }
+  input[type="password"]:focus { border-color: #6366f1; }
+  button {
+    width: 100%;
+    padding: 12px;
+    background: #6366f1;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+  }
+  button:hover { background: #5457e5; }
+  .error { color: #ef4444; font-size: 14px; margin-top: 12px; }
+</style>
+</head>
+<body>
+<div class="login-card">
+  <h1>Bot Farm Dashboard</h1>
+  <p>Enter password to continue</p>
+  <form method="post" action="/login">
+    <input type="password" name="password" placeholder="Password" autofocus>
+    <button type="submit">Sign in</button>
+  </form>
+</div>
+</body>
+</html>

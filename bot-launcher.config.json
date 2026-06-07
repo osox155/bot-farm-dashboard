@@ -1,0 +1,79 @@
+{
+  "AutoJoinBot": {
+    "Enabled": false,
+    "DesktopIndex": 1,
+    "ExePath": "%USERPROFILE%/Downloads/BOT Py/AutoJoinBot/join_groups.py",
+    "RotationEnabled": false,
+    "Accounts": "3,4",
+    "RotationPreset": {
+      "RotationMode": "DayOfWeek",
+      "AccountPool": "2,3,4,6,7",
+      "RotationBatchSize": 1
+    },
+    "WaitAfterLaunchSeconds": 5
+  },
+  "CommentsReplyBot": {
+    "Enabled": true,
+    "DesktopIndex": 2,
+    "ExePath": "%USERPROFILE%/Downloads/BOT Py/CommentsReplyBot/facebook_bot.py",
+    "OptionSequence": 1,
+    "RotationEnabled": true,
+    "ManualAccounts": {
+      "AccountsForOption1": "6",
+      "AccountsForOption5": ""
+    },
+    "RotationPreset": {
+      "RotationMode": "DayOfWeek",
+      "AccountPool": "2,3,4",
+      "BatchSizeForOption1": 1,
+      "BatchSizeForOption5": 2
+    },
+    "WaitAfterEachStepSeconds": 5
+  },
+  "FewFeed": {
+    "Enabled": false,
+    "DesktopIndex": 3,
+    "ExePath": "%USERPROFILE%/Downloads/BOT Py/fewfeedbotv6/fewfeed_bot_template.py",
+    "MenuOptionToLaunch": 1,
+    "RotationEnabled": true,
+    "Accounts": "6",
+    "RotationPreset": {
+      "RotationMode": "DayOfWeek",
+      "AccountPool": "2,3,4",
+      "RotationBatchSize": 2
+    },
+    "WaitAfterLaunchSeconds": 10,
+    "LaunchMode": "sequential",
+    "SequentialDelaySeconds": 20,
+    "BatchSize": 1
+  },
+  "ReplyBot": {
+    "Enabled": true,
+    "DesktopIndex": 4,
+    "ExePath": "%USERPROFILE%/Downloads/BOT Py/ReplyBotv7/new.py",
+    "OptionSequence": 2,
+    "RotationEnabled": true,
+    "ManualAccounts": {
+      "AccountsForOption2": "6",
+      "AccountsForOption11": ""
+    },
+    "RotationPreset": {
+      "RotationMode": "DayOfWeek",
+      "AccountPool": "2,3,4",
+      "BatchSizeForOption2": 2,
+      "BatchSizeForOption11": 1
+    },
+    "WaitAfterEachStepSeconds": 10,
+    "DelayBeforeStartSeconds": 15
+  },
+  "NewDesktop": {
+    "UseNewVirtualDesktop": true,
+    "TryVirtualDesktopModuleFirst": true,
+    "AutoInstallIfMissing": true
+  },
+  "Launcher": {
+    "KeepAliveWhileChildrenRunning": true,
+    "ExtraKeepAliveSecondsAfterStart": 5,
+    "ReturnToDesktopAfterLaunch": "CommentsReplyBot"
+  }
+}

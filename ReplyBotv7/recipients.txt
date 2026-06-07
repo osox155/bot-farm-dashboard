@@ -1,0 +1,10 @@
+# Paste one Messenger URL per line. Supported formats:
+# https://www.messenger.com/t/ID  (for groups)
+# https://www.messenger.com/e2ee/t/ID  (for people)
+# Example:
+# https://www.messenger.com/t/123456789
+# https://www.messenger.com/e2ee/t/987654321
+
+https://www.messenger.com/t/9330527896968033
+https://www.messenger.com/t/6705299432858132
+

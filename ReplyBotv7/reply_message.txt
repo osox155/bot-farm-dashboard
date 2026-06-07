@@ -1,0 +1,6 @@
+Hello {{RAN_M(👋|🙌|😊| there)}}
+{{RAN_M(Here’s|This is|You can use)}} the link {{RAN_M(I used|that I tried|I found)}} to get {{RAN_M(free|some)}} Monopoly GO {{RAN_M(stickers|stickers + dice|rewards)}}:
+
+https://beacons.ai/freedicesandstickers
+
+{{RAN_M(Just follow the steps 👍|Open it and claim yours 👍|It should work fine 👍)}}

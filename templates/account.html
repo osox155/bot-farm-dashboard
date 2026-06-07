@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>__ACCOUNT_NAME__ - Bot Farm</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/*SHARED_CSS*/
+</style>
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-brand">
+    <div class="sidebar-logo">B</div>
+    <h2>Bot Farm</h2>
+  </div>
+  <div class="sidebar-menu">
+    <a href="/" id="menu-overview">📊 Dashboard</a>
+    <a href="/history" id="menu-history">🕒 Session History</a>
+    <div class="sidebar-menu-title">Bots</div>
+    <div class="sidebar-bots-list" id="sidebar-bots-list"></div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="header">
+    <div class="header-left">
+      <a href="/" style="color: var(--accent); text-decoration: none; font-size: 13px; font-weight: 600;">← Back to Dashboard</a>
+      <div style="display: flex; align-items: center; gap: 12px; margin-top: 4px;">
+        <h1>👤 __ACCOUNT_NAME__</h1>
+        <div id="status-container"></div>
+      </div>
+      <p id="page-subtitle" style="color: var(--text3); font-size: 12px;">Inspect login attempts and activity log</p>
+    </div>
+    <div class="header-right">
+      <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+      <button class="btn btn-outline" onclick="load()">↻</button>
+      <button class="btn btn-danger" onclick="confirmResetAccount()">✕ Reset Account Data</button>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="two-col-row">
+      <div class="panel">
+        <div class="panel-header">
+          <h3>Activity Logs</h3>
+          <div class="search-box">
+            <input type="text" id="event-search" placeholder="Search events..." oninput="filterEvents()">
+          </div>
+        </div>
+        <div class="events" id="events">
+          <div class="e">Loading activity...</div>
+        </div>
+      </div>
+      
+      <div class="panel">
+        <div class="panel-header">
+          <h3>Login Attempts</h3>
+          <div class="search-box">
+            <input type="text" id="login-search" placeholder="Search login status..." oninput="filterLogins()">
+          </div>
+        </div>
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Bot</th>
+                <th>Result</th>
+                <th>Reason</th>
+              </tr>
+            </thead>
+            <tbody id="logins">
+              <tr><td colspan="4" class="e">Loading logins...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal-box">
+    <h3 id="modal-title">Confirm</h3>
+    <p id="modal-text">Are you sure?</p>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-danger" id="modal-confirm" onclick="confirmModal()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/*SHARED_JS*/
+
+const acc = '__ACCOUNT_NAME__';
+let accountData = null;
+
+function confirmResetAccount() {
+  showModal(
+    'Reset Account Data',
+    'Are you sure you want to delete all historical logs, events, and login logs for the account "' + acc + '"? This will reset status but keep the account reference.',
+    function() {
+      fetch('/api/reset/account/' + encodeURIComponent(acc), { method: 'POST' })
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+          if (d.ok) {
+            toast('Account history wiped successfully', 'success');
+            load();
+          } else {
+            toast(d.error || 'Failed to wipe data', 'error');
+          }
+        })
+        .catch(function() {
+          toast('Network error wiping account data', 'error');
+        });
+    }
+  );
+}
+
+function load() {
+  fetch('/api/account/' + encodeURIComponent(acc))
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (!d.ok) return;
+      accountData = d;
+      
+      // Determine account status from events / logins
+      var status = 'unknown';
+      var botName = null;
+      
+      // Check active status in accounts table or fallback
+      if (d.data.events && d.data.events.length > 0) {
+         // Find latest event or status login result
+         // Fallback to logic checking logins success
+      }
+      
+      if (d.data.logins && d.data.logins.length) {
+        status = d.data.logins[0].success ? 'active' : 'logged_out';
+        botName = d.data.logins[0].bot_name;
+      }
+      
+      var optActive = status === 'active' ? 'selected' : '';
+      var optPaused = status === 'paused' ? 'selected' : '';
+      var optLoggedOut = status === 'logged_out' ? 'selected' : '';
+      
+      document.getElementById('status-container').innerHTML = 
+        '<span class="status ' + status + '" style="margin-right:8px;">' + status + '</span>' +
+        '<select class="status-select" onchange="updateStatus(this.value, \'' + esc(botName || '') + '\')">' +
+          '<option value="active" ' + optActive + '>Activate</option>' +
+          '<option value="paused" ' + optPaused + '>Pause</option>' +
+          '<option value="logged_out" ' + optLoggedOut + '>Log Out</option>' +
+        '</select>';
+
+      renderEvents();
+      renderLogins();
+    })
+    .catch(function() {
+      toast('Failed to load account statistics', 'error');
+    });
+}
+
+function updateStatus(newStatus, botName) {
+  changeAccountStatus(acc, newStatus, botName, function() {
+    load();
+  });
+}
+
+function renderEvents() {
+  if (!accountData) return;
+  var ev = accountData.data.events || [];
+  var searchQuery = document.getElementById('event-search').value.toLowerCase();
+  
+  var filtered = ev.filter(function(e) {
+    return !searchQuery || (e.event_type && e.event_type.toLowerCase().indexOf(searchQuery) !== -1);
+  });
+  
+  document.getElementById('events').innerHTML = filtered.map(function(e) {
+    var botTag = e.bot_name ? '<span class="bot-tag">' + esc(e.bot_name) + '</span>' : '';
+    return '<div class="ev">' +
+      '<span class="time">' + fmtDateTime(e.created_at) + '</span>' +
+      botTag +
+      '<span>' + fmtType(e.event_type) + '</span>' +
+      '</div>';
+  }).join('') || '<div class="e">No events found</div>';
+}
+
+function renderLogins() {
+  if (!accountData) return;
+  var logins = accountData.data.logins || [];
+  var searchQuery = document.getElementById('login-search').value.toLowerCase();
+  
+  var filtered = logins.filter(function(l) {
+    if (!searchQuery) return true;
+    var mBot = l.bot_name && l.bot_name.toLowerCase().indexOf(searchQuery) !== -1;
+    var mReason = l.reason && l.reason.toLowerCase().indexOf(searchQuery) !== -1;
+    var mResult = (l.success ? 'success' : 'failed').indexOf(searchQuery) !== -1;
+    return mBot || mReason || mResult;
+  });
+  
+  document.getElementById('logins').innerHTML = filtered.map(function(l) {
+    var resClass = l.success ? 'success' : 'failed';
+    var resText = l.success ? 'Success' : 'Failed';
+    return '<tr>' +
+      '<td>' + fmtDateTime(l.attempted_at) + '</td>' +
+      '<td>' + esc(l.bot_name || '-') + '</td>' +
+      '<td><span class="status ' + resClass + '">' + resText + '</span></td>' +
+      '<td style="color:var(--text2);">' + esc(l.reason || '-') + '</td>' +
+      '</tr>';
+  }).join('') || '<tr><td colspan="4" class="e">No logins recorded</td></tr>';
+}
+
+function filterEvents() {
+  renderEvents();
+}
+
+function filterLogins() {
+  renderLogins();
+}
+
+initTheme();
+load();
+loadSidebarBots('');
+setInterval(load, 10000);
+</script>
+</body>
+</html>

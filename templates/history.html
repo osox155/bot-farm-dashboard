@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Session History - Bot Farm</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/*SHARED_CSS*/
+</style>
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-brand">
+    <div class="sidebar-logo">B</div>
+    <h2>Bot Farm</h2>
+  </div>
+  <div class="sidebar-menu">
+    <a href="/" id="menu-overview">📊 Dashboard</a>
+    <a href="/history" id="menu-history">🕒 Session History</a>
+    <div class="sidebar-menu-title">Bots</div>
+    <div class="sidebar-bots-list" id="sidebar-bots-list"></div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="header">
+    <div class="header-left">
+      <h1>Session History</h1>
+      <p id="page-subtitle">Historical bot session execution logs</p>
+    </div>
+    <div class="header-right">
+      <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+      <button class="btn btn-outline" onclick="loadSessions()">↻ Refresh</button>
+      <button class="btn btn-danger" onclick="clearHistory()">✕ Clear Session History</button>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="panel">
+      <div class="panel-header">
+        <div style="display: flex; gap: 8px;">
+          <select id="bot-filter" class="status-select" onchange="loadSessions()">
+            <option value="">All Bots</option>
+          </select>
+        </div>
+        <div class="search-box">
+          <input type="text" id="session-search" placeholder="Search sessions..." oninput="filterSessions()">
+        </div>
+      </div>
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Session ID</th>
+              <th>Bot</th>
+              <th>Started</th>
+              <th>Ended</th>
+              <th>Duration</th>
+              <th>Accounts</th>
+              <th>Replies</th>
+              <th>Messages</th>
+              <th>Failures</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+            <tr><td colspan="10" class="e">Loading sessions...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal-box">
+    <h3 id="modal-title">Confirm</h3>
+    <p id="modal-text">Are you sure?</p>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-danger" id="modal-confirm" onclick="confirmModal()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/*SHARED_JS*/
+
+let sessionsData = null;
+
+function clearHistory() {
+  showModal(
+    'Clear Session History',
+    'Are you sure you want to delete all historical bot session records? This will clear the session table database entries completely.',
+    function() {
+      fetch('/api/reset/all', { method: 'POST' })
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+          if (d.ok) {
+            toast('Session history cleared successfully', 'success');
+            loadSessions();
+          } else {
+            toast(d.error || 'Failed to wipe history', 'error');
+          }
+        })
+        .catch(function() {
+          toast('Network error wiping session logs', 'error');
+        });
+    }
+  );
+}
+
+function calcDuration(started, ended) {
+  if (!started || !ended) return '-';
+  try {
+    var s = new Date(started), e = new Date(ended);
+    var diff = Math.floor((e - s) / 1000);
+    if (isNaN(diff) || diff < 0) return '-';
+    if (diff < 60) return diff + 's';
+    if (diff < 3600) return Math.floor(diff / 60) + 'm';
+    return Math.floor(diff / 3600) + 'h ' + Math.floor((diff % 3600) / 60) + 'm';
+  } catch (e) {
+    return '-';
+  }
+}
+
+function loadSessions() {
+  var bot = document.getElementById('bot-filter').value;
+  var url = '/api/sessions';
+  if (bot) url += '?bot=' + encodeURIComponent(bot);
+  
+  fetch(url)
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (!d.ok) return;
+      sessionsData = d;
+      renderSessionsTable();
+    })
+    .catch(function() {
+      toast('Failed to load session history', 'error');
+    });
+}
+
+function renderSessionsTable() {
+  if (!sessionsData) return;
+  var list = sessionsData.sessions || [];
+  var searchQuery = document.getElementById('session-search').value.toLowerCase();
+  
+  var filtered = list.filter(function(s) {
+    if (!searchQuery) return true;
+    var mId = s.session_id && s.session_id.toLowerCase().indexOf(searchQuery) !== -1;
+    var mBot = s.bot_name && s.bot_name.toLowerCase().indexOf(searchQuery) !== -1;
+    return mId || mBot;
+  });
+  
+  document.getElementById('table-body').innerHTML = filtered.map(function(s) {
+    var statusClass = s.status || '';
+    return '<tr>' +
+      '<td style="font-family:monospace; font-size:11px; color:var(--text3);">' + esc(s.session_id) + '</td>' +
+      '<td style="font-weight:600;">' + (s.bot_name ? esc(s.bot_name) : '-') + '</td>' +
+      '<td>' + fmtDateTime(s.started_at) + '</td>' +
+      '<td>' + fmtDateTime(s.ended_at) + '</td>' +
+      '<td style="color:var(--text2); font-size:12px;">' + calcDuration(s.started_at, s.ended_at) + '</td>' +
+      '<td>' + (s.accounts_count || 0) + '</td>' +
+      '<td>' + (s.total_replies || 0) + '</td>' +
+      '<td>' + (s.total_messages || 0) + '</td>' +
+      '<td>' + (s.total_failures || 0) + '</td>' +
+      '<td><span class="status ' + statusClass + '">' + (s.status || '-') + '</span></td>' +
+      '</tr>';
+  }).join('') || '<tr><td colspan="10" class="e">No matching session history found</td></tr>';
+}
+
+function filterSessions() {
+  renderSessionsTable();
+}
+
+function loadBots() {
+  fetch('/api/overview')
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (d.bots) {
+        var sel = document.getElementById('bot-filter');
+        sel.innerHTML = '<option value="">All Bots</option>';
+        d.bots.forEach(function(b) {
+          sel.innerHTML += '<option value="' + esc(b) + '">' + esc(b) + '</option>';
+        });
+      }
+    })
+    .catch(function() {});
+}
+
+document.getElementById('menu-history').classList.add('active');
+initTheme();
+loadSessions();
+loadBots();
+loadSidebarBots('');
+setInterval(loadSessions, 15000);
+</script>
+</body>
+</html>

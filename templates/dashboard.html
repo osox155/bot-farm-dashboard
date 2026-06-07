@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bot Farm Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<style>
+/*SHARED_CSS*/
+</style>
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-brand">
+    <div class="sidebar-logo">B</div>
+    <h2>Bot Farm</h2>
+  </div>
+  <div class="sidebar-menu">
+    <a href="/" id="menu-overview">📊 Dashboard</a>
+    <a href="/history" id="menu-history">🕒 Session History</a>
+    <div class="sidebar-menu-title">Bots</div>
+    <div class="sidebar-bots-list" id="sidebar-bots-list"></div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="header">
+    <div class="header-left">
+      <h1>Dashboard Overview</h1>
+      <p id="page-subtitle">Loading statistics...</p>
+    </div>
+    <div class="header-right">
+      <div style="font-size: 12px; color: var(--text2); display: flex; align-items: center; gap: 6px;">
+        <span>Refresh:</span>
+        <select id="refresh-interval" class="status-select" onchange="setupRefresh()">
+          <option value="5000">5s</option>
+          <option value="10000" selected>10s</option>
+          <option value="30000">30s</option>
+          <option value="0">Off</option>
+        </select>
+      </div>
+      <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+      <button class="btn btn-outline" onclick="loadOverview()">↻</button>
+    </div>
+  <div class="main-content">
+    <div class="panel" id="attention-alert" style="border-color: var(--red); background: rgba(239, 68, 68, 0.05); margin-bottom: 24px; display: none;">
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; color: var(--red);">
+        <span style="font-size: 16px;">🚨</span>
+        <h3 style="color: var(--red); margin-bottom: 0; text-transform: uppercase; font-size: 13px; letter-spacing: 1px;">Attention Required</h3>
+      </div>
+      <p style="font-size: 13px; color: var(--text2); margin-bottom: 12px;">The following accounts have encountered login failures or expired cookies and require action:</p>
+      <ul id="alert-list" style="font-size: 13px; list-style-type: none; padding-left: 0; line-height: 1.6;"></ul>
+    </div>
+
+    <div class="cards" id="cards"></div>
+    
+    <div class="panel">
+      <div class="panel-header">
+        <h3>Bots Performance</h3>
+        <div class="search-box">
+          <input type="text" id="bot-search" placeholder="Search bots..." oninput="filterBots()">
+        </div>
+      </div>
+      <div class="bot-grid" id="bot-grid"></div>
+    </div>
+
+    <div class="chart-section">
+      <h3>Daily Activity (14 days)</h3>
+      <div class="chart-tabs" id="chart-tabs"></div>
+      <div style="height: 220px; position: relative;">
+        <canvas id="dailyChart"></canvas>
+      </div>
+    </div>
+
+    <div style="display: flex; justify-content: flex-end; margin-top: 24px; padding-bottom: 24px;">
+      <button class="btn btn-danger" onclick="confirmResetAll()">⚠ Reset All History</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal-box">
+    <h3 id="modal-title">Confirm</h3>
+    <p id="modal-text">Are you sure?</p>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-danger" id="modal-confirm" onclick="confirmModal()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/*SHARED_JS*/
+
+let dailyChart = null, chartFilter = '', dashData = null, refreshTimer = null;
+
+function setupRefresh() {
+  if (refreshTimer) {
+    clearInterval(refreshTimer);
+    refreshTimer = null;
+  }
+  var val = parseInt(document.getElementById('refresh-interval').value);
+  if (val > 0) {
+    refreshTimer = setInterval(loadOverview, val);
+  }
+}
+
+function confirmResetAll() {
+  showModal(
+    'Reset All History',
+    'Are you absolutely sure you want to wipe all session history, daily statistics, accounts, events, and login logs? This action is irreversible.',
+    function() {
+      fetch('/api/reset/all', { method: 'POST' })
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+          if (d.ok) {
+            toast('All history wiped successfully', 'success');
+            loadOverview();
+          } else {
+            toast(d.error || 'Failed to wipe history', 'error');
+          }
+        })
+        .catch(function() {
+          toast('Network error resetting history', 'error');
+        });
+    }
+  );
+}
+
+function setChartFilter(bot) {
+  chartFilter = bot;
+  var tabs = document.querySelectorAll('.chart-tab');
+  tabs.forEach(function(t) { t.classList.remove('active'); });
+  if (bot) {
+    tabs.forEach(function(t) {
+      if (t.getAttribute('data-bot') === bot) t.classList.add('active');
+    });
+  } else {
+    tabs[0].classList.add('active');
+  }
+  renderChart(dashData);
+}
+
+function updateChartsTheme() {
+  if (!dailyChart) return;
+  var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  var gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(15, 23, 42, 0.05)';
+  var tickColor = isDark ? '#94a3b8' : '#475569';
+  
+  dailyChart.options.scales.x.grid.color = gridColor;
+  dailyChart.options.scales.y.grid.color = gridColor;
+  dailyChart.options.scales.x.ticks.color = tickColor;
+  dailyChart.options.scales.y.ticks.color = tickColor;
+  dailyChart.options.plugins.legend.labels.color = tickColor;
+  dailyChart.update();
+}
+
+function renderChart(d) {
+  if (!d || !d.daily_stats) return;
+  var stats = chartFilter && d.bot_daily ? (d.bot_daily[chartFilter] || []) : d.daily_stats;
+  if (dailyChart) {
+    dailyChart.destroy();
+    dailyChart = null;
+  }
+  if (!stats || !stats.length) return;
+  
+  var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  var gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(15, 23, 42, 0.05)';
+  var tickColor = isDark ? '#94a3b8' : '#475569';
+  
+  var canvasCtx = document.getElementById('dailyChart').getContext('2d');
+  
+  var repliesGrad = canvasCtx.createLinearGradient(0, 0, 0, 220);
+  repliesGrad.addColorStop(0, 'rgba(99, 102, 241, 0.3)');
+  repliesGrad.addColorStop(1, 'rgba(99, 102, 241, 0.0)');
+  
+  var messagesGrad = canvasCtx.createLinearGradient(0, 0, 0, 220);
+  messagesGrad.addColorStop(0, 'rgba(16, 185, 129, 0.3)');
+  messagesGrad.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+  
+  var failuresGrad = canvasCtx.createLinearGradient(0, 0, 0, 220);
+  failuresGrad.addColorStop(0, 'rgba(239, 68, 68, 0.3)');
+  failuresGrad.addColorStop(1, 'rgba(239, 68, 68, 0.0)');
+
+  dailyChart = new Chart(canvasCtx, {
+    type: 'line',
+    data: {
+      labels: stats.map(function(s) { return s.date ? s.date.slice(5) : '?'; }),
+      datasets: [
+        {
+          label: 'Replies',
+          data: stats.map(function(s) { return s.replies; }),
+          backgroundColor: repliesGrad,
+          borderColor: '#6366f1',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.35,
+          pointBackgroundColor: '#6366f1',
+          pointHoverRadius: 6
+        },
+        {
+          label: 'Messages',
+          data: stats.map(function(s) { return s.messages; }),
+          backgroundColor: messagesGrad,
+          borderColor: '#10b981',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.35,
+          pointBackgroundColor: '#10b981',
+          pointHoverRadius: 6
+        },
+        {
+          label: 'Failures',
+          data: stats.map(function(s) { return s.failures; }),
+          backgroundColor: failuresGrad,
+          borderColor: '#ef4444',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.35,
+          pointBackgroundColor: '#ef4444',
+          pointHoverRadius: 6
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          labels: {
+            color: tickColor,
+            boxWidth: 12,
+            font: { size: 11, family: 'Plus Jakarta Sans', weight: '500' }
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: tickColor, font: { size: 10, family: 'Plus Jakarta Sans' } },
+          grid: { color: gridColor }
+        },
+        y: {
+          ticks: { color: tickColor, font: { size: 10, family: 'Plus Jakarta Sans' } },
+          grid: { color: gridColor }
+        }
+      }
+    }
+  });
+}
+
+function loadOverview() {
+  fetch('/api/overview')
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (!d.ok) return;
+      dashData = d;
+      document.getElementById('page-subtitle').textContent = 'Live telemetry status • Last updated ' + fmtDateTime(d.now);
+      document.getElementById('cards').innerHTML =
+        '<div class="card"><div class="label">Active Accounts</div><div class="value green">' + d.active_count + '</div></div>' +
+        '<div class="card"><div class="label">Failed Accounts</div><div class="value red">' + d.failed_count + '</div></div>' +
+        '<div class="card"><div class="label">Replies Today</div><div class="value blue">' + d.today.replies + '</div></div>' +
+        '<div class="card"><div class="label">Messages Today</div><div class="value blue">' + d.today.messages + '</div></div>' +
+        '<div class="card"><div class="label">Failures Today</div><div class="value yellow">' + d.today.failures + '</div></div>' +
+        '<div class="card"><div class="label">Login Failures Today</div><div class="value red">' + d.today.login_failures + '</div></div>';
+      
+      // Attention Required alert handling
+      var alertPanel = document.getElementById('attention-alert');
+      var failedAccts = (d.accounts || []).filter(function(a) { return a.status === 'logged_out'; });
+      if (failedAccts.length > 0) {
+        var alertList = '';
+        failedAccts.forEach(function(a) {
+          alertList += '<li style="margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">' +
+            '<span class="status logged_out" style="padding: 2px 6px; font-size: 10px; line-height:1.2;">Logged Out</span>' +
+            '<span>Account <a href="/account/' + encodeURIComponent(a.name) + '" style="color:var(--accent); text-decoration:none; font-weight:600;">' + esc(a.name) + '</a> on <b>' + esc(a.bot_name) + '</b></span>' +
+            '</li>';
+        });
+        document.getElementById('alert-list').innerHTML = alertList;
+        alertPanel.style.display = 'block';
+      } else {
+        alertPanel.style.display = 'none';
+      }
+
+      renderBotsList();
+      
+      var tabs = '<div class="chart-tab active" data-bot="" onclick="setChartFilter(\'\')">All Bots</div>';
+      (d.bots || []).forEach(function(b) {
+        tabs += '<div class="chart-tab' + (chartFilter === b ? ' active' : '') + '" data-bot="' + esc(b) + '" onclick="setChartFilter(\'' + esc(b) + '\')">' + esc(b) + '</div>';
+      });
+      document.getElementById('chart-tabs').innerHTML = tabs;
+      renderChart(d);
+    })
+    .catch(function() {
+      toast('Failed to load overview data', 'error');
+    });
+}
+
+function renderBotsList() {
+  if (!dashData) return;
+  var d = dashData;
+  var searchQuery = document.getElementById('bot-search').value.toLowerCase();
+  var grid = '';
+  
+  (d.bots || []).forEach(function(botName) {
+    if (searchQuery && botName.toLowerCase().indexOf(searchQuery) === -1) {
+      return;
+    }
+    
+    // Find today's stats for this bot, fallback to zeros if bot didn't run today
+    var b = (d.bots_today || []).find(function(bt) { return bt.bot_name === botName; }) || {
+      bot_name: botName,
+      replies: 0,
+      messages: 0,
+      failures: 0,
+      login_failures: 0
+    };
+    
+    var accts = d.bot_accounts && d.bot_accounts[botName] ? d.bot_accounts[botName] : { active: 0, failed: 0, total: 0 };
+    var dot = 'gray';
+    if (accts.active > 0) dot = 'green';
+    else if (accts.failed > 0) dot = 'red';
+    
+    // Filter active and failed account names for this bot
+    var botAccountsList = (d.accounts || []).filter(function(a) { return a.bot_name === botName; });
+    var activeNames = botAccountsList.filter(function(a) { return a.status === 'active' || a.status === 'running'; }).map(function(a) { return a.name; });
+    var failedNames = botAccountsList.filter(function(a) { return a.status === 'logged_out'; }).map(function(a) { return a.name; });
+    
+    var activeText = activeNames.length > 0 ? ' <small style="color:var(--text3); font-weight:normal;">(' + activeNames.join(', ') + ')</small>' : '';
+    var failedText = failedNames.length > 0 ? ' <small style="color:var(--text3); font-weight:normal;">(' + failedNames.join(', ') + ')</small>' : '';
+    
+    grid += '<a href="/bot/' + encodeURIComponent(botName) + '" class="bot-card">' +
+      '<div class="top">' +
+        '<div class="bot-info"><span class="dot ' + dot + '"></span><span class="bname">' + esc(botName) + '</span></div>' +
+        '<span style="font-size: 10px; color: var(--text3);">View Profile →</span>' +
+      '</div>' +
+      '<div class="stats">' +
+        '<div class="row"><span>Active Accounts</span><span class="val" style="color:var(--green)">' + accts.active + activeText + '</span></div>' +
+        '<div class="row"><span>Failed Accounts</span><span class="val" style="color:var(--red)">' + accts.failed + failedText + '</span></div>' +
+        '<div class="row"><span>Replies</span><span class="val">' + b.replies + '</span></div>' +
+        '<div class="row"><span>Messages</span><span class="val">' + b.messages + '</span></div>' +
+        '<div class="row"><span>Failures</span><span class="val" style="color:' + (b.failures > 0 ? 'var(--yellow)' : 'inherit') + '">' + b.failures + '</span></div>' +
+        '<div class="row"><span>Login Fails</span><span class="val" style="color:' + ((b.login_failures || 0) > 0 ? 'var(--red)' : 'inherit') + '">' + (b.login_failures || 0) + '</span></div>' +
+      '</div></a>';
+  });
+  
+  document.getElementById('bot-grid').innerHTML = grid || '<div class="e">No matching bots found</div>';
+}
+
+function filterBots() {
+  renderBotsList();
+}
+
+document.getElementById('menu-overview').classList.add('active');
+initTheme();
+loadOverview();
+loadSidebarBots('');
+setupRefresh();
+</script>
+</body>
+</html>

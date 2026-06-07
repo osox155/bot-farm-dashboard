@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>__BOT_NAME__ - Bot Farm</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<style>
+/*SHARED_CSS*/
+</style>
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-brand">
+    <div class="sidebar-logo">B</div>
+    <h2>Bot Farm</h2>
+  </div>
+  <div class="sidebar-menu">
+    <a href="/" id="menu-overview">📊 Dashboard</a>
+    <a href="/history" id="menu-history">🕒 Session History</a>
+    <div class="sidebar-menu-title">Bots</div>
+    <div class="sidebar-bots-list" id="sidebar-bots-list"></div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="header">
+    <div class="header-left">
+      <a href="/" style="color: var(--accent); text-decoration: none; font-size: 13px; font-weight: 600;">← Back to Overview</a>
+      <h1 style="margin-top: 4px;">🤖 __BOT_NAME__</h1>
+      <p id="sub">Loading bot profiles...</p>
+    </div>
+    <div class="header-right">
+      <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+      <button class="btn btn-outline" onclick="load()">↻</button>
+      <button class="btn btn-danger" onclick="confirmWipeBot()">✕ Wipe Bot Data</button>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="cards" id="cards"></div>
+    
+    <div class="two-col-row">
+      <div class="panel">
+        <div class="panel-header">
+          <h3>Tracked Accounts</h3>
+          <div class="search-box">
+            <input type="text" id="account-search" placeholder="Search accounts..." oninput="filterAccounts()">
+          </div>
+        </div>
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Account</th>
+                <th>Status</th>
+                <th>Action</th>
+                <th>Last Active</th>
+              </tr>
+            </thead>
+            <tbody id="accounts-table">
+              <tr><td colspan="4" class="e">Loading accounts...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <div class="panel">
+        <div class="panel-header">
+          <h3>Recent Events Log</h3>
+          <div class="search-box">
+            <input type="text" id="event-search" placeholder="Search events..." oninput="filterEvents()">
+          </div>
+        </div>
+        <div class="events" id="events">
+          <div class="e">Loading events...</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-section">
+      <h3>Bot Activity History (14 days)</h3>
+      <div style="height: 220px; position: relative;">
+        <canvas id="chart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal-box">
+    <h3 id="modal-title">Confirm</h3>
+    <p id="modal-text">Are you sure?</p>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-danger" id="modal-confirm" onclick="confirmModal()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/*SHARED_JS*/
+
+const bot = '__BOT_NAME__';
+let chart = null, botData = null;
+
+function confirmWipeBot() {
+  showModal(
+    'Wipe Bot Data',
+    'Are you sure you want to delete all historical logs, events, session history, and account links for the bot "' + bot + '"? This cannot be undone.',
+    function() {
+      fetch('/api/reset/bot/' + encodeURIComponent(bot), { method: 'POST' })
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+          if (d.ok) {
+            toast('Bot "' + bot + '" data wiped successfully', 'success');
+            window.location.href = '/';
+          } else {
+            toast(d.error || 'Failed to wipe data', 'error');
+          }
+        })
+        .catch(function() {
+          toast('Network error wiping bot data', 'error');
+        });
+    }
+  );
+}
+
+function updateChartsTheme() {
+  if (!chart) return;
+  var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  var gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(15, 23, 42, 0.05)';
+  var tickColor = isDark ? '#94a3b8' : '#475569';
+  
+  chart.options.scales.x.grid.color = gridColor;
+  chart.options.scales.y.grid.color = gridColor;
+  chart.options.scales.x.ticks.color = tickColor;
+  chart.options.scales.y.ticks.color = tickColor;
+  chart.options.plugins.legend.labels.color = tickColor;
+  chart.update();
+}
+
+function renderChart(d) {
+  if (!d.daily_stats || !d.daily_stats.length) return;
+  if (chart) {
+    chart.destroy();
+    chart = null;
+  }
+  
+  var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  var gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(15, 23, 42, 0.05)';
+  var tickColor = isDark ? '#94a3b8' : '#475569';
+  
+  var canvasCtx = document.getElementById('chart').getContext('2d');
+  
+  var repliesGrad = canvasCtx.createLinearGradient(0, 0, 0, 220);
+  repliesGrad.addColorStop(0, 'rgba(99, 102, 241, 0.25)');
+  repliesGrad.addColorStop(1, 'rgba(99, 102, 241, 0.0)');
+  
+  var messagesGrad = canvasCtx.createLinearGradient(0, 0, 0, 220);
+  messagesGrad.addColorStop(0, 'rgba(16, 185, 129, 0.25)');
+  messagesGrad.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+  
+  var failuresGrad = canvasCtx.createLinearGradient(0, 0, 0, 220);
+  failuresGrad.addColorStop(0, 'rgba(239, 68, 68, 0.25)');
+  failuresGrad.addColorStop(1, 'rgba(239, 68, 68, 0.0)');
+
+  chart = new Chart(canvasCtx, {
+    type: 'line',
+    data: {
+      labels: d.daily_stats.map(function(s) { return s.date ? s.date.slice(5) : '?'; }),
+      datasets: [
+        {
+          label: 'Replies',
+          data: d.daily_stats.map(function(s) { return s.replies; }),
+          backgroundColor: repliesGrad,
+          borderColor: '#6366f1',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.35,
+          pointBackgroundColor: '#6366f1'
+        },
+        {
+          label: 'Messages',
+          data: d.daily_stats.map(function(s) { return s.messages; }),
+          backgroundColor: messagesGrad,
+          borderColor: '#10b981',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.35,
+          pointBackgroundColor: '#10b981'
+        },
+        {
+          label: 'Failures',
+          data: d.daily_stats.map(function(s) { return s.failures; }),
+          backgroundColor: failuresGrad,
+          borderColor: '#ef4444',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.35,
+          pointBackgroundColor: '#ef4444'
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          labels: {
+            color: tickColor,
+            boxWidth: 12,
+            font: { size: 11, family: 'Plus Jakarta Sans', weight: '500' }
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: tickColor, font: { size: 10, family: 'Plus Jakarta Sans' } },
+          grid: { color: gridColor }
+        },
+        y: {
+          ticks: { color: tickColor, font: { size: 10, family: 'Plus Jakarta Sans' } },
+          grid: { color: gridColor }
+        }
+      }
+    }
+  });
+}
+
+function load() {
+  fetch('/api/bot/' + encodeURIComponent(bot))
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (!d.ok) return;
+      botData = d;
+      var ac = d.accounts || [];
+      document.getElementById('sub').textContent = ac.length + ' accounts linked to this bot profile';
+      
+      var activeCount = ac.filter(function(a) { return a.status === 'active' || a.status === 'running'; }).length;
+      var failedCount = ac.filter(function(a) { return a.status === 'logged_out'; }).length;
+      
+      document.getElementById('cards').innerHTML =
+        '<div class="card"><div class="label">Active Accounts</div><div class="value green">' + activeCount + '</div></div>' +
+        '<div class="card"><div class="label">Failed Accounts</div><div class="value red">' + failedCount + '</div></div>' +
+        '<div class="card"><div class="label">Replies Today</div><div class="value blue">' + d.today.replies + '</div></div>' +
+        '<div class="card"><div class="label">Messages Today</div><div class="value blue">' + d.today.messages + '</div></div>' +
+        '<div class="card"><div class="label">Failures Today</div><div class="value yellow">' + d.today.failures + '</div></div>' +
+        '<div class="card"><div class="label">Login Failures Today</div><div class="value red">' + d.today.login_failures + '</div></div>';
+      
+      renderAccountsTable();
+      renderEventsList();
+      renderChart(d);
+    })
+    .catch(function() {
+      toast('Failed to load bot details', 'error');
+    });
+}
+
+function renderAccountsTable() {
+  if (!botData) return;
+  var ac = botData.accounts || [];
+  var searchQuery = document.getElementById('account-search').value.toLowerCase();
+  
+  var filtered = ac.filter(function(a) {
+    return !searchQuery || a.name.toLowerCase().indexOf(searchQuery) !== -1;
+  });
+  
+  document.getElementById('accounts-table').innerHTML = filtered.map(function(a) {
+    var optActive = a.status === 'active' ? 'selected' : '';
+    var optPaused = a.status === 'paused' ? 'selected' : '';
+    var optLoggedOut = a.status === 'logged_out' ? 'selected' : '';
+    
+    var selectHtml = '<select class="status-select" onchange="updateAccountStatus(\'' + esc(a.name) + '\', this.value)">' +
+      '<option value="active" ' + optActive + '>Activate</option>' +
+      '<option value="paused" ' + optPaused + '>Pause</option>' +
+      '<option value="logged_out" ' + optLoggedOut + '>Log Out</option>' +
+      '</select>';
+
+    return '<tr>' +
+      '<td><a href="/account/' + encodeURIComponent(a.name) + '" style="color:var(--accent); text-decoration:none; font-weight:600;">' + esc(a.name) + '</a></td>' +
+      '<td><span class="status ' + a.status + '">' + a.status + '</span></td>' +
+      '<td>' + selectHtml + '</td>' +
+      '<td style="color:var(--text3); font-size:12px;">' + fmtDateTime(a.last_active) + '</td>' +
+      '</tr>';
+  }).join('') || '<tr><td colspan="4" class="e">No matching accounts found</td></tr>';
+}
+
+function updateAccountStatus(accountName, newStatus) {
+  changeAccountStatus(accountName, newStatus, bot, function() {
+    load();
+  });
+}
+
+function renderEventsList() {
+  if (!botData) return;
+  var ev = botData.events || [];
+  var searchQuery = document.getElementById('event-search').value.toLowerCase();
+  
+  var filtered = ev.filter(function(e) {
+    if (!searchQuery) return true;
+    var matchName = e.account_name && e.account_name.toLowerCase().indexOf(searchQuery) !== -1;
+    var matchType = e.event_type && e.event_type.toLowerCase().indexOf(searchQuery) !== -1;
+    return matchName || matchType;
+  });
+  
+  document.getElementById('events').innerHTML = filtered.map(function(e) {
+    var acNameLink = e.account_name ? ' <a href="/account/' + encodeURIComponent(e.account_name) + '" class="ac">' + esc(e.account_name) + '</a>' : '';
+    return '<div class="ev">' +
+      '<span class="time">' + fmtDateTime(e.created_at) + '</span>' +
+      '<span>● ' + fmtType(e.event_type) + acNameLink + '</span>' +
+      '</div>';
+  }).join('') || '<div class="e">No matching events found</div>';
+}
+
+function filterAccounts() {
+  renderAccountsTable();
+}
+
+function filterEvents() {
+  renderEventsList();
+}
+
+initTheme();
+load();
+loadSidebarBots(bot);
+setInterval(load, 10000);
+</script>
+</body>
+</html>

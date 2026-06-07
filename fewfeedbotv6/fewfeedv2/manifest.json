@@ -1,0 +1,51 @@
+{
+    "name": "FewFeed V3",
+    "version": "9.3",
+    "manifest_version": 3,
+    "description": "FewFeed V3.9.3",
+    "background": {
+        "service_worker": "bg.js"
+    },
+    "action": {},
+    "content_scripts": [
+        {
+            "matches": [
+                "https://fewfeed.app/*",
+                "https://fewfeed.online/*"
+            ],
+            "js": [
+                "inject.js"
+            ],
+            "run_at": "document_start",
+            "world": "MAIN",
+            "all_frames": true
+        },
+        {
+            "matches": [
+                "https://fewfeed.app/*",
+                "https://fewfeed.online/*"
+            ],
+            "js": [
+                "content.js"
+            ],
+            "all_frames": true
+        }
+    ],
+    "icons": {
+        "16": "icon.png",
+        "48": "icon.png",
+        "128": "icon.png"
+    },
+    "permissions": [
+        "declarativeNetRequest",
+        "declarativeNetRequestFeedback",
+        "declarativeNetRequestWithHostAccess",
+        "cookies",
+        "tabs",
+        "storage",
+        "scripting"
+    ],
+    "host_permissions": [
+        "*://*/*"
+    ]
+}
