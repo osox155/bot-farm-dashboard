@@ -13,6 +13,7 @@
 </style>
 </head>
 <body>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 <div class="sidebar">
   <div class="sidebar-brand">
     <div class="sidebar-logo">B</div>
@@ -29,7 +30,10 @@
 <div class="main">
   <div class="header">
     <div class="header-left">
-      <a href="/" style="color: var(--accent); text-decoration: none; font-size: 13px; font-weight: 600;">← Back to Overview</a>
+      <div style="display:flex; align-items:center;">
+        <button class="hamburger" id="hamburger" onclick="toggleSidebar()">☰</button>
+        <a href="/" style="color: var(--accent); text-decoration: none; font-size: 13px; font-weight: 600;">← Back to Overview</a>
+      </div>
       <h1 style="margin-top: 4px;">🤖 __BOT_NAME__</h1>
       <p id="sub">Loading bot profiles...</p>
     </div>

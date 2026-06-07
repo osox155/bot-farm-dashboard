@@ -12,6 +12,7 @@
 </style>
 </head>
 <body>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 <div class="sidebar">
   <div class="sidebar-brand">
     <div class="sidebar-logo">B</div>
@@ -28,7 +29,10 @@
 <div class="main">
   <div class="header">
     <div class="header-left">
-      <h1>Session History</h1>
+      <div style="display:flex; align-items:center;">
+        <button class="hamburger" id="hamburger" onclick="toggleSidebar()">☰</button>
+        <h1>Session History</h1>
+      </div>
       <p id="page-subtitle">Historical bot session execution logs</p>
     </div>
     <div class="header-right">

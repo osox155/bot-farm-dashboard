@@ -764,8 +764,142 @@ tr:hover td {
   margin-bottom: 24px;
 }
 
-@media (max-width: 1024px) {
+.hamburger {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  margin-right: 12px;
+  line-height: 1;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: background 0.2s;
+  display: none;
+  flex-shrink: 0;
+}
+
+.hamburger:hover {
+  background: var(--hover);
+}
+
+.sidebar-overlay {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .hamburger {
+    display: flex;
+  }
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 98;
+  }
+  .sidebar-overlay.show {
+    display: block;
+  }
+  .sidebar {
+    position: fixed;
+    left: 0; top: 0;
+    z-index: 99;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  body.sidebar-open {
+    overflow: hidden;
+  }
+  .main-content {
+    padding: 16px;
+  }
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .header-right {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .header-left h1 {
+    font-size: 20px;
+  }
+  .cards {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+  }
+  .card .value {
+    font-size: 22px;
+  }
+  .bot-grid {
+    grid-template-columns: 1fr;
+  }
+  .search-box input {
+    width: 140px;
+  }
   .two-col-row {
     grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .chart-section {
+    padding: 16px;
+  }
+  .panel {
+    padding: 16px;
+  }
+  .modal-box {
+    width: 95%;
+    padding: 20px;
+  }
+  .toast {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    max-width: none;
+  }
+  table {
+    font-size: 12px;
+  }
+  th, td {
+    padding: 8px 10px;
+  }
+  .events .ev .time {
+    width: 80px;
+  }
+  .sidebar-bots-list a {
+    padding: 8px 24px 8px 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cards {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .card {
+    padding: 14px;
+  }
+  .card .value {
+    font-size: 18px;
+  }
+  .card .label {
+    font-size: 10px;
+  }
+  .header-left h1 {
+    font-size: 17px;
+  }
+  .main-content {
+    padding: 12px;
+  }
+  .search-box input {
+    width: 100px;
   }
 }

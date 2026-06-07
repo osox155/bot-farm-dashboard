@@ -146,3 +146,24 @@ function esc(s) {
 function fmtType(t) {
   return t.replace(/_/g,' ').replace(/\b\w/g, function(c){return c.toUpperCase()});
 }
+
+function toggleSidebar() {
+  var sidebar = document.querySelector('.sidebar');
+  var overlay = document.getElementById('sidebarOverlay');
+  var isOpen = sidebar.classList.contains('open');
+  if (isOpen) {
+    closeSidebar();
+  } else {
+    sidebar.classList.add('open');
+    if (overlay) overlay.classList.add('show');
+    document.body.classList.add('sidebar-open');
+  }
+}
+
+function closeSidebar() {
+  var sidebar = document.querySelector('.sidebar');
+  var overlay = document.getElementById('sidebarOverlay');
+  sidebar.classList.remove('open');
+  if (overlay) overlay.classList.remove('show');
+  document.body.classList.remove('sidebar-open');
+}

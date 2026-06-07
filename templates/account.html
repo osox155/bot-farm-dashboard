@@ -12,6 +12,7 @@
 </style>
 </head>
 <body>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 <div class="sidebar">
   <div class="sidebar-brand">
     <div class="sidebar-logo">B</div>
@@ -28,7 +29,10 @@
 <div class="main">
   <div class="header">
     <div class="header-left">
-      <a href="/" style="color: var(--accent); text-decoration: none; font-size: 13px; font-weight: 600;">← Back to Dashboard</a>
+      <div style="display:flex; align-items:center;">
+        <button class="hamburger" id="hamburger" onclick="toggleSidebar()">☰</button>
+        <a href="/" style="color: var(--accent); text-decoration: none; font-size: 13px; font-weight: 600;">← Back to Dashboard</a>
+      </div>
       <div style="display: flex; align-items: center; gap: 12px; margin-top: 4px;">
         <h1>👤 __ACCOUNT_NAME__</h1>
         <div id="status-container"></div>

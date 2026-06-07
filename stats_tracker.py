@@ -99,11 +99,14 @@ def _supa_patch(table, data, query):
 
 def _supa_delete(table, query):
     if not _API_BASE:
-        return
-    try:
-        _requests.delete(f"{_API_BASE}/{table}", headers=_HEADERS, params=query, timeout=10)
-    except Exception:
-        pass
+        return {"error": "No API base URL"}
+    headers = dict(_HEADERS)
+    if not query:
+        headers["Prefer"] = "count=planned"
+    r = _requests.delete(f"{_API_BASE}/{table}", headers=headers, params=query, timeout=10)
+    if r.status_code not in (200, 204):
+        raise Exception(f"DELETE {table} failed: {r.status_code} {r.text[:200]}")
+    return r.json() if r.status_code == 200 and r.text.strip() else []
 
 def _supa_upsert(table, data, on_conflict):
     if not _API_BASE:
