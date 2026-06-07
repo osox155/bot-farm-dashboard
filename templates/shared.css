@@ -328,6 +328,14 @@ body {
 .card .value.red { color: var(--red); }
 .card .value.blue { color: var(--accent); }
 .card .value.yellow { color: var(--yellow); }
+.card .value.gray { color: var(--text2); }
+
+.card .sub {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 6px;
+  font-weight: 500;
+}
 
 .bot-grid {
   display: grid;
@@ -388,6 +396,11 @@ body {
 
 .bot-card .dot.gray {
   background: var(--text3);
+}
+
+.bot-card .dot.yellow {
+  background: var(--yellow);
+  box-shadow: 0 0 10px var(--yellow);
 }
 
 @keyframes pulse {

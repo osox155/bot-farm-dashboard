@@ -2,7 +2,7 @@ import json
 import os
 import time
 import threading
-from datetime import datetime, date
+from datetime import datetime, date, timezone
 
 try:
     import requests as _requests
@@ -58,7 +58,16 @@ def _parse_ts(val):
         return None
     if isinstance(val, str):
         try:
-            dt = datetime.fromisoformat(val.replace("Z", ""))
+            # Timestamps are stored in UTC (suffixed with "Z"). Parse them as
+            # timezone-aware UTC so .timestamp() yields the correct epoch on any
+            # machine; otherwise a naive parse is treated as local time and the
+            # value is wrong by the local UTC offset (breaks offline detection).
+            s = val.strip()
+            if s.endswith("Z"):
+                s = s[:-1] + "+00:00"
+            dt = datetime.fromisoformat(s)
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
             return dt.timestamp()
         except Exception:
             return val

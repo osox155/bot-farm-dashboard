@@ -93,6 +93,9 @@ def api_overview():
 
         active_count = sum(1 for a in accounts if a["status"] in ("active", "running"))
         failed_count = sum(1 for a in accounts if a["status"] == "logged_out")
+        offline_count = sum(1 for a in accounts if a["status"] == "offline")
+        paused_count = sum(1 for a in accounts if a["status"] == "paused")
+        total_count = len(accounts)
 
         for e in recent:
             e["created_at"] = _fmt_ts(e["created_at"])
@@ -105,7 +108,7 @@ def api_overview():
 
         bot_accounts = {}
         for b in bots:
-            bot_accounts[b] = {"active": 0, "failed": 0, "total": 0}
+            bot_accounts[b] = {"active": 0, "failed": 0, "offline": 0, "total": 0}
         for a in accounts:
             bn = a.get("bot_name", "")
             if bn in bot_accounts:
@@ -114,11 +117,16 @@ def api_overview():
                     bot_accounts[bn]["active"] += 1
                 elif a["status"] == "logged_out":
                     bot_accounts[bn]["failed"] += 1
+                elif a["status"] == "offline":
+                    bot_accounts[bn]["offline"] += 1
 
         return json.dumps({
             "ok": True,
             "active_count": active_count,
             "failed_count": failed_count,
+            "offline_count": offline_count,
+            "paused_count": paused_count,
+            "total_count": total_count,
             "accounts": accounts,
             "today": today,
             "bots_today": bots_today,
@@ -183,7 +191,8 @@ def api_account(name):
 def api_sessions():
     response.content_type = 'application/json'
     try:
-        sessions = tracker.get_sessions(limit=20)
+        bot = request.query.get("bot") or None
+        sessions = tracker.get_sessions(limit=50, bot_name=bot)
         for s in sessions:
             s["started_at"] = _fmt_ts(s["started_at"])
             s["ended_at"] = _fmt_ts(s["ended_at"])
@@ -294,7 +303,10 @@ def _fmt_ts(ts):
         return None
     try:
         if isinstance(ts, (int, float)):
-            return datetime.fromtimestamp(ts).isoformat() + "Z"
+            # ts is a UTC epoch; emit a UTC ISO string so the browser converts
+            # it to the viewer's local time. Using fromtimestamp() here would
+            # bake in the server's local offset and then mislabel it "Z".
+            return datetime.utcfromtimestamp(ts).isoformat() + "Z"
         if isinstance(ts, str):
             if "T" in ts:
                 return ts
