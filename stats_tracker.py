@@ -148,9 +148,14 @@ class StatsTracker:
         ts = _iso_now()
         with _lock:
             for acc in self._accounts:
+                # Register the account roster as "idle" — known but NOT yet
+                # running. An account only becomes "active" once it actually
+                # logs in (log_login_success) or performs an action (log_event).
+                # Marking them "active" here would make every known account look
+                # launched even when only a couple were actually started.
                 _supa_upsert("accounts", {
                     "name": acc, "bot_name": self._bot_name,
-                    "last_active": ts, "status": "active"
+                    "last_active": ts, "status": "idle"
                 }, on_conflict="name,bot_name")
 
             _supa_post("sessions", {
@@ -325,6 +330,22 @@ class StatsTracker:
         for r in rows:
             out.append({
                 "name": r["name"],
+                "bot_name": r.get("bot_name", ""),
+                "status": r.get("status", "unknown"),
+                "last_active": _parse_ts(r.get("last_active"))
+            })
+        return out
+
+    def get_account_status(self, account_name):
+        """Return the stored status of an account across every bot it belongs to."""
+        rows = _supa_get("accounts", {
+            "select": "bot_name,status,last_active",
+            "name": f"eq.{account_name}",
+            "order": "last_active.desc.nullslast"
+        })
+        out = []
+        for r in rows:
+            out.append({
                 "bot_name": r.get("bot_name", ""),
                 "status": r.get("status", "unknown"),
                 "last_active": _parse_ts(r.get("last_active"))

@@ -292,7 +292,7 @@ function loadOverview() {
       hideConnError();
       dashData = d;
       document.getElementById('page-subtitle').textContent = 'Live telemetry status • Last updated ' + fmtDateTime(d.now);
-      var offline = d.offline_count || 0;
+      var idle = d.idle_count || 0;
       var total = (typeof d.total_count === 'number') ? d.total_count : (d.accounts || []).length;
       var paused = d.paused_count || 0;
       var actSent = (d.today.replies || 0) + (d.today.messages || 0);
@@ -301,11 +301,11 @@ function loadOverview() {
 
       document.getElementById('cards').innerHTML =
         '<div class="card"><div class="label">Total Accounts</div><div class="value">' + total + '</div>' +
-          '<div class="sub">' + d.active_count + ' active · ' + offline + ' idle · ' + d.failed_count + ' failed' + (paused ? ' · ' + paused + ' paused' : '') + '</div></div>' +
-        '<div class="card"><div class="label">Active Accounts</div><div class="value green">' + d.active_count + '</div>' +
-          '<div class="sub">Seen in the last 5 min</div></div>' +
-        '<div class="card"><div class="label">Idle / Offline</div><div class="value gray">' + offline + '</div>' +
-          '<div class="sub">No activity &gt; 5 min</div></div>' +
+          '<div class="sub">' + d.active_count + ' running · ' + idle + ' idle · ' + d.failed_count + ' failed' + (paused ? ' · ' + paused + ' paused' : '') + '</div></div>' +
+        '<div class="card"><div class="label">Running Accounts</div><div class="value green">' + d.active_count + '</div>' +
+          '<div class="sub">Logged in &amp; active</div></div>' +
+        '<div class="card"><div class="label">Idle / Not Running</div><div class="value gray">' + idle + '</div>' +
+          '<div class="sub">Registered or silent &gt; 5 min</div></div>' +
         '<div class="card"><div class="label">Failed Accounts</div><div class="value red">' + d.failed_count + '</div>' +
           '<div class="sub">Logged out / cookie expired</div></div>' +
         '<div class="card"><div class="label">Replies Today</div><div class="value blue">' + (d.today.replies || 0) + '</div></div>' +
@@ -366,16 +366,16 @@ function renderBotsList() {
       login_failures: 0
     };
     
-    var accts = d.bot_accounts && d.bot_accounts[botName] ? d.bot_accounts[botName] : { active: 0, failed: 0, offline: 0, total: 0 };
+    var accts = d.bot_accounts && d.bot_accounts[botName] ? d.bot_accounts[botName] : { active: 0, failed: 0, idle: 0, total: 0 };
     var dot = 'gray';
     if (accts.active > 0) dot = 'green';
     else if (accts.failed > 0) dot = 'red';
-    else if (accts.offline > 0) dot = 'yellow';
+    else if (accts.idle > 0) dot = 'yellow';
 
     // Filter active, idle and failed account names for this bot
     var botAccountsList = (d.accounts || []).filter(function(a) { return a.bot_name === botName; });
     var activeNames = botAccountsList.filter(function(a) { return a.status === 'active' || a.status === 'running'; }).map(function(a) { return a.name; });
-    var offlineNames = botAccountsList.filter(function(a) { return a.status === 'offline'; }).map(function(a) { return a.name; });
+    var idleNames = botAccountsList.filter(function(a) { return a.status === 'idle' || a.status === 'offline'; }).map(function(a) { return a.name; });
     var failedNames = botAccountsList.filter(function(a) { return a.status === 'logged_out'; }).map(function(a) { return a.name; });
 
     function names(list) { return list.length > 0 ? ' <small style="color:var(--text3); font-weight:normal;">(' + list.map(esc).join(', ') + ')</small>' : ''; }
@@ -386,8 +386,8 @@ function renderBotsList() {
         '<span style="font-size: 10px; color: var(--text3);">View Profile →</span>' +
       '</div>' +
       '<div class="stats">' +
-        '<div class="row"><span>Active Accounts</span><span class="val" style="color:var(--green)">' + accts.active + names(activeNames) + '</span></div>' +
-        '<div class="row"><span>Idle Accounts</span><span class="val" style="color:var(--text2)">' + (accts.offline || 0) + names(offlineNames) + '</span></div>' +
+        '<div class="row"><span>Running Accounts</span><span class="val" style="color:var(--green)">' + accts.active + names(activeNames) + '</span></div>' +
+        '<div class="row"><span>Idle Accounts</span><span class="val" style="color:var(--text2)">' + (accts.idle || 0) + names(idleNames) + '</span></div>' +
         '<div class="row"><span>Failed Accounts</span><span class="val" style="color:var(--red)">' + accts.failed + names(failedNames) + '</span></div>' +
         '<div class="row"><span>Total Accounts</span><span class="val">' + (accts.total || 0) + '</span></div>' +
         '<div class="row"><span>Replies</span><span class="val">' + b.replies + '</span></div>' +

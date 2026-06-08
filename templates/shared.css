@@ -611,7 +611,7 @@ tr:hover td {
   color: var(--yellow);
 }
 
-.status.unknown, .status.offline {
+.status.unknown, .status.offline, .status.idle {
   background: var(--bg3);
   color: var(--text2);
 }

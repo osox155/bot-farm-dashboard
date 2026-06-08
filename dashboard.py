@@ -93,7 +93,9 @@ def api_overview():
 
         active_count = sum(1 for a in accounts if a["status"] in ("active", "running"))
         failed_count = sum(1 for a in accounts if a["status"] == "logged_out")
-        offline_count = sum(1 for a in accounts if a["status"] == "offline")
+        # "idle" = registered but not running; "offline" = was active, now stale.
+        # Both mean "not currently launched", so report them together.
+        idle_count = sum(1 for a in accounts if a["status"] in ("idle", "offline"))
         paused_count = sum(1 for a in accounts if a["status"] == "paused")
         total_count = len(accounts)
 
@@ -108,7 +110,7 @@ def api_overview():
 
         bot_accounts = {}
         for b in bots:
-            bot_accounts[b] = {"active": 0, "failed": 0, "offline": 0, "total": 0}
+            bot_accounts[b] = {"active": 0, "failed": 0, "idle": 0, "total": 0}
         for a in accounts:
             bn = a.get("bot_name", "")
             if bn in bot_accounts:
@@ -117,14 +119,14 @@ def api_overview():
                     bot_accounts[bn]["active"] += 1
                 elif a["status"] == "logged_out":
                     bot_accounts[bn]["failed"] += 1
-                elif a["status"] == "offline":
-                    bot_accounts[bn]["offline"] += 1
+                elif a["status"] in ("idle", "offline"):
+                    bot_accounts[bn]["idle"] += 1
 
         return json.dumps({
             "ok": True,
             "active_count": active_count,
             "failed_count": failed_count,
-            "offline_count": offline_count,
+            "idle_count": idle_count,
             "paused_count": paused_count,
             "total_count": total_count,
             "accounts": accounts,
@@ -183,7 +185,19 @@ def api_account(name):
             e["created_at"] = _fmt_ts(e["created_at"])
         for l in data["logins"]:
             l["attempted_at"] = _fmt_ts(l["attempted_at"])
-        return json.dumps({"ok": True, "account": name, "data": data})
+
+        # Real stored status per bot (with the same stale->offline rule the
+        # rest of the dashboard uses), so the page shows the true state instead
+        # of guessing from the last login attempt.
+        statuses = tracker.get_account_status(name)
+        now_ts = time.time()
+        for s in statuses:
+            la = s.get("last_active")
+            if s.get("status") in ("active", "running") and la and (now_ts - la) > 300:
+                s["status"] = "offline"
+            s["last_active"] = _fmt_ts(s["last_active"])
+
+        return json.dumps({"ok": True, "account": name, "data": data, "statuses": statuses})
     except Exception as e:
         return json.dumps({"ok": False, "error": str(e)})
 

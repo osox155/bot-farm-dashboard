@@ -134,33 +134,30 @@ function load() {
     .then(function(d) {
       if (!d.ok) return;
       accountData = d;
-      
-      // Determine account status from events / logins
-      var status = 'unknown';
-      var botName = null;
-      
-      // Check active status in accounts table or fallback
-      if (d.data.events && d.data.events.length > 0) {
-         // Find latest event or status login result
-         // Fallback to logic checking logins success
-      }
-      
-      if (d.data.logins && d.data.logins.length) {
-        status = d.data.logins[0].success ? 'active' : 'logged_out';
-        botName = d.data.logins[0].bot_name;
-      }
-      
-      var optActive = status === 'active' ? 'selected' : '';
-      var optPaused = status === 'paused' ? 'selected' : '';
-      var optLoggedOut = status === 'logged_out' ? 'selected' : '';
-      
-      document.getElementById('status-container').innerHTML = 
-        '<span class="status ' + status + '" style="margin-right:8px;">' + status + '</span>' +
-        '<select class="status-select" onchange="updateStatus(this.value, \'' + esc(botName || '') + '\')">' +
-          '<option value="active" ' + optActive + '>Activate</option>' +
-          '<option value="paused" ' + optPaused + '>Pause</option>' +
-          '<option value="logged_out" ' + optLoggedOut + '>Log Out</option>' +
-        '</select>';
+
+      // Use the real stored status from the accounts table (per bot) rather
+      // than guessing from the last login attempt.
+      var statuses = d.statuses || [];
+      document.getElementById('status-container').innerHTML = statuses.length
+        ? statuses.map(function(s) {
+            var isActive = s.status === 'active' || s.status === 'running';
+            var isIdle = s.status === 'idle' || s.status === 'offline';
+            var optActive = isActive ? 'selected' : '';
+            var optIdle = isIdle ? 'selected' : '';
+            var optPaused = s.status === 'paused' ? 'selected' : '';
+            var optLoggedOut = s.status === 'logged_out' ? 'selected' : '';
+            var botLabel = s.bot_name ? '<span class="bot-tag">' + esc(s.bot_name) + '</span>' : '';
+            return '<span style="display:inline-flex; align-items:center; gap:6px; margin-right:12px;">' +
+              botLabel +
+              '<span class="status ' + s.status + '">' + s.status + '</span>' +
+              '<select class="status-select" onchange="updateStatus(this.value, \'' + esc(s.bot_name || '') + '\')">' +
+                '<option value="active" ' + optActive + '>Activate</option>' +
+                '<option value="idle" ' + optIdle + '>Idle</option>' +
+                '<option value="paused" ' + optPaused + '>Pause</option>' +
+                '<option value="logged_out" ' + optLoggedOut + '>Log Out</option>' +
+              '</select></span>';
+          }).join('')
+        : '<span class="status unknown">unknown</span>';
 
       renderEvents();
       renderLogins();
