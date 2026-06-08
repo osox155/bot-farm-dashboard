@@ -300,7 +300,9 @@ def save_telemetry(bot_name, account, status=None, failed_logins=None, stats=Non
         import time
         import json
 
-        # Log to shared SQLite database
+        # Log to shared database (login state only). FewFeed is a posting bot;
+        # its periodic status pings carry a cumulative "posts" count and must NOT
+        # be logged as reply/message events (that inflated the dashboard counters).
         try:
             acc = str(account).replace("_cookies.json", "").replace("_cookies", "").replace(".json", "").strip()
             if failed_logins is not None and isinstance(failed_logins, dict):
@@ -308,8 +310,6 @@ def save_telemetry(bot_name, account, status=None, failed_logins=None, stats=Non
                     _ff_tracker.log_login_failure(acc, reason=list(failed_logins.values())[0])
                 else:
                     _ff_tracker.log_login_success(acc)
-            if stats:
-                _ff_tracker.log_event("message_sent" if stats.get("messages") else "reply_sent", account_name=acc)
         except Exception:
             pass
 

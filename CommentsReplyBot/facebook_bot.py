@@ -71,6 +71,11 @@ class FacebookCommentBot:
         self.recent_replies = []  # Store last 10 replies for live status
         self.current_group_url = None  # Current group being processed
         self.current_group_name = None  # Current group name
+        # Per-session counters (start at 0 each run) — these drive the dashboard
+        # so a reset truly zeroes counts even though processed_comments persists
+        # locally for de-duplication.
+        self.session_replies = 0
+        self.session_failures = 0
 
     def _jitter_sleep(self, base_seconds, jitter_key="reply_jitter"):
         """Sleep for base_seconds plus optional jitter from config. jitter_key in anti_block."""
@@ -109,7 +114,9 @@ class FacebookCommentBot:
             if account is None:
                 account = 'unknown'
 
-            # Log to shared SQLite database
+            # Log to shared database (login state only). Reply/message counts
+            # are logged separately at the real reply moment (see reply_to_comment)
+            # so periodic status pings don't inflate the dashboard counters.
             try:
                 acc_name = str(account).replace("_cookies.json", "").replace("_cookies", "").replace(".json", "").strip()
                 if failed_logins is not None and isinstance(failed_logins, dict):
@@ -117,8 +124,6 @@ class FacebookCommentBot:
                         _cr_tracker.log_login_failure(acc_name, reason=list(failed_logins.values())[0])
                     else:
                         _cr_tracker.log_login_success(acc_name)
-                if stats:
-                    _cr_tracker.log_event("message_sent" if stats.get("messages") else "reply_sent", account_name=acc_name)
             except Exception:
                 pass
 
@@ -3455,6 +3460,19 @@ class FacebookCommentBot:
             # Step 5: Send Telegram notification with correct final status
             self._send_reply_telegram_notification(username, comment_text, reply_message, final_status)
 
+            # Log the reply to the shared dashboard DB — once, here, at the real
+            # reply moment. Counted per session (not from len(processed_comments)).
+            try:
+                acc = str(getattr(self, 'account_number', '') or '').strip()
+                if final_status == 'sent':
+                    self.session_replies += 1
+                    _cr_tracker.log_event("reply_sent", account_name=acc)
+                elif final_status in ('failed', 'declined'):
+                    self.session_failures += 1
+                    _cr_tracker.log_event("reply_failed", account_name=acc)
+            except Exception:
+                pass
+
             status_emoji = {"declined": "❌", "pending": "⏳", "sent": "✅", "failed": "❌", "unconfirmed": "⚠️"}.get(final_status, "⚠️")
             verified_tag = " (verified)" if verified and final_status == "sent" else ""
             self.logger.info(f"{status_emoji} Reply to {username}: '{reply_message}' - Status: {final_status.upper()}{verified_tag}")
@@ -3464,6 +3482,11 @@ class FacebookCommentBot:
             self.logger.error("Could not submit reply")
             # Send Telegram notification for failed reply
             self._send_reply_telegram_notification(username, comment_text, reply_message, "failed")
+            try:
+                self.session_failures += 1
+                _cr_tracker.log_event("reply_failed", account_name=str(getattr(self, 'account_number', '') or '').strip())
+            except Exception:
+                pass
             return False
 
     def _check_reply_status(self, comment_element, username, reply_message):

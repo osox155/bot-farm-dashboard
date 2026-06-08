@@ -37,6 +37,17 @@ except Exception:
 bot_statistics = {}
 stats_lock = threading.Lock()
 
+def _telegram_alerts_only(config=None):
+    """True when routine Telegram status/report sends should be suppressed,
+    leaving only failed-login/logout alerts. Stats now live on the dashboard.
+    Controlled by config telegram.alerts_only (default True)."""
+    try:
+        cfg = config if config is not None else load_config()
+        tg = (cfg or {}).get('telegram', {}) or {}
+        return bool(tg.get('alerts_only', True))
+    except Exception:
+        return True
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -840,6 +851,10 @@ def _atomic_write_json(path: Path, data: dict):
         return False
 
 def send_or_update_telegram_status(text, config, force=False):
+    # Routine status updates are suppressed in alerts-only mode (stats live on
+    # the dashboard now). Failed-login alerts use a separate function.
+    if _telegram_alerts_only(config):
+        return None
     import re
     account = "Summary"
     status_line = "Running"
@@ -927,6 +942,9 @@ def send_or_update_telegram_status(text, config, force=False):
     return False
 
 def send_or_update_telegram_report(text, config, force=False):
+    # Routine summary reports are suppressed in alerts-only mode.
+    if _telegram_alerts_only(config):
+        return None
     telegram_config = (config or {}).get('telegram', {})
     bot_token = telegram_config.get('bot_token')
     chat_id = telegram_config.get('chat_id')
