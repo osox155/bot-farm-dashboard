@@ -57,7 +57,10 @@ def load_config():
                         return {
                             "bot_token": str(token).strip(),
                             "chat_id": str(chat_id).strip(),
-                            "enabled": bool(enabled)
+                            "enabled": bool(enabled),
+                            # When true (default), Telegram is used ONLY for account
+                            # login-problem alerts — no routine status/stats dashboard.
+                            "alerts_only": bool(tg.get('alerts_only', True))
                         }
             except Exception as e:
                 logger.error(f"Error reading config {p}: {e}")
@@ -90,6 +93,9 @@ class CentralTelegramNotifier:
         self.cfg = cfg
         self.token = cfg['bot_token']
         self.chat_id = cfg['chat_id']
+        # Alerts-only: push only account login-problem notifications, never the
+        # routine status/stats dashboard. Default on.
+        self.alerts_only = bool(cfg.get('alerts_only', True))
         self.state = load_broker_state()
         self.lock = threading.Lock()
         self.last_api_call = 0.0
@@ -885,15 +891,33 @@ def main():
     
     # 4. Main Update Loop
     last_status_hash = ""
-    
+
     while True:
         try:
             # Aggregate all telemetry files
             bots_data, logout_alerts, stats_data = compile_telemetry()
-            
+
+            if notifier.alerts_only:
+                # Telegram is used ONLY for account login-problem notifications,
+                # across ALL bots. compile_telemetry() already aggregates every
+                # bot's failed_logins, so this one message covers the whole farm.
+                # Push the consolidated alert when one or more accounts have a
+                # login failure / expired cookie; remove the message entirely when
+                # everything is healthy. No routine status/stats dashboard is sent.
+                alert_text = build_logout_alerts(logout_alerts)
+                alert_hash = hash(alert_text or "")
+                if alert_hash != last_status_hash:
+                    if alert_text:
+                        notifier.send_or_update(alert_text, "alerts")
+                    else:
+                        notifier.delete_message("alerts")
+                    last_status_hash = alert_hash
+                time.sleep(10)
+                continue
+
             # Check the active view mode (dashboard or specific bot details)
             view_mode = notifier.state.get("current_view", "dashboard")
-            
+
             if view_mode == "dashboard":
                 # Message 1: Status Dashboard
                 status_text = build_status_dashboard(bots_data, stats_data, logout_alerts)
@@ -918,10 +942,10 @@ def main():
                         ]
                     })
                     last_status_hash = details_hash
-                
+
         except Exception as e:
             logger.error(f"Error in broker main loop: {e}")
-            
+
         time.sleep(10)
 
 def load_config_with_retry():

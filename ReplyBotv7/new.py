@@ -37,6 +37,24 @@ except Exception:
 bot_statistics = {}
 stats_lock = threading.Lock()
 
+# --- Telegram alert/report state (module-scoped) ---
+# These were referenced throughout but never defined, so any code path that
+# touched them (notably the failed-login alert) raised NameError, which
+# propagated out of run_account into `finally: driver.quit()` and closed the
+# browser — defeating the "keep Chrome open and retry" login loop. They hold the
+# single rolling Telegram message ids (persisted to disk), the per-message edit
+# throttle timestamps, and the cross-thread lock guarding the consolidated
+# failed-login alert that all account threads share.
+_STATE_DIR = Path(__file__).resolve().parent / "telemetry_state"
+FAILED_LOGIN_STATE_FILE = _STATE_DIR / "failed_login_state.json"
+STATUS_STATE_FILE = _STATE_DIR / "status_state.json"
+REPORT_STATE_FILE = _STATE_DIR / "report_state.json"
+STATS_CHECKPOINT_FILE = _STATE_DIR / "stats_checkpoint.json"
+FAILED_LOGIN_LOCK = threading.Lock()
+LAST_FAILED_ALERT_EDIT_TS = 0.0
+LAST_STATUS_EDIT_TS = 0.0
+LAST_REPORT_EDIT_TS = 0.0
+
 def _telegram_alerts_only(config=None):
     """True when routine Telegram status/report sends should be suppressed,
     leaving only failed-login/logout alerts. Stats now live on the dashboard.
@@ -45,6 +63,19 @@ def _telegram_alerts_only(config=None):
         cfg = config if config is not None else load_config()
         tg = (cfg or {}).get('telegram', {}) or {}
         return bool(tg.get('alerts_only', True))
+    except Exception:
+        return True
+
+def _alerts_via_broker(config=None):
+    """True when this bot should NOT send failed-login alerts to Telegram
+    directly, and instead let the central telemetry_broker.py send a single
+    consolidated alert for all bots (fed by the telemetry file this bot writes).
+    Default True so Telegram has exactly one voice. The bot still writes its
+    telemetry/stats; only the direct Telegram API call is skipped."""
+    try:
+        cfg = config if config is not None else load_config()
+        tg = (cfg or {}).get('telegram', {}) or {}
+        return bool(tg.get('alerts_via_broker', True))
     except Exception:
         return True
 
@@ -500,6 +531,11 @@ def send_or_update_failed_login_notice(account_name, config, reason_text="Login 
             )
         except Exception:
             pass
+        # The telemetry file is now written; telemetry_broker.py turns it into
+        # the single consolidated Telegram alert that covers every bot. Skip this
+        # bot's own direct Telegram send so the operator gets one message, not two.
+        if _alerts_via_broker(config):
+            return True
         body = _render_failed_login_alert(accounts)
         msg_id = state.get('message_id')
         edit_failed = False
@@ -691,6 +727,12 @@ def clear_failed_login_notice(account_name, config):
         stats_tracker.log_login_success(clean_acc)
     except Exception:
         pass
+
+    # Telemetry was already rewritten with failed_logins={} above, so the broker
+    # drops this account from the consolidated alert on its own. Skip the direct
+    # Telegram edit when alerts are centralized in the broker.
+    if _alerts_via_broker(config):
+        return True
 
     # Update the failed login alert
     telegram_config = (config or {}).get('telegram', {})
@@ -3787,21 +3829,37 @@ def run_account(fname, reply_message, accounts_dir, x, y, w, h, config, win_mode
         driver.set_window_position(x, y)
         logger.info(f"Window set to {w}x{h} at position ({x},{y}) for {fname}")
     try:
-        # Attempt to log in using cookies up to 3 times
-        max_login_attempts = 3
-        for attempt in range(1, max_login_attempts + 1):
+        # Persistent login: keep re-fetching cookies from Google Sheets and
+        # retrying until login succeeds. We never give up and never close Chrome
+        # on a failed login — the operator updates the cookies in the sheet and
+        # the next refresh picks them up automatically.
+        retry_delay = config.get("login_retry_delay_seconds", 60)
+        logged_in = False
+        attempt = 0
+        while not logged_in:
+            attempt += 1
+            # Cookies were pre-synced before this loop, so attempt 1 uses those.
+            # From attempt 2 on, re-pull from the sheet each time so a manual
+            # cookie update is picked up without restarting the bot.
+            if attempt > 1:
+                try:
+                    refresh_account_cookies(fname, accounts_dir, config, logger)
+                except Exception:
+                    pass
+                cookies = load_cookies_from_file(os.path.join(accounts_dir, fname))
+
             driver.get("https://www.messenger.com/")
             driver.delete_all_cookies()
             for cookie in cookies:
-                driver.add_cookie(cookie)
+                try:
+                    driver.add_cookie(cookie)
+                except Exception:
+                    pass
             driver.refresh()
             time.sleep(config.get("delay_retry_login", 4))
 
-            # Control teardown behavior on failures (default: keep window open)
-            abort_reason = None
-            keep_open_on_fail = bool(config.get("keep_browser_open_on_fail", True))
-
             if "login" not in driver.current_url and "recover" not in driver.current_url:
+                logged_in = True
                 logger.info(f"Login successful for {fname} on attempt {attempt}.")
                 try:
                     clear_failed_login_notice(fname, config)
@@ -3811,7 +3869,7 @@ def run_account(fname, reply_message, accounts_dir, x, y, w, h, config, win_mode
                     update_account_status(fname, "🟢 Active - running")
                 except Exception:
                     pass
-                
+
                 # Save fresh cookies locally for all accounts
                 try:
                     fresh_cookies = driver.get_cookies()
@@ -3820,12 +3878,12 @@ def run_account(fname, reply_message, accounts_dir, x, y, w, h, config, win_mode
                         with open(cookie_path, 'w', encoding='utf-8') as f:
                             json.dump(fresh_cookies, f, ensure_ascii=False, indent=2)
                         logger.info(f"Saved fresh cookies locally for {fname}")
-                        
+
                         # Only update Google Sheets for accounts WITH credentials (2FA accounts)
                         # Accounts without credentials use manual cookie updates
                         account_creds = load_account_credentials(fname, accounts_dir, config)
                         has_credentials = account_creds.get('username') and account_creds.get('password') and account_creds.get('totp_secret')
-                        
+
                         if has_credentials:
                             gs = (config or {}).get('google_sheets') or {}
                             if gs.get('enabled'):
@@ -3834,26 +3892,24 @@ def run_account(fname, reply_message, accounts_dir, x, y, w, h, config, win_mode
                             logger.info(f"Account {fname} has no credentials - skipping Google Sheets cookie update (manual mode)")
                 except Exception as e:
                     logger.warning(f"Could not save fresh cookies after login: {e}")
-                
                 break  # success
 
-            logger.warning(f"[LOGIN FAILED] Attempt {attempt}/{max_login_attempts} for {fname}.")
+            # Login failed: keep the browser open and retry. Cookies are
+            # re-pulled from the sheet at the top of the next iteration.
+            logger.warning(f"[LOGIN FAILED] Attempt {attempt} for {fname}. Keeping Chrome open; retrying with fresh cookies from the sheet in {retry_delay}s.")
             try:
                 driver.execute_script(f"document.title = '[LOGIN RETRY {attempt}] ' + document.title;")
             except Exception:
                 pass
-            if attempt == max_login_attempts:
-                logger.error(f"[ERROR] Could not log in after {max_login_attempts} attempts for {fname}. Trying remote cookie refresh...")
-                # Try remote refresh once
-                refreshed = refresh_account_cookies(fname, accounts_dir, config, logger)
-                if refreshed:
-                    logger.info("Remote cookies fetched. Retrying login once...")
-                    cookies[:] = load_cookies_from_file(os.path.join(accounts_dir, fname))
-                    continue  # loop will add cookies again and retry
-                # Persist a single per-account notice and keep it until cookies are fixed
-                send_or_update_failed_login_notice(fname, config, "🔴 Login failed — remote cookies unavailable. Please update cookies.")
-                return  # Abort this account
-            time.sleep(config.get("delay_retry_login", 4))
+            try:
+                update_account_status(fname, "🔴 Login failed — retrying (update cookies in sheet)")
+            except Exception:
+                pass
+            # Send the consolidated alert only once (on the first failure) so the
+            # login-failure counter isn't re-incremented on every retry.
+            if attempt == 1:
+                send_or_update_failed_login_notice(fname, config, "🔴 Login failed — please update cookies in Google Sheets. Retrying automatically until it works.")
+            time.sleep(retry_delay)
         close_temporary_block_popup(driver, logger)
         process_message_requests(driver, reply_message, config, logger, option_type=option_type)
     except KeyboardInterrupt:
