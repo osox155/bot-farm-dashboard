@@ -97,7 +97,9 @@ def api_overview():
         # Both mean "not currently launched", so report them together.
         idle_count = sum(1 for a in accounts if a["status"] in ("idle", "offline"))
         paused_count = sum(1 for a in accounts if a["status"] == "paused")
-        total_count = len(accounts)
+        # Idle/offline accounts are "not currently launched" — don't count them
+        # toward the total. Total reflects only running/failed/paused accounts.
+        total_count = sum(1 for a in accounts if a["status"] not in ("idle", "offline"))
 
         for e in recent:
             e["created_at"] = _fmt_ts(e["created_at"])
@@ -114,11 +116,12 @@ def api_overview():
         for a in accounts:
             bn = a.get("bot_name", "")
             if bn in bot_accounts:
-                bot_accounts[bn]["total"] += 1
                 if a["status"] in ("active", "running"):
                     bot_accounts[bn]["active"] += 1
+                    bot_accounts[bn]["total"] += 1
                 elif a["status"] == "logged_out":
                     bot_accounts[bn]["failed"] += 1
+                    bot_accounts[bn]["total"] += 1
                 elif a["status"] in ("idle", "offline"):
                     bot_accounts[bn]["idle"] += 1
 

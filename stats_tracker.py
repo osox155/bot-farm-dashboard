@@ -147,17 +147,12 @@ class StatsTracker:
 
         ts = _iso_now()
         with _lock:
-            for acc in self._accounts:
-                # Register the account roster as "idle" — known but NOT yet
-                # running. An account only becomes "active" once it actually
-                # logs in (log_login_success) or performs an action (log_event).
-                # Marking them "active" here would make every known account look
-                # launched even when only a couple were actually started.
-                _supa_upsert("accounts", {
-                    "name": acc, "bot_name": self._bot_name,
-                    "last_active": ts, "status": "idle"
-                }, on_conflict="name,bot_name")
-
+            # Do NOT pre-register the account roster here. Only accounts that
+            # are actually launched should appear, and they create their own
+            # rows the moment they act: log_login_success -> "active",
+            # log_login_failure -> "logged_out", end_session flips active ->
+            # "idle". Pre-seeding every known cookie file as "idle" made the
+            # dashboard report accounts that were never launched this run.
             _supa_post("sessions", {
                 "session_id": self._session_id,
                 "bot_name": self._bot_name,
@@ -173,6 +168,12 @@ class StatsTracker:
         with _lock:
             _supa_patch("sessions", {"ended_at": ts, "status": status},
                        {"session_id": f"eq.{self._session_id}"})
+            # Flip this bot's currently-running accounts back to "idle" so the
+            # dashboard stops showing them "running" the moment the bot stops,
+            # instead of waiting ~5 min for the stale-timeout rule. Leave
+            # "logged_out" rows untouched so failed accounts still surface.
+            _supa_patch("accounts", {"status": "idle", "last_active": ts},
+                       {"bot_name": f"eq.{self._bot_name}", "status": "in.(active,running)"})
 
     def _ensure_session(self):
         if not self._session_id:

@@ -247,14 +247,11 @@ function load() {
       document.getElementById('sub').textContent = ac.length + ' accounts linked to this bot profile';
       
       var activeCount = ac.filter(function(a) { return a.status === 'active' || a.status === 'running'; }).length;
-      var idleCount = ac.filter(function(a) { return a.status === 'idle' || a.status === 'offline'; }).length;
       var failedCount = ac.filter(function(a) { return a.status === 'logged_out'; }).length;
 
       document.getElementById('cards').innerHTML =
         '<div class="card"><div class="label">Running Accounts</div><div class="value green">' + activeCount + '</div>' +
           '<div class="sub">Logged in &amp; active</div></div>' +
-        '<div class="card"><div class="label">Idle / Not Running</div><div class="value gray">' + idleCount + '</div>' +
-          '<div class="sub">Registered or silent &gt; 5 min</div></div>' +
         '<div class="card"><div class="label">Failed Accounts</div><div class="value red">' + failedCount + '</div>' +
           '<div class="sub">Logged out / cookie expired</div></div>' +
         '<div class="card"><div class="label">Replies Today</div><div class="value blue">' + (d.today.replies || 0) + '</div></div>' +
