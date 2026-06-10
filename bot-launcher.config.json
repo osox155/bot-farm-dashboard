@@ -2,9 +2,9 @@
   "AutoJoinBot": {
     "Enabled": false,
     "DesktopIndex": 1,
-    "ExePath": "%USERPROFILE%/Downloads/Bot Py/AutoJoinBot/join_groups.py",
+    "ExePath": "AutoJoinBot/join_groups.py",
     "RotationEnabled": false,
-    "Accounts": "3,4,7",
+    "Accounts": "3,4",
     "RotationPreset": {
       "RotationMode": "DayOfWeek",
       "AccountPool": "2,3,4",
@@ -13,9 +13,9 @@
     "WaitAfterLaunchSeconds": 5
   },
   "CommentsReplyBot": {
-    "Enabled": true,
+    "Enabled": false,
     "DesktopIndex": 2,
-    "ExePath": "%USERPROFILE%/Downloads/Bot Py/CommentsReplyBot/facebook_bot.py",
+    "ExePath": "CommentsReplyBot/facebook_bot.py",
     "OptionSequence": 1,
     "RotationEnabled": true,
     "ManualAccounts": {
@@ -31,9 +31,9 @@
     "WaitAfterEachStepSeconds": 5
   },
   "FewFeed": {
-    "Enabled": true,
+    "Enabled": false,
     "DesktopIndex": 3,
-    "ExePath": "%USERPROFILE%/Downloads/Bot Py/fewfeedbotv6/fewfeed_bot_template.py",
+    "ExePath": "fewfeedbotv6/fewfeed_bot_template.py",
     "MenuOptionToLaunch": 1,
     "RotationEnabled": true,
     "Accounts": "6",
@@ -50,7 +50,7 @@
   "ReplyBot": {
     "Enabled": true,
     "DesktopIndex": 4,
-    "ExePath": "%USERPROFILE%/Downloads/Bot Py/ReplyBotv7/new.py",
+    "ExePath": "ReplyBotv7/new.py",
     "OptionSequence": 2,
     "RotationEnabled": true,
     "ManualAccounts": {
