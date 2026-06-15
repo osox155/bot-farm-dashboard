@@ -1,0 +1,10 @@
+[5588:17964:0518/064457.715:INFO:components\enterprise\browser\controller\chrome_browser_cloud_management_controller.cc:238] No machine level policy manager exists.
+[5588:17964:0518/064459.570:ERROR:chrome\browser\ui\webui\ntp\new_tab_ui.cc:54] Requested load of chrome://newtab/ for incorrect profile type.
+[5588:17964:0518/064503.535:ERROR:chrome\browser\ui\webui\ntp\new_tab_ui.cc:54] Requested load of chrome://newtab/ for incorrect profile type.
+[7880:13380:0518/064505.566:WARNING:net\spdy\spdy_session.cc:3142] Received HEADERS for invalid stream 1
+[7880:13380:0518/064505.571:WARNING:net\spdy\spdy_session.cc:3142] Received HEADERS for invalid stream 3
+[7880:13380:0518/064505.576:WARNING:net\spdy\spdy_session.cc:3142] Received HEADERS for invalid stream 5
+[5588:2644:0518/064507.292:ERROR:google_apis\gcm\engine\registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT
+[5588:17964:0518/064519.125:WARNING:content\browser\download\download_manager_impl.cc:702] A download with the same GUID already exists, the new request is ignored.
+[5588:17964:0518/064521.117:WARNING:content\browser\download\download_manager_impl.cc:702] A download with the same GUID already exists, the new request is ignored.
+[5588:2644:0518/064535.150:ERROR:google_apis\gcm\engine\registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT

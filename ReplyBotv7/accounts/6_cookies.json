@@ -1,0 +1,92 @@
+[
+  {
+    "domain": ".messenger.com",
+    "expiry": 1810408307,
+    "httpOnly": false,
+    "name": "c_user",
+    "path": "/",
+    "sameSite": "None",
+    "secure": true,
+    "value": "100012340574849"
+  },
+  {
+    "domain": ".messenger.com",
+    "expiry": 1793267824,
+    "httpOnly": true,
+    "name": "ps_n",
+    "path": "/",
+    "sameSite": "Lax",
+    "secure": true,
+    "value": "1"
+  },
+  {
+    "domain": ".www.messenger.com",
+    "expiry": 1793267814,
+    "httpOnly": false,
+    "name": "datr",
+    "path": "/",
+    "sameSite": "Lax",
+    "secure": true,
+    "value": "mWTaZBxAoW8lFl0v3EpECGYi"
+  },
+  {
+    "domain": ".messenger.com",
+    "expiry": 1793812551,
+    "httpOnly": true,
+    "name": "datr",
+    "path": "/",
+    "sameSite": "Lax",
+    "secure": true,
+    "value": "Rxr-abPhTjmdVIjPnOXT0wSK"
+  },
+  {
+    "domain": ".messenger.com",
+    "expiry": 1793267824,
+    "httpOnly": true,
+    "name": "ps_l",
+    "path": "/",
+    "sameSite": "Lax",
+    "secure": true,
+    "value": "1"
+  },
+  {
+    "domain": ".messenger.com",
+    "expiry": 1794422124,
+    "httpOnly": true,
+    "name": "sb",
+    "path": "/",
+    "sameSite": "Lax",
+    "secure": true,
+    "value": "r8b1aUeqex2V0CtK5GvjsRnS"
+  },
+  {
+    "domain": ".messenger.com",
+    "expiry": 1779477110,
+    "httpOnly": false,
+    "name": "dpr",
+    "path": "/",
+    "sameSite": "None",
+    "secure": true,
+    "value": "1.25"
+  },
+  {
+    "domain": ".messenger.com",
+    "expiry": 1779477110,
+    "httpOnly": false,
+    "name": "wd",
+    "path": "/",
+    "sameSite": "Lax",
+    "secure": true,
+    "value": "788x458"
+  },
+  {
+    "domain": ".messenger.com",
+    "expiry": 1810408307,
+    "httpOnly": true,
+    "name": "xs",
+    "path": "/",
+    "sameSite": "None",
+    "secure": true,
+    "value": "42%3APVpUy4ZMBTAYWA%3A2%3A1778870124%3A-1%3A-1%3A%3AAcwZwbKzL7D7DijtIFz2G7GsTN9pN3CMwNnWyBUmVw"
+  }
+]

@@ -1,0 +1,28 @@
+{
+  "auto_start": false,
+  "uids": "uid.txt",
+
+  "cookies_sheet_csv_url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4KwBV19U3SF9Q1owyVYA1BuZbpunVlHgorKwvVaaIYavpBAyiJZ8iGCGHArdO5vBWQXwXeprVjNE6/pub?gid=0&single=true&output=csv",
+  "accounts_numbers": [1, 7],
+
+  "accounts": "accounts",
+  "account": null,
+  "cookies": null,
+  "headless": false,
+  "delay": 1.0,
+  "logs_dir": "logs",
+
+  "ai": {
+    "enabled": true,
+    "api_key": "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",
+    "model": "gpt-4o-mini"
+  },
+
+  "telegram": {
+    "enabled": true,
+    "bot_token": "6582805256:AAE_SEYuHjKf7PHXlL7jTHICMKJHzRDYPRA",
+    "chat_id": "1670086536"
+  },
+
+  "local_accounts": []
+}

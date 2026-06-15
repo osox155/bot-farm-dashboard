@@ -1,0 +1,4 @@
+2026-06-07 16:07:24,928 [account_4] Preparing to launch...
+2026-06-07 16:07:25,678 [account_4] Created isolated session profile.
+2026-06-07 16:07:25,678 [account_4] Loading extension from: C:\Users\HP\Downloads\Bot Py\fewfeedbotv6\fewfeedv2
+2026-06-07 16:07:36,618 [account_4] An error occurred: 'str' object has no attribute 'fileno'

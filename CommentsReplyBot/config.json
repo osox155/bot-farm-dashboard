@@ -1,0 +1,92 @@
+{
+    "bot_settings": {
+      "delay_between_actions": 2,
+      "delay_between_comments": 300,
+      "delay_between_posts": 10,
+      "delay_between_groups": 15,
+      "max_comments_per_post": 0,
+      "max_posts_per_group": 300,
+      "max_posts_per_session": 20,
+      "headless_mode": false,
+      "window_size": "1920,1080",
+      "max_scrolls_collect": 10,
+      "max_comment_load_rounds": 8,
+      "stagnation_threshold": 3,
+      "scroll_pause_seconds": 1.5,
+      "background_mode": true,
+      "reply_only_once_per_user_per_post": true,
+      "continuous_mode": true,
+      "continuous_cycle_minutes": 30,
+      "revisit_old_posts": true,
+      "delay_retry_login": 4,
+      "logout_check_interval": 300
+    },
+    "reply_settings": {
+      "reply_probability": 0.8,
+      "skip_own_comments": true,
+      "skip_replied_comments": true,
+      "max_reply_length": 500,
+      "randomize_replies": true,
+      "reply_only_once_per_user_per_post": true
+    },
+    "filters": {
+      "min_comment_length": 0,
+      "skip_keywords": ["spam", "bot", "fake"],
+      "skip_users": [],
+      "only_reply_to_posts_newer_than_hours": 24
+    },
+    "logging": {
+      "log_level": "INFO",
+      "log_file": "logs/bot.log",
+      "log_replies": true,
+      "log_skipped": true,
+      "log_errors": true,
+      "log_to_console": false
+    },
+    "anti_block": {
+      "cooldown_minutes_on_block": 30,
+      "reply_jitter": [0.3, 1.2],
+      "post_jitter": [1.0, 3.0]
+    },
+    "database": {
+      "processed_posts_file": "logs/processed_posts.json",
+      "processed_comments_file": "logs/processed_comments.json"
+    },
+  
+    "posts_multitab": {
+      "refresh_seconds": 60,
+      "per_tab_pause_seconds": 3,
+      "max_rounds": 0,
+      "max_tabs": 3
+    },
+  
+    "posts_per_account_sheet": {
+      "enabled": true,
+      "use_for_option5": true,
+      "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTAsFoSW_ZQ_v_cspwAr8fYK4JKpOn8J72iPxFm93pBsU8bCqejuflkVYI57hG-lKQNMHQLNLu_VVQB/pub?gid=0&single=true&output=csv",
+      "reload_seconds": 300
+    },
+  
+    "sheets_csv": {
+      "enabled": true,
+      "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSM0GNILR2kJz_12Zr_oyfptz5jSoTyffA_wtNGBp0pxABrKtD2ia6qwG-nfQF53eUKsmLPJvk_8i_Q/pub?gid=0&single=true&output=csv",
+      "groups_col": 0,
+      "posts_col": 1,
+      "reload_seconds": 300
+    },
+  
+    "accounts_sheet": {
+      "enabled": true,
+      "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4KwBV19U3SF9Q1owyVYA1BuZbpunVlHgorKwvVaaIYavpBAyiJZ8iGCGHArdO5vBWQXwXeprVjNE6/pub?gid=0&single=true&output=csv",
+      "account_file_col": 0,
+      "cookies_json_col": 1,
+      "reload_seconds": 60
+    },
+  
+    "telegram": {
+        "bot_token": "6582805256:AAE_SEYuHjKf7PHXlL7jTHICMKJHzRDYPRA",
+        "chat_id": "1670086536",
+        "min_interval_sec": 900,
+        "enabled": true
+    }
+}

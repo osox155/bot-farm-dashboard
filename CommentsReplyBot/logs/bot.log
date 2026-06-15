@@ -1,0 +1,599 @@
+2026-05-18 18:03:01,490 - INFO - Loaded 1 groups from public CSV
+2026-05-18 18:03:10,433 - INFO - Loaded 0 posts from public CSV
+2026-05-18 18:03:10,455 - INFO - Found ChromeDriver at: C:\Users\HP\Downloads\Bot\CommentsReplyBot\chromedriver\chromedriver.exe
+2026-05-18 18:03:15,480 - WARNING - Local ChromeDriver failed, attempting Selenium Manager fallback: Message: session not created: This version of ChromeDriver only supports Chrome version 138
+Current browser version is 148.0.7778.168 with binary path C:\Progra
+2026-05-18 18:03:27,312 - WARNING - Error sending stats to Plausible: error sending request for url (https://plausible.io/api/event)
+2026-05-18 18:03:29,220 - INFO - ChromeDriver setup successful (Selenium Manager)
+2026-05-18 18:03:41,230 - INFO - Loaded cookies for 2_cookies.json from Google Sheets
+2026-05-18 18:03:41,240 - INFO - Navigating to Facebook...
+2026-05-18 18:03:58,178 - INFO - Successfully added 12/12 cookies
+2026-05-18 18:03:58,178 - INFO - Navigating directly to first group: https://www.facebook.com/groups/1082108649794052
+2026-05-18 18:04:12,424 - ERROR - Error loading cookies: Message: tab crashed
+  (Session info: chrome=148.0.7778.168)
+
+2026-05-18 18:04:12,444 - WARNING - Logout detected for 2_cookies.json (attempt 1)
+2026-05-18 18:04:20,675 - INFO - Loaded cookies for 2_cookies.json from Google Sheets
+2026-05-18 18:04:20,687 - INFO - Refreshed cookies for 2_cookies.json
+2026-05-18 18:04:25,871 - INFO - Loaded cookies for 2_cookies.json from Google Sheets
+2026-05-18 18:04:25,877 - INFO - Loaded cookies from Google Sheets
+2026-05-18 18:04:27,930 - INFO - Successfully added 0/12 cookies
+2026-06-03 06:07:19,566 - INFO - Loaded 1 groups from public CSV
+2026-06-03 06:07:29,834 - INFO - Loaded 0 posts from public CSV
+2026-06-03 06:07:29,861 - INFO - Found ChromeDriver at: C:\Users\HP\Downloads\BOT Py\CommentsReplyBot\chromedriver\chromedriver.exe
+2026-06-03 06:07:35,484 - WARNING - Local ChromeDriver failed, attempting Selenium Manager fallback: Message: session not created: This version of ChromeDriver only supports Chrome version 138
+Current browser version is 148.0.7778.217 with binary path C:\Progra
+2026-06-03 06:07:56,724 - WARNING - Error sending stats to Plausible: error sending request for url (https://plausible.io/api/event)
+2026-06-03 06:07:59,666 - INFO - ChromeDriver setup successful (Selenium Manager)
+2026-06-03 06:08:11,812 - INFO - Loaded cookies for 4_cookies.json from Google Sheets
+2026-06-03 06:08:11,825 - INFO - Navigating to Facebook...
+2026-06-03 06:08:30,428 - INFO - Successfully added 14/14 cookies
+2026-06-03 06:08:30,428 - INFO - Navigating directly to first group: https://facebook.com/groups/693479499296960/
+2026-06-03 06:08:47,776 - ERROR - Error loading cookies: Message: tab crashed
+  (Session info: chrome=148.0.7778.217)
+
+2026-06-03 06:08:47,779 - WARNING - Logout detected for 4_cookies.json (attempt 1)
+2026-06-03 06:13:50,463 - INFO - Loaded 1 groups from public CSV
+2026-06-03 06:13:56,058 - INFO - Loaded 0 posts from public CSV
+2026-06-03 06:13:56,066 - INFO - Found ChromeDriver at: C:\Users\HP\Downloads\BOT Py\CommentsReplyBot\chromedriver\chromedriver.exe
+2026-06-03 06:14:00,522 - WARNING - Local ChromeDriver failed, attempting Selenium Manager fallback: Message: session not created: This version of ChromeDriver only supports Chrome version 138
+Current browser version is 148.0.7778.217 with binary path C:\Progra
+2026-06-03 06:14:03,500 - INFO - ChromeDriver setup successful (Selenium Manager)
+2026-06-03 06:14:14,957 - INFO - Loaded cookies for 4_cookies.json from Google Sheets
+2026-06-03 06:14:14,957 - INFO - Navigating to Facebook...
+2026-06-03 06:14:32,888 - INFO - Successfully added 14/14 cookies
+2026-06-03 06:14:32,889 - INFO - Navigating directly to first group: https://facebook.com/groups/693479499296960/
+2026-06-03 06:14:47,512 - INFO - Successfully logged in with 14 cookies
+2026-06-03 06:14:47,550 - WARNING - Logout detected for 4_cookies.json (attempt 1)
+2026-06-03 06:14:52,939 - INFO - Loaded cookies for 4_cookies.json from Google Sheets
+2026-06-03 06:14:52,953 - INFO - Refreshed cookies for 4_cookies.json
+2026-06-03 06:14:58,072 - INFO - Loaded cookies for 4_cookies.json from Google Sheets
+2026-06-03 06:14:58,072 - INFO - Loaded cookies from Google Sheets
+2026-06-03 06:15:13,032 - INFO - Successfully added 14/14 cookies
+2026-06-03 06:15:22,001 - ERROR - Re-login after cookie refresh did not succeed
+2026-06-03 06:15:22,010 - INFO - Waiting 30 seconds before retry...
+2026-06-03 06:15:52,013 - WARNING - Logout detected for 4_cookies.json (attempt 2)
+2026-06-03 06:15:58,475 - INFO - Loaded cookies for 4_cookies.json from Google Sheets
+2026-06-03 06:15:58,484 - INFO - Refreshed cookies for 4_cookies.json
+2026-06-03 06:16:03,869 - INFO - Loaded cookies for 4_cookies.json from Google Sheets
+2026-06-03 06:16:03,869 - INFO - Loaded cookies from Google Sheets
+2026-06-03 06:16:22,982 - INFO - Successfully added 14/14 cookies
+2026-06-03 06:16:26,987 - ERROR - Re-login after cookie refresh did not succeed
+2026-06-03 06:16:27,001 - INFO - Waiting 30 seconds before retry...
+2026-06-06 22:17:05,314 - INFO - Loaded 1 groups from public CSV
+2026-06-06 22:17:10,305 - INFO - Loaded 0 posts from public CSV
+2026-06-06 22:17:10,327 - INFO - Found ChromeDriver at: C:\Users\HP\Downloads\BOT Py\CommentsReplyBot\chromedriver\chromedriver.exe
+2026-06-06 22:17:14,740 - WARNING - Local ChromeDriver failed, attempting Selenium Manager fallback: Message: session not created: This version of ChromeDriver only supports Chrome version 138
+Current browser version is 149.0.7827.53 with binary path C:\Program
+2026-06-06 22:17:45,019 - INFO - ChromeDriver setup successful (Selenium Manager)
+2026-06-06 22:18:00,196 - INFO - Loaded cookies for 2_cookies.json from Google Sheets
+2026-06-06 22:18:00,200 - INFO - Navigating to Facebook...
+2026-06-06 22:18:21,616 - INFO - Successfully added 14/14 cookies
+2026-06-06 22:18:21,616 - INFO - Navigating directly to first group: https://facebook.com/groups/693479499296960/
+2026-06-06 22:18:52,059 - INFO - Successfully logged in with 14 cookies
+2026-06-06 22:18:52,153 - INFO - Processing group: https://facebook.com/groups/693479499296960/
+2026-06-06 22:19:03,297 - INFO - Group name: Monopoly Go! Free Dice Rolls
+2026-06-06 22:19:03,298 - INFO - Collecting post permalinks by scrolling the feed...
+2026-06-06 22:19:04,993 - INFO - Scroll 1/10: collected +1, total=1
+2026-06-06 22:19:09,610 - INFO - Scroll 2/10: collected +2, total=3
+2026-06-06 22:19:15,693 - INFO - Scroll 3/10: collected +1, total=4
+2026-06-06 22:19:19,805 - INFO - Scroll 4/10: collected +1, total=5
+2026-06-06 22:19:23,656 - INFO - Scroll 5/10: collected +1, total=6
+2026-06-06 22:19:31,471 - INFO - Scroll 6/10: collected +2, total=8
+2026-06-06 22:19:37,768 - INFO - Scroll 7/10: collected +0, total=8
+2026-06-06 22:19:44,463 - INFO - Scroll 8/10: collected +1, total=9
+2026-06-06 22:19:50,606 - INFO - Scroll 9/10: collected +2, total=11
+2026-06-06 22:19:57,672 - INFO - Scroll 10/10: collected +0, total=11
+2026-06-06 22:20:05,188 - INFO - Final pass added 2; total unique URLs: 13
+2026-06-06 22:20:05,193 - INFO - [1/13] Processing post URL: https://web.facebook.com/groups/693479499296960/posts/1403498471628389
+2026-06-06 22:59:18,898 - INFO - Loaded 1 groups from public CSV
+2026-06-06 22:59:24,543 - INFO - Loaded 0 posts from public CSV
+2026-06-06 22:59:24,549 - INFO - Found ChromeDriver at: C:\Users\HP\Downloads\BOT Py\CommentsReplyBot\chromedriver\chromedriver.exe
+2026-06-06 22:59:28,492 - WARNING - Local ChromeDriver failed, attempting Selenium Manager fallback: Message: session not created: This version of ChromeDriver only supports Chrome version 138
+Current browser version is 149.0.7827.53 with binary path C:\Program
+2026-06-06 22:59:31,542 - INFO - ChromeDriver setup successful (Selenium Manager)
+2026-06-06 22:59:40,813 - INFO - Loaded cookies for 4_cookies.json from Google Sheets
+2026-06-06 22:59:40,823 - INFO - Navigating to Facebook...
+2026-06-06 23:41:58,622 - INFO - Loaded 1 groups from public CSV
+2026-06-06 23:42:04,057 - INFO - Loaded 0 posts from public CSV
+2026-06-06 23:42:04,082 - INFO - Found ChromeDriver at: C:\Users\HP\Downloads\BOT Py\CommentsReplyBot\chromedriver\chromedriver.exe
+2026-06-06 23:42:14,401 - WARNING - Local ChromeDriver failed, attempting Selenium Manager fallback: Message: session not created: This version of ChromeDriver only supports Chrome version 138
+Current browser version is 149.0.7827.53 with binary path C:\Program
+2026-06-06 23:42:29,625 - WARNING - Error sending stats to Plausible: error sending request for url (https://plausible.io/api/event)
+2026-06-06 23:42:32,995 - INFO - ChromeDriver setup successful (Selenium Manager)
+2026-06-06 23:42:44,696 - INFO - Loaded cookies for 4_cookies.json from Google Sheets
+2026-06-06 23:42:44,710 - INFO - Navigating to Facebook...
+2026-06-06 23:43:19,073 - INFO - Successfully added 15/15 cookies
+2026-06-06 23:43:19,123 - INFO - Navigating directly to first group: https://facebook.com/groups/693479499296960/
+2026-06-06 23:43:57,648 - INFO - Successfully logged in with 15 cookies
+2026-06-06 23:44:53,952 - INFO - Processing group: https://facebook.com/groups/693479499296960/
+2026-06-06 23:45:06,087 - INFO - Group name: Monopoly Go! Free Dice Rolls
+2026-06-06 23:45:06,088 - INFO - Collecting post permalinks by scrolling the feed...
+2026-06-06 23:45:08,410 - INFO - Scroll 1/10: collected +2, total=2
+2026-06-06 23:45:11,960 - INFO - Scroll 2/10: collected +1, total=3
+2026-06-06 23:45:16,059 - INFO - Scroll 3/10: collected +2, total=5
+2026-06-06 23:45:19,752 - INFO - Scroll 4/10: collected +0, total=5
+2026-06-06 23:45:23,863 - INFO - Scroll 5/10: collected +2, total=7
+2026-06-06 23:45:28,114 - INFO - Scroll 6/10: collected +1, total=8
+2026-06-06 23:45:31,896 - INFO - Scroll 7/10: collected +1, total=9
+2026-06-06 23:45:35,861 - INFO - Scroll 8/10: collected +1, total=10
+2026-06-06 23:45:39,566 - INFO - Scroll 9/10: collected +1, total=11
+2026-06-06 23:45:42,874 - INFO - Scroll 10/10: collected +1, total=12
+2026-06-06 23:45:48,282 - INFO - Final pass added 1; total unique URLs: 13
+2026-06-06 23:45:48,284 - INFO - [1/13] Processing post URL: https://web.facebook.com/groups/693479499296960/posts/1400513161926920/
+2026-06-06 23:46:12,950 - INFO - Found 10 comments on post page using selector: div[aria-label*="Comment by"]
+2026-06-06 23:46:16,778 - INFO - Processing 10 unique root comments from post page (found=10)
+2026-06-06 23:46:17,598 - INFO - Attempting to reply to Michael Johnson's comment: Thanks...
+2026-06-06 23:46:18,515 - INFO - Clicked Reply button
+2026-06-06 23:46:27,034 - WARNING - Composer does not reference target user 'Michael Johnson'. Retrying binder...
+2026-06-06 23:46:30,729 - INFO - Typed reply message: Still need help? stickers DM me
+2026-06-06 23:46:45,672 - INFO - ✅ Reply to Michael Johnson: 'Still need help? stickers DM me' - Status: SENT (verified)
+2026-06-06 23:47:53,985 - INFO - Loaded 1 groups from public CSV
+2026-06-06 23:47:58,834 - INFO - Loaded 0 posts from public CSV
+2026-06-06 23:47:58,848 - INFO - Found ChromeDriver at: C:\Users\HP\Downloads\BOT Py\CommentsReplyBot\chromedriver\chromedriver.exe
+2026-06-06 23:48:02,866 - WARNING - Local ChromeDriver failed, attempting Selenium Manager fallback: Message: session not created: This version of ChromeDriver only supports Chrome version 138
+Current browser version is 149.0.7827.53 with binary path C:\Program
+2026-06-06 23:48:05,322 - INFO - ChromeDriver setup successful (Selenium Manager)
+2026-06-06 23:48:14,915 - INFO - Loaded cookies for 4_cookies.json from Google Sheets
+2026-06-06 23:48:14,918 - INFO - Navigating to Facebook...
+2026-06-06 23:48:57,552 - INFO - Successfully added 15/15 cookies
+2026-06-06 23:48:57,552 - INFO - Navigating directly to first group: https://facebook.com/groups/693479499296960/
+2026-06-06 23:49:21,064 - INFO - Successfully logged in with 15 cookies
+2026-06-06 23:49:46,337 - INFO - Processing group: https://facebook.com/groups/693479499296960/
+2026-06-06 23:50:02,273 - INFO - Group name: Monopoly Go! Free Dice Rolls
+2026-06-06 23:50:02,273 - INFO - Collecting post permalinks by scrolling the feed...
+2026-06-06 23:50:04,057 - INFO - Scroll 1/10: collected +1, total=1
+2026-06-06 23:50:07,979 - INFO - Scroll 2/10: collected +2, total=3
+2026-06-06 23:50:11,472 - INFO - Scroll 3/10: collected +2, total=5
+2026-06-06 23:50:14,730 - INFO - Scroll 4/10: collected +0, total=5
+2026-06-06 23:50:18,222 - INFO - Scroll 5/10: collected +2, total=7
+2026-06-06 23:50:21,793 - INFO - Scroll 6/10: collected +1, total=8
+2026-06-06 23:50:25,077 - INFO - Scroll 7/10: collected +1, total=9
+2026-06-06 23:50:28,357 - INFO - Scroll 8/10: collected +1, total=10
+2026-06-06 23:50:31,777 - INFO - Scroll 9/10: collected +1, total=11
+2026-06-06 23:50:34,884 - INFO - Scroll 10/10: collected +1, total=12
+2026-06-06 23:50:39,905 - INFO - Final pass added 1; total unique URLs: 13
+2026-06-06 23:50:39,905 - INFO - [1/13] Processing post URL: https://web.facebook.com/groups/693479499296960/posts/1400513161926920/
+2026-06-06 23:52:13,832 - INFO - Found 10 comments on post page using selector: div[aria-label*="Comment by"]
+2026-06-06 23:52:18,890 - INFO - Processing 10 unique root comments from post page (found=10)
+2026-06-06 23:52:19,709 - INFO - Attempting to reply to Stacy Gardner's comment: Thanks...
+2026-06-06 23:52:20,474 - INFO - Clicked Reply button
+2026-06-06 23:52:29,678 - WARNING - Composer does not reference target user 'Stacy Gardner'. Retrying binder...
+2026-06-06 23:52:33,100 - INFO - Typed reply message: Need Monopoly Go stickers? DM me
+2026-06-06 23:52:48,290 - INFO - ✅ Reply to Stacy Gardner: 'Need Monopoly Go stickers? DM me' - Status: SENT (verified)
+2026-06-06 23:57:15,517 - INFO - Loaded 1 groups from public CSV
+2026-06-06 23:57:19,873 - INFO - Loaded 0 posts from public CSV
+2026-06-06 23:57:19,922 - INFO - ====== WebDriver manager ======
+2026-06-06 23:57:24,372 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-06 23:57:25,592 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-06 23:57:26,846 - INFO - Driver [C:\Users\HP\.wdm\drivers\chromedriver\win64\149.0.7827.54\chromedriver-win32/chromedriver.exe] found in cache
+2026-06-06 23:57:28,923 - INFO - ChromeDriver setup successful (webdriver-manager)
+2026-06-06 23:57:34,426 - INFO - Loaded cookies for 4_cookies.json from Google Sheets
+2026-06-06 23:57:34,432 - INFO - Navigating to Facebook...
+2026-06-06 23:57:56,201 - INFO - Successfully added 15/15 cookies
+2026-06-06 23:57:56,201 - INFO - Navigating directly to first group: https://facebook.com/groups/693479499296960/
+2026-06-06 23:58:41,340 - INFO - Successfully logged in with 15 cookies
+2026-06-06 23:59:09,303 - INFO - Processing group: https://facebook.com/groups/693479499296960/
+2026-06-06 23:59:26,445 - INFO - Group name: Monopoly Go! Free Dice Rolls
+2026-06-06 23:59:26,445 - INFO - Collecting post permalinks by scrolling the feed...
+2026-06-06 23:59:28,394 - INFO - Scroll 1/10: collected +1, total=1
+2026-06-06 23:59:32,071 - INFO - Scroll 2/10: collected +2, total=3
+2026-06-06 23:59:35,731 - INFO - Scroll 3/10: collected +2, total=5
+2026-06-06 23:59:39,087 - INFO - Scroll 4/10: collected +0, total=5
+2026-06-06 23:59:42,996 - INFO - Scroll 5/10: collected +2, total=7
+2026-06-06 23:59:46,615 - INFO - Scroll 6/10: collected +1, total=8
+2026-06-06 23:59:49,978 - INFO - Scroll 7/10: collected +1, total=9
+2026-06-06 23:59:53,339 - INFO - Scroll 8/10: collected +1, total=10
+2026-06-06 23:59:56,578 - INFO - Scroll 9/10: collected +1, total=11
+2026-06-06 23:59:59,688 - INFO - Scroll 10/10: collected +1, total=12
+2026-06-07 00:00:04,780 - INFO - Final pass added 1; total unique URLs: 13
+2026-06-07 00:00:04,780 - INFO - [1/13] Processing post URL: https://web.facebook.com/groups/693479499296960/posts/1400513161926920/
+2026-06-07 00:00:30,593 - INFO - Found 10 comments on post page using selector: div[aria-label*="Comment by"]
+2026-06-07 00:00:35,082 - INFO - Processing 10 unique root comments from post page (found=10)
+2026-06-07 00:00:35,893 - INFO - Attempting to reply to Stacy Gardner's comment: Thanks...
+2026-06-07 00:00:36,579 - INFO - Clicked Reply button
+2026-06-07 00:00:45,493 - WARNING - Composer does not reference target user 'Stacy Gardner'. Retrying binder...
+2026-06-07 00:00:48,939 - INFO - Typed reply message: Still searching stickers? DM me
+2026-06-07 00:01:03,073 - INFO - ✅ Reply to Stacy Gardner: 'Still searching stickers? DM me' - Status: SENT (verified)
+2026-06-07 00:07:49,723 - INFO - Loaded 1 groups from public CSV
+2026-06-07 00:07:54,039 - INFO - Loaded 0 posts from public CSV
+2026-06-07 00:07:54,141 - INFO - ====== WebDriver manager ======
+2026-06-07 00:07:58,305 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-07 00:08:01,855 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-07 00:08:03,211 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-07 00:08:06,025 - INFO - WebDriver version 149.0.7827.54 selected
+2026-06-07 00:08:06,036 - INFO - Modern chrome version https://storage.googleapis.com/chrome-for-testing-public/149.0.7827.54/win32/chromedriver-win32.zip
+2026-06-07 00:08:06,036 - INFO - About to download new driver from https://storage.googleapis.com/chrome-for-testing-public/149.0.7827.54/win32/chromedriver-win32.zip
+2026-06-07 00:08:09,607 - INFO - Driver downloading response is 200
+2026-06-07 00:08:14,836 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-07 00:08:16,703 - INFO - Driver has been saved in cache [C:\Users\HP\.wdm\drivers\chromedriver\win64\149.0.7827.54]
+2026-06-07 00:08:18,415 - INFO - ChromeDriver setup successful (webdriver-manager)
+2026-06-07 00:08:24,739 - INFO - Loaded cookies for 2_cookies.json from Google Sheets
+2026-06-07 00:08:24,743 - INFO - Navigating to Facebook...
+2026-06-07 00:08:51,117 - INFO - Successfully added 14/14 cookies
+2026-06-07 00:08:51,117 - INFO - Navigating directly to first group: https://facebook.com/groups/693479499296960/
+2026-06-07 00:09:31,408 - INFO - Successfully logged in with 14 cookies
+2026-06-07 00:09:55,539 - INFO - Processing group: https://facebook.com/groups/693479499296960/
+2026-06-07 06:08:01,649 - INFO - Loaded 1 groups from public CSV
+2026-06-07 06:08:06,763 - INFO - Loaded 0 posts from public CSV
+2026-06-07 06:08:06,836 - INFO - ====== WebDriver manager ======
+2026-06-07 06:08:11,223 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-07 06:08:15,040 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-07 06:08:16,338 - INFO - Driver [C:\Users\HP\.wdm\drivers\chromedriver\win64\149.0.7827.54\chromedriver-win32/chromedriver.exe] found in cache
+2026-06-07 06:08:18,068 - INFO - ChromeDriver setup successful (webdriver-manager)
+2026-06-07 06:08:24,069 - INFO - Loaded cookies for 2_cookies.json from Google Sheets
+2026-06-07 06:08:24,074 - INFO - Navigating to Facebook...
+2026-06-07 06:08:38,981 - INFO - Successfully added 14/14 cookies
+2026-06-07 06:08:38,981 - INFO - Navigating directly to first group: https://facebook.com/groups/693479499296960/
+2026-06-07 06:08:59,380 - INFO - Successfully logged in with 14 cookies
+2026-06-07 06:09:36,218 - INFO - Processing group: https://facebook.com/groups/693479499296960/
+2026-06-07 06:09:46,913 - INFO - Group name: Monopoly Go! Free Dice Rolls
+2026-06-07 06:09:46,917 - INFO - Collecting post permalinks by scrolling the feed...
+2026-06-07 06:09:51,446 - INFO - Scroll 1/10: collected +1, total=1
+2026-06-07 06:09:54,839 - INFO - Scroll 2/10: collected +0, total=1
+2026-06-07 06:09:58,415 - INFO - Scroll 3/10: collected +0, total=1
+2026-06-07 06:10:01,890 - INFO - Scroll 4/10: collected +1, total=2
+2026-06-07 06:10:05,481 - INFO - Scroll 5/10: collected +1, total=3
+2026-06-07 06:10:09,271 - INFO - Scroll 6/10: collected +1, total=4
+2026-06-07 06:10:13,355 - INFO - Scroll 7/10: collected +1, total=5
+2026-06-07 06:10:17,500 - INFO - Scroll 8/10: collected +1, total=6
+2026-06-07 06:10:21,987 - INFO - Scroll 9/10: collected +1, total=7
+2026-06-07 06:10:26,650 - INFO - Scroll 10/10: collected +0, total=7
+2026-06-07 06:10:33,396 - INFO - Final pass added 2; total unique URLs: 9
+2026-06-07 06:10:33,396 - INFO - [1/9] Processing post URL: https://web.facebook.com/groups/693479499296960/posts/1403707341607502
+2026-06-07 06:11:02,582 - INFO - No comments found on post page for 1403707341607502
+2026-06-07 06:11:19,248 - INFO - [2/9] Processing post URL: https://web.facebook.com/groups/693479499296960/posts/1403498471628389
+2026-06-07 06:13:16,751 - INFO - Found 1 comments on post page using selector: div[aria-label*="Comment by"]
+2026-06-07 06:13:17,758 - INFO - Processing 1 unique root comments from post page (found=1)
+2026-06-07 06:13:18,576 - INFO - Attempting to reply to Superholly's comment: 243...
+2026-06-07 06:13:20,525 - INFO - Clicked Reply button
+2026-06-07 06:13:32,458 - INFO - Typed reply message: Need help with album? inbox me
+2026-06-07 06:13:32,791 - INFO - Sent reply using Enter key
+2026-06-07 06:13:52,070 - INFO - ✅ Reply to Superholly: 'Need help with album? inbox me' - Status: SENT (verified)
+2026-06-07 06:19:58,659 - INFO - Loaded 1 groups from public CSV
+2026-06-07 06:20:08,414 - INFO - Loaded 0 posts from public CSV
+2026-06-07 06:20:08,502 - INFO - ====== WebDriver manager ======
+2026-06-07 06:20:14,912 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-07 06:20:17,956 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-07 06:20:19,859 - INFO - Driver [C:\Users\HP\.wdm\drivers\chromedriver\win64\149.0.7827.54\chromedriver-win32/chromedriver.exe] found in cache
+2026-06-07 06:20:22,060 - INFO - ChromeDriver setup successful (webdriver-manager)
+2026-06-07 06:20:29,924 - INFO - Loaded cookies for 2_cookies.json from Google Sheets
+2026-06-07 06:20:29,932 - INFO - Navigating to Facebook...
+2026-06-07 06:20:46,364 - INFO - Successfully added 14/14 cookies
+2026-06-07 06:20:46,364 - INFO - Navigating directly to first group: https://facebook.com/groups/693479499296960/
+2026-06-07 06:21:09,330 - INFO - Successfully logged in with 14 cookies
+2026-06-07 06:21:49,626 - INFO - Processing group: https://facebook.com/groups/693479499296960/
+2026-06-07 06:22:03,089 - INFO - Group name: Monopoly Go! Free Dice Rolls
+2026-06-07 06:22:03,089 - INFO - Collecting post permalinks by scrolling the feed...
+2026-06-07 06:22:05,080 - INFO - Scroll 1/10: collected +1, total=1
+2026-06-07 06:22:08,370 - INFO - Scroll 2/10: collected +0, total=1
+2026-06-07 06:22:11,859 - INFO - Scroll 3/10: collected +0, total=1
+2026-06-07 06:22:15,641 - INFO - Scroll 4/10: collected +1, total=2
+2026-06-07 06:22:19,559 - INFO - Scroll 5/10: collected +1, total=3
+2026-06-07 06:22:22,934 - INFO - Scroll 6/10: collected +1, total=4
+2026-06-07 06:22:26,745 - INFO - Scroll 7/10: collected +1, total=5
+2026-06-07 06:22:30,717 - INFO - Scroll 8/10: collected +1, total=6
+2026-06-07 06:22:35,633 - INFO - Scroll 9/10: collected +1, total=7
+2026-06-07 06:22:41,001 - INFO - Scroll 10/10: collected +0, total=7
+2026-06-07 06:22:49,350 - INFO - Final pass added 2; total unique URLs: 9
+2026-06-07 06:22:49,352 - INFO - Post 1403707341607502 already processed, skipping
+2026-06-07 06:22:49,352 - INFO - [2/9] Processing post URL: https://web.facebook.com/groups/693479499296960/posts/1403498471628389
+2026-06-07 06:23:21,876 - INFO - No comments found on post page for 1403498471628389
+2026-06-07 06:23:37,875 - INFO - [3/9] Processing post URL: https://web.facebook.com/groups/693479499296960/posts/1403470498297853
+2026-06-07 06:33:50,319 - INFO - Loaded 1 groups from public CSV
+2026-06-07 06:33:59,734 - INFO - Loaded 0 posts from public CSV
+2026-06-07 06:33:59,850 - INFO - ====== WebDriver manager ======
+2026-06-07 06:34:06,252 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-07 06:34:08,328 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-07 06:34:10,286 - INFO - Driver [C:\Users\HP\.wdm\drivers\chromedriver\win64\149.0.7827.54\chromedriver-win32/chromedriver.exe] found in cache
+2026-06-07 06:34:12,352 - INFO - ChromeDriver setup successful (webdriver-manager)
+2026-06-07 06:34:19,403 - INFO - Loaded cookies for 2_cookies.json from Google Sheets
+2026-06-07 06:34:19,412 - INFO - Navigating to Facebook...
+2026-06-07 06:34:34,134 - INFO - Successfully added 14/14 cookies
+2026-06-07 06:34:34,134 - INFO - Navigating directly to first group: https://facebook.com/groups/693479499296960/
+2026-06-07 06:34:52,028 - INFO - Successfully logged in with 14 cookies
+2026-06-07 06:35:30,020 - INFO - Processing group: https://facebook.com/groups/693479499296960/
+2026-06-07 06:35:42,728 - INFO - Group name: Monopoly Go! Free Dice Rolls
+2026-06-07 06:35:42,728 - INFO - Collecting post permalinks by scrolling the feed...
+2026-06-07 06:35:44,919 - INFO - Scroll 1/10: collected +1, total=1
+2026-06-07 06:35:48,658 - INFO - Scroll 2/10: collected +0, total=1
+2026-06-07 06:35:52,033 - INFO - Scroll 3/10: collected +0, total=1
+2026-06-07 06:35:55,596 - INFO - Scroll 4/10: collected +1, total=2
+2026-06-07 06:35:59,346 - INFO - Scroll 5/10: collected +1, total=3
+2026-06-07 06:36:03,016 - INFO - Scroll 6/10: collected +1, total=4
+2026-06-07 06:36:06,771 - INFO - Scroll 7/10: collected +1, total=5
+2026-06-07 06:36:10,658 - INFO - Scroll 8/10: collected +1, total=6
+2026-06-07 06:36:14,717 - INFO - Scroll 9/10: collected +1, total=7
+2026-06-07 06:36:18,574 - INFO - Scroll 10/10: collected +0, total=7
+2026-06-07 06:36:24,750 - INFO - Final pass added 2; total unique URLs: 9
+2026-06-07 06:36:24,750 - INFO - Post 1403707341607502 already processed, skipping
+2026-06-07 06:36:24,750 - INFO - Post 1403498471628389 already processed, skipping
+2026-06-07 06:36:24,750 - INFO - [3/9] Processing post URL: https://web.facebook.com/groups/693479499296960/posts/1403470498297853
+2026-06-07 06:37:00,053 - INFO - No comments found on post page for 1403470498297853
+2026-06-07 06:37:20,148 - INFO - [4/9] Processing post URL: https://web.facebook.com/groups/693479499296960/posts/1403160958328807
+2026-06-07 06:37:48,692 - INFO - No comments found on post page for 1403160958328807
+2026-06-07 06:38:06,435 - INFO - [5/9] Processing post URL: https://web.facebook.com/groups/693479499296960/posts/1400513161926920/
+2026-06-07 06:38:39,116 - INFO - Found 10 comments on post page using selector: div[aria-label*="Comment by"]
+2026-06-07 06:38:53,784 - INFO - Processing 10 unique root comments from post page (found=10)
+2026-06-07 06:38:54,619 - INFO - Attempting to reply to Stacy Gardner's comment: Thanks...
+2026-06-07 06:38:56,244 - INFO - Clicked Reply button
+2026-06-07 06:39:05,395 - WARNING - Composer does not reference target user 'Stacy Gardner'. Retrying binder...
+2026-06-07 06:39:08,617 - WARNING - Error typing in reply input: Message: tab crashed
+  (Session info: chrome=149.0.7827.53)
+
+2026-06-07 06:39:08,623 - INFO - Typed reply message: I can help you finish fast DM me
+2026-06-07 06:39:08,629 - WARNING - Error sending Enter key: Message: tab crashed
+  (Session info: chrome=149.0.7827.53)
+
+2026-06-07 06:39:08,633 - WARNING - Error sending Ctrl+Enter: Message: tab crashed
+  (Session info: chrome=149.0.7827.53)
+
+2026-06-07 06:39:08,635 - ERROR - Could not submit reply
+2026-06-07 06:48:39,562 - INFO - Loaded 1 groups from public CSV
+2026-06-07 06:48:48,034 - INFO - Loaded 0 posts from public CSV
+2026-06-07 06:48:48,150 - INFO - ====== WebDriver manager ======
+2026-06-07 06:48:54,542 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-07 06:48:57,018 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-07 06:48:59,182 - INFO - Driver [C:\Users\HP\.wdm\drivers\chromedriver\win64\149.0.7827.54\chromedriver-win32/chromedriver.exe] found in cache
+2026-06-07 06:49:01,193 - INFO - ChromeDriver setup successful (webdriver-manager)
+2026-06-07 06:49:09,336 - INFO - Loaded cookies for 2_cookies.json from Google Sheets
+2026-06-07 06:49:09,344 - INFO - Navigating to Facebook...
+2026-06-07 06:49:24,848 - INFO - Successfully added 14/14 cookies
+2026-06-07 06:49:24,848 - INFO - Navigating directly to first group: https://facebook.com/groups/693479499296960/
+2026-06-07 06:49:48,668 - INFO - Successfully logged in with 14 cookies
+2026-06-07 06:50:26,779 - INFO - Processing group: https://facebook.com/groups/693479499296960/
+2026-06-07 06:50:37,262 - INFO - Group name: Monopoly Go! Free Dice Rolls
+2026-06-07 06:50:37,262 - INFO - Collecting post permalinks by scrolling the feed...
+2026-06-07 06:50:40,963 - INFO - Scroll 1/10: collected +1, total=1
+2026-06-07 06:50:44,390 - INFO - Scroll 2/10: collected +0, total=1
+2026-06-07 06:50:47,761 - INFO - Scroll 3/10: collected +0, total=1
+2026-06-07 06:50:51,464 - INFO - Scroll 4/10: collected +1, total=2
+2026-06-07 06:50:55,282 - INFO - Scroll 5/10: collected +1, total=3
+2026-06-07 06:50:58,928 - INFO - Scroll 6/10: collected +1, total=4
+2026-06-07 06:51:02,686 - INFO - Scroll 7/10: collected +1, total=5
+2026-06-07 06:51:06,396 - INFO - Scroll 8/10: collected +1, total=6
+2026-06-07 06:51:10,409 - INFO - Scroll 9/10: collected +1, total=7
+2026-06-07 06:51:14,858 - INFO - Scroll 10/10: collected +0, total=7
+2026-06-07 06:51:21,615 - INFO - Final pass added 2; total unique URLs: 9
+2026-06-07 06:51:21,615 - INFO - Post 1403707341607502 already processed, skipping
+2026-06-07 06:51:21,615 - INFO - Post 1403498471628389 already processed, skipping
+2026-06-07 06:51:21,615 - INFO - Post 1403470498297853 already processed, skipping
+2026-06-07 06:51:21,615 - INFO - Post 1403160958328807 already processed, skipping
+2026-06-07 06:51:21,615 - INFO - [5/9] Processing post URL: https://web.facebook.com/groups/693479499296960/posts/1400513161926920/
+2026-06-07 06:52:05,887 - INFO - Found 10 comments on post page using selector: div[aria-label*="Comment by"]
+2026-06-07 06:52:36,647 - INFO - Processing 10 unique root comments from post page (found=10)
+2026-06-07 06:52:38,442 - INFO - Attempting to reply to Stacy Gardner's comment: Thanks...
+2026-06-07 06:52:43,761 - INFO - Clicked Reply button
+2026-06-07 06:53:01,397 - WARNING - Composer does not reference target user 'Stacy Gardner'. Retrying binder...
+2026-06-07 06:53:22,279 - INFO - Typed reply message: Let’s trade stickers DM me
+2026-06-07 06:54:01,878 - INFO - ✅ Reply to Stacy Gardner: 'Let’s trade stickers DM me' - Status: SENT (verified)
+2026-06-07 07:05:05,968 - INFO - Loaded 1 groups from public CSV
+2026-06-07 07:05:13,519 - INFO - Loaded 0 posts from public CSV
+2026-06-07 07:05:13,718 - INFO - ====== WebDriver manager ======
+2026-06-07 07:05:20,481 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-07 07:05:22,046 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-07 07:05:24,009 - INFO - Driver [C:\Users\HP\.wdm\drivers\chromedriver\win64\149.0.7827.54\chromedriver-win32/chromedriver.exe] found in cache
+2026-06-07 07:05:26,478 - INFO - ChromeDriver setup successful (webdriver-manager)
+2026-06-07 07:05:34,131 - INFO - Loaded cookies for 2_cookies.json from Google Sheets
+2026-06-07 07:05:34,135 - INFO - Navigating to Facebook...
+2026-06-07 07:05:50,017 - INFO - Successfully added 14/14 cookies
+2026-06-07 07:05:50,017 - INFO - Navigating directly to first group: https://facebook.com/groups/693479499296960/
+2026-06-07 07:06:12,585 - INFO - Successfully logged in with 14 cookies
+2026-06-07 07:06:48,713 - INFO - Processing group: https://facebook.com/groups/693479499296960/
+2026-06-07 07:07:01,665 - INFO - Group name: Monopoly Go! Free Dice Rolls
+2026-06-07 07:07:01,665 - INFO - Collecting post permalinks by scrolling the feed...
+2026-06-07 07:07:03,781 - INFO - Scroll 1/10: collected +1, total=1
+2026-06-07 07:07:07,578 - INFO - Scroll 2/10: collected +0, total=1
+2026-06-07 07:07:11,259 - INFO - Scroll 3/10: collected +0, total=1
+2026-06-07 07:07:15,190 - INFO - Scroll 4/10: collected +1, total=2
+2026-06-07 07:07:19,422 - INFO - Scroll 5/10: collected +1, total=3
+2026-06-07 07:07:23,328 - INFO - Scroll 6/10: collected +1, total=4
+2026-06-07 07:07:27,192 - INFO - Scroll 7/10: collected +1, total=5
+2026-06-07 07:07:30,909 - INFO - Scroll 8/10: collected +1, total=6
+2026-06-07 07:07:34,732 - INFO - Scroll 9/10: collected +1, total=7
+2026-06-07 07:07:39,172 - INFO - Scroll 10/10: collected +0, total=7
+2026-06-07 07:07:45,961 - INFO - Final pass added 2; total unique URLs: 9
+2026-06-07 07:07:45,961 - INFO - Post 1403707341607502 already processed, skipping
+2026-06-07 07:07:45,961 - INFO - [2/9] Processing post URL: https://web.facebook.com/groups/693479499296960/posts/1400513161926920/
+2026-06-07 07:08:24,726 - INFO - Found 10 comments on post page using selector: div[aria-label*="Comment by"]
+2026-06-07 07:08:33,715 - INFO - Processing 10 unique root comments from post page (found=10)
+2026-06-07 07:08:34,539 - INFO - Attempting to reply to Vicky Kilby's comment: Thanks...
+2026-06-07 07:08:35,612 - INFO - Clicked Reply button
+2026-06-07 07:08:44,764 - WARNING - Composer does not reference target user 'Vicky Kilby'. Retrying binder...
+2026-06-07 07:08:48,941 - INFO - Typed reply message: I can help you finish fast DM me
+2026-06-07 07:09:18,556 - INFO - ✅ Reply to Vicky Kilby: 'I can help you finish fast DM me' - Status: SENT (verified)
+2026-06-07 07:25:46,882 - INFO - Loaded 1 groups from public CSV
+2026-06-07 07:26:02,851 - INFO - Loaded 0 posts from public CSV
+2026-06-07 07:26:03,067 - INFO - ====== WebDriver manager ======
+2026-06-07 07:26:09,343 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-07 07:26:12,744 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-07 07:26:14,942 - INFO - Driver [C:\Users\HP\.wdm\drivers\chromedriver\win64\149.0.7827.54\chromedriver-win32/chromedriver.exe] found in cache
+2026-06-07 07:26:16,600 - INFO - ChromeDriver setup successful (webdriver-manager)
+2026-06-07 07:26:23,703 - INFO - Loaded cookies for 2_cookies.json from Google Sheets
+2026-06-07 07:26:23,707 - INFO - Navigating to Facebook...
+2026-06-07 07:26:37,794 - INFO - Successfully added 14/14 cookies
+2026-06-07 07:26:37,794 - INFO - Navigating directly to first group: https://facebook.com/groups/693479499296960/
+2026-06-07 07:27:01,133 - INFO - Successfully logged in with 14 cookies
+2026-06-07 07:27:42,559 - INFO - Processing group: https://facebook.com/groups/693479499296960/
+2026-06-07 07:27:55,505 - INFO - Group name: Monopoly Go! Free Dice Rolls
+2026-06-07 07:27:55,506 - INFO - Collecting post permalinks by scrolling the feed...
+2026-06-07 07:27:57,792 - INFO - Scroll 1/10: collected +1, total=1
+2026-06-07 07:28:01,213 - INFO - Scroll 2/10: collected +0, total=1
+2026-06-07 07:28:04,608 - INFO - Scroll 3/10: collected +0, total=1
+2026-06-07 07:28:09,267 - INFO - Scroll 4/10: collected +1, total=2
+2026-06-07 07:28:13,804 - INFO - Scroll 5/10: collected +0, total=2
+2026-06-07 07:28:17,940 - INFO - Scroll 6/10: collected +1, total=3
+2026-06-07 07:28:21,800 - INFO - Scroll 7/10: collected +1, total=4
+2026-06-07 07:28:25,468 - INFO - Scroll 8/10: collected +1, total=5
+2026-06-07 07:28:29,133 - INFO - Scroll 9/10: collected +1, total=6
+2026-06-07 07:28:32,556 - INFO - Scroll 10/10: collected +1, total=7
+2026-06-07 07:28:39,980 - INFO - Final pass added 2; total unique URLs: 9
+2026-06-07 07:28:39,980 - INFO - Post 1403707341607502 already processed, skipping
+2026-06-07 07:28:39,982 - INFO - [2/9] Processing post URL: https://web.facebook.com/groups/693479499296960/posts/1400513161926920/
+2026-06-07 07:31:00,839 - INFO - Found 10 comments on post page using selector: div[aria-label*="Comment by"]
+2026-06-07 07:31:17,736 - INFO - Processing 10 unique root comments from post page (found=10)
+2026-06-07 07:31:18,660 - INFO - Attempting to reply to Stacy Gardner's comment: Thanks...
+2026-06-07 07:31:20,334 - INFO - Clicked Reply button
+2026-06-07 07:31:29,628 - WARNING - Composer does not reference target user 'Stacy Gardner'. Retrying binder...
+2026-06-07 07:31:35,318 - INFO - Typed reply message: Need Monopoly stickers? message me
+2026-06-07 07:32:06,142 - INFO - ✅ Reply to Stacy Gardner: 'Need Monopoly stickers? message me' - Status: SENT (verified)
+2026-06-07 12:48:53,747 - INFO - Loaded 1 groups from public CSV
+2026-06-07 12:48:59,245 - INFO - Loaded 0 posts from public CSV
+2026-06-07 12:48:59,386 - INFO - ====== WebDriver manager ======
+2026-06-07 12:49:04,222 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-07 12:49:07,612 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-07 12:49:09,009 - INFO - Driver [C:\Users\HP\.wdm\drivers\chromedriver\win64\149.0.7827.54\chromedriver-win32/chromedriver.exe] found in cache
+2026-06-07 12:49:11,035 - INFO - ChromeDriver setup successful (webdriver-manager)
+2026-06-07 12:49:17,637 - INFO - Loaded cookies for 2_cookies.json from Google Sheets
+2026-06-07 12:49:17,641 - INFO - Navigating to Facebook...
+2026-06-07 12:49:34,420 - INFO - Successfully added 14/14 cookies
+2026-06-07 12:49:34,420 - INFO - Navigating directly to first group: https://facebook.com/groups/693479499296960/
+2026-06-07 12:50:01,868 - INFO - Successfully logged in with 14 cookies
+2026-06-07 13:43:58,806 - ERROR - Failed to load groups from public CSV: HTTPSConnectionPool(host='docs.google.com', port=443): Read timed out. (read timeout=15)
+2026-06-07 13:44:15,240 - ERROR - Failed to load posts from public CSV: HTTPSConnectionPool(host='docs.google.com', port=443): Read timed out. (read timeout=15)
+2026-06-07 13:44:15,328 - INFO - ====== WebDriver manager ======
+2026-06-07 13:44:19,713 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-07 15:57:58,756 - INFO - Loaded 1 groups from public CSV
+2026-06-07 15:58:05,168 - INFO - Loaded 0 posts from public CSV
+2026-06-07 15:58:05,233 - INFO - ====== WebDriver manager ======
+2026-06-07 15:58:09,520 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-07 15:58:13,201 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-07 15:58:15,126 - INFO - Driver [C:\Users\HP\.wdm\drivers\chromedriver\win64\149.0.7827.54\chromedriver-win32/chromedriver.exe] found in cache
+2026-06-07 15:58:16,876 - INFO - ChromeDriver setup successful (webdriver-manager)
+2026-06-07 15:58:23,883 - INFO - Loaded cookies for 2_cookies.json from Google Sheets
+2026-06-07 15:58:23,891 - INFO - Navigating to Facebook...
+2026-06-07 15:58:44,664 - INFO - Successfully added 14/14 cookies
+2026-06-07 15:58:44,664 - INFO - Navigating directly to first group: https://facebook.com/groups/693479499296960/
+2026-06-07 15:59:53,423 - INFO - Successfully logged in with 14 cookies
+2026-06-07 16:00:28,488 - INFO - Processing group: https://facebook.com/groups/693479499296960/
+2026-06-07 16:00:41,292 - INFO - Group name: Monopoly Go! Free Dice Rolls
+2026-06-07 16:00:41,293 - INFO - Collecting post permalinks by scrolling the feed...
+2026-06-07 16:00:44,176 - INFO - Scroll 1/10: collected +0, total=0
+2026-06-07 16:00:49,306 - INFO - Scroll 2/10: collected +3, total=3
+2026-06-07 16:00:52,978 - INFO - Scroll 3/10: collected +1, total=4
+2026-06-07 16:00:56,531 - INFO - Scroll 4/10: collected +0, total=4
+2026-06-07 16:01:00,687 - INFO - Scroll 5/10: collected +1, total=5
+2026-06-07 16:01:03,887 - INFO - Scroll 6/10: collected +0, total=5
+2026-06-07 16:01:07,041 - INFO - Scroll 7/10: collected +0, total=5
+2026-06-07 16:01:10,731 - INFO - Scroll 8/10: collected +2, total=7
+2026-06-07 16:01:15,104 - INFO - Scroll 9/10: collected +1, total=8
+2026-06-07 16:01:18,947 - INFO - Scroll 10/10: collected +0, total=8
+2026-06-07 16:01:25,307 - INFO - Final pass added 1; total unique URLs: 9
+2026-06-07 16:01:25,308 - INFO - [1/9] Processing post URL: https://web.facebook.com/groups/693479499296960/posts/1404139691564267
+2026-06-07 16:03:28,065 - INFO - Found 1 comments on post page using selector: div[aria-label*="Comment by"]
+2026-06-07 16:03:28,538 - INFO - Processing 1 unique root comments from post page (found=1)
+2026-06-07 16:03:29,353 - INFO - Attempting to reply to Karla Lopez Samano's comment: Yo también falto
+.... no he podido adquirirlos, po...
+2026-06-07 16:03:31,065 - INFO - Clicked Reply button
+2026-06-07 16:05:24,098 - INFO - Loaded 1 groups from public CSV
+2026-06-07 16:05:32,277 - INFO - Loaded 0 posts from public CSV
+2026-06-07 16:05:32,411 - INFO - ====== WebDriver manager ======
+2026-06-07 16:05:37,167 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-07 16:05:39,192 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-07 16:05:41,998 - INFO - Driver [C:\Users\HP\.wdm\drivers\chromedriver\win64\149.0.7827.54\chromedriver-win32/chromedriver.exe] found in cache
+2026-06-07 16:05:43,872 - INFO - ChromeDriver setup successful (webdriver-manager)
+2026-06-07 16:05:51,930 - INFO - Loaded cookies for 3_cookies.json from Google Sheets
+2026-06-07 16:05:51,936 - INFO - Navigating to Facebook...
+2026-06-07 16:06:11,214 - INFO - Successfully added 12/12 cookies
+2026-06-07 16:06:11,214 - INFO - Navigating directly to first group: https://facebook.com/groups/693479499296960/
+2026-06-07 16:06:50,710 - INFO - Successfully logged in with 12 cookies
+2026-06-07 16:07:26,603 - INFO - Processing group: https://facebook.com/groups/693479499296960/
+2026-06-07 16:07:38,916 - INFO - Group name: Monopoly Go! Free Dice Rolls
+2026-06-07 16:07:38,916 - INFO - Collecting post permalinks by scrolling the feed...
+2026-06-07 16:07:41,038 - INFO - Scroll 1/10: collected +2, total=2
+2026-06-07 16:07:44,148 - INFO - Scroll 2/10: collected +1, total=3
+2026-06-07 16:07:47,570 - INFO - Scroll 3/10: collected +1, total=4
+2026-06-07 16:07:51,036 - INFO - Scroll 4/10: collected +1, total=5
+2026-06-07 16:07:54,295 - INFO - Scroll 5/10: collected +0, total=5
+2026-06-07 16:07:57,704 - INFO - Scroll 6/10: collected +0, total=5
+2026-06-07 16:08:01,009 - INFO - Scroll 7/10: collected +1, total=6
+2026-06-07 16:08:04,203 - INFO - Scroll 8/10: collected +0, total=6
+2026-06-07 16:08:07,577 - INFO - Scroll 9/10: collected +0, total=6
+2026-06-07 16:08:10,826 - INFO - Scroll 10/10: collected +1, total=7
+2026-06-07 16:08:16,426 - INFO - Final pass added 1; total unique URLs: 8
+2026-06-07 16:08:16,427 - INFO - [1/8] Processing post URL: https://web.facebook.com/groups/693479499296960/posts/1404139691564267
+2026-06-07 16:09:56,249 - INFO - No comments found on post page for 1404139691564267
+2026-06-07 16:10:15,608 - INFO - [2/8] Processing post URL: https://web.facebook.com/groups/1731572473957070/posts/2457883741325936/
+2026-06-07 16:11:55,327 - INFO - Found 9 comments on post page using selector: div[aria-label*="Comment by"]
+2026-06-07 16:11:59,245 - INFO - Processing 9 unique root comments from post page (found=9)
+2026-06-07 16:12:00,060 - INFO - Attempting to reply to Shelia Payne's comment: Thanks...
+2026-06-07 16:12:00,850 - INFO - Clicked Reply button
+2026-06-07 16:12:09,754 - WARNING - Composer does not reference target user 'Shelia Payne'. Retrying binder...
+2026-06-07 16:12:13,058 - INFO - Typed reply message: I can help with your set DM me
+2026-06-07 16:19:00,428 - INFO - Loaded 1 groups from public CSV
+2026-06-07 16:19:04,852 - INFO - Loaded 0 posts from public CSV
+2026-06-07 16:19:04,950 - INFO - ====== WebDriver manager ======
+2026-06-07 16:19:09,099 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-07 16:19:10,353 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-07 16:19:11,577 - INFO - Driver [C:\Users\HP\.wdm\drivers\chromedriver\win64\149.0.7827.54\chromedriver-win32/chromedriver.exe] found in cache
+2026-06-07 16:19:13,235 - INFO - ChromeDriver setup successful (webdriver-manager)
+2026-06-07 16:19:17,162 - INFO - Loaded cookies for 2_cookies.json from Google Sheets
+2026-06-07 16:19:17,170 - INFO - Navigating to Facebook...
+2026-06-07 16:19:24,091 - INFO - Successfully added 14/14 cookies
+2026-06-07 16:19:24,091 - INFO - Navigating directly to first group: https://facebook.com/groups/693479499296960/
+2026-06-07 16:19:49,487 - INFO - Successfully logged in with 14 cookies
+2026-06-07 16:20:19,611 - INFO - Processing group: https://facebook.com/groups/693479499296960/
+2026-06-07 16:20:29,340 - INFO - Group name: Monopoly Go! Free Dice Rolls
+2026-06-07 16:20:29,340 - INFO - Collecting post permalinks by scrolling the feed...
+2026-06-07 16:20:31,089 - INFO - Scroll 1/10: collected +1, total=1
+2026-06-07 16:20:35,501 - INFO - Scroll 2/10: collected +3, total=4
+2026-06-07 16:20:39,111 - INFO - Scroll 3/10: collected +1, total=5
+2026-06-07 16:20:42,570 - INFO - Scroll 4/10: collected +0, total=5
+2026-06-07 16:20:46,122 - INFO - Scroll 5/10: collected +1, total=6
+2026-06-07 16:20:49,350 - INFO - Scroll 6/10: collected +0, total=6
+2026-06-07 16:20:52,283 - INFO - Scroll 7/10: collected +0, total=6
+2026-06-07 16:20:55,804 - INFO - Scroll 8/10: collected +2, total=8
+2026-06-07 16:20:59,339 - INFO - Scroll 9/10: collected +1, total=9
+2026-06-07 16:21:03,781 - INFO - Scroll 10/10: collected +1, total=10
+2026-06-07 16:21:10,325 - INFO - Final pass added 0; total unique URLs: 10
+2026-06-07 16:21:10,325 - INFO - [1/10] Processing post URL: https://web.facebook.com/groups/693479499296960/posts/1404185951559641
+2026-06-07 16:21:33,216 - INFO - No comments found on post page for 1404185951559641
+2026-06-07 16:21:48,784 - INFO - Post 1404139691564267 already processed, skipping
+2026-06-07 16:21:48,785 - INFO - [3/10] Processing post URL: https://web.facebook.com/groups/693479499296960/posts/1403963218248581
+2026-06-07 16:22:16,442 - INFO - Found 1 comments on post page using selector: div[aria-label*="Comment by"]
+2026-06-07 16:22:16,951 - INFO - Processing 1 unique root comments from post page (found=1)
+2026-06-07 16:22:17,764 - INFO - Attempting to reply to Wong Keith's comment: On guard (set 2) swap maggie(set 1)...
+2026-06-07 16:22:18,769 - INFO - Clicked Reply button
+2026-06-07 16:22:27,368 - WARNING - Composer does not reference target user 'Wong Keith'. Retrying binder...
+2026-06-07 16:22:31,042 - INFO - Typed reply message: Still searching stickers? DM me
+2026-06-07 16:22:31,215 - INFO - Sent reply using Enter key
+2026-06-07 16:22:45,699 - INFO - ✅ Reply to Wong Keith: 'Still searching stickers? DM me' - Status: SENT (verified)
+2026-06-07 16:35:06,031 - INFO - Loaded 1 groups from public CSV
+2026-06-07 16:35:10,487 - INFO - Loaded 0 posts from public CSV
+2026-06-07 16:35:10,609 - INFO - ====== WebDriver manager ======
+2026-06-07 16:35:15,044 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-07 16:35:16,114 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-07 16:35:17,343 - INFO - Driver [C:\Users\HP\.wdm\drivers\chromedriver\win64\149.0.7827.54\chromedriver-win32/chromedriver.exe] found in cache
+2026-06-07 16:35:19,097 - INFO - ChromeDriver setup successful (webdriver-manager)
+2026-06-07 16:35:22,289 - INFO - Loaded cookies for 2_cookies.json from Google Sheets
+2026-06-07 16:35:22,298 - INFO - Navigating to Facebook...
+2026-06-07 16:35:29,153 - INFO - Successfully added 14/14 cookies
+2026-06-07 16:35:29,153 - INFO - Navigating directly to first group: https://facebook.com/groups/693479499296960/
+2026-06-07 16:35:51,837 - INFO - Successfully logged in with 14 cookies
+2026-06-07 16:36:23,218 - INFO - Processing group: https://facebook.com/groups/693479499296960/
+2026-06-07 16:36:32,140 - INFO - Group name: Monopoly Go! Free Dice Rolls
+2026-06-07 16:36:32,140 - INFO - Collecting post permalinks by scrolling the feed...
+2026-06-07 16:36:33,916 - INFO - Scroll 1/10: collected +1, total=1
+2026-06-07 16:36:38,522 - INFO - Scroll 2/10: collected +3, total=4
+2026-06-07 16:36:42,273 - INFO - Scroll 3/10: collected +1, total=5
+2026-06-07 16:36:45,864 - INFO - Scroll 4/10: collected +0, total=5
+2026-06-07 16:36:49,273 - INFO - Scroll 5/10: collected +1, total=6
+2026-06-07 16:36:52,483 - INFO - Scroll 6/10: collected +0, total=6
+2026-06-07 16:36:55,720 - INFO - Scroll 7/10: collected +0, total=6
+2026-06-07 16:36:59,381 - INFO - Scroll 8/10: collected +2, total=8
+2026-06-07 16:37:02,985 - INFO - Scroll 9/10: collected +1, total=9
+2026-06-07 16:37:07,467 - INFO - Scroll 10/10: collected +1, total=10
+2026-06-07 16:37:13,814 - INFO - Final pass added 0; total unique URLs: 10
+2026-06-07 16:37:13,815 - INFO - Post 1404185951559641 already processed, skipping
+2026-06-07 16:37:13,815 - INFO - Post 1404139691564267 already processed, skipping
+2026-06-07 16:37:13,815 - INFO - [3/10] Processing post URL: https://web.facebook.com/groups/693479499296960/posts/1403963218248581/
+2026-06-07 16:39:02,705 - INFO - Found 1 comments on post page using selector: div[aria-label*="Comment by"]
+2026-06-07 16:39:03,330 - INFO - Processing 1 unique root comments from post page (found=1)
+2026-06-07 16:39:04,207 - INFO - Attempting to reply to Wong Keith's comment: On guard (set 2) swap maggie(set 1)...
+2026-06-07 16:39:05,294 - INFO - Clicked Reply button
+2026-06-07 16:39:14,099 - WARNING - Composer does not reference target user 'Wong Keith'. Retrying binder...
+2026-06-07 16:39:17,762 - INFO - Typed reply message: I can trade stickers DM me
+2026-06-07 16:39:18,167 - INFO - Sent reply using Enter key
+2026-06-07 16:39:19,455 - ERROR - Rate-limit dialog detected. Starting cooldown.
+2026-06-07 16:39:19,456 - WARNING - Entering cooldown for 30m due to rate_limit_dialog
+2026-06-07 16:39:19,456 - ERROR - Reply blocked by rate-limit. Entering cooldown and aborting this comment.

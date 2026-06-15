@@ -1,0 +1,177 @@
+2026-06-10 22:09:27,823 - INFO - Google Sheets API: Found cookies for 4_cookies.json (length=3072)
+2026-06-10 22:09:27,841 - INFO - Updated cookies for 4_cookies.json from Google Sheets API
+2026-06-10 22:09:53,034 - INFO - Window maximized for 4_cookies.json
+2026-06-10 22:10:04,349 - INFO - Login successful for 4_cookies.json on attempt 1.
+2026-06-10 22:10:30,823 - INFO - Saved fresh cookies locally for 4_cookies.json
+2026-06-10 22:10:30,824 - INFO - Account 4_cookies.json has no credentials - skipping Google Sheets cookie update (manual mode)
+2026-06-10 22:11:58,250 - INFO - Google Sheets API: Found cookies for 4_cookies.json (length=3072)
+2026-06-10 22:11:58,254 - INFO - Updated cookies for 4_cookies.json from Google Sheets API
+2026-06-10 22:12:15,305 - WARNING - No credentials/TOTP found for 4_cookies.json. Keeping cookie-only mode.
+2026-06-10 22:12:15,305 - INFO - Please update cookies in Google Sheets manually for 4_cookies.json
+2026-06-10 22:13:36,665 - WARNING - Re-login failed for 4_cookies.json, waiting before retry...
+2026-06-10 22:14:34,466 - INFO - Google Sheets API: Found cookies for 4_cookies.json (length=3071)
+2026-06-10 22:14:34,470 - INFO - Updated cookies for 4_cookies.json from Google Sheets API
+2026-06-10 22:14:58,019 - INFO - Auto re-login successful after cookie refresh.
+2026-06-10 22:15:13,786 - INFO - Re-login successful for 4_cookies.json, waiting for Messenger to load...
+2026-06-10 22:15:28,448 - INFO - Auto-clicked generic close 'X' button (strategy 1)
+2026-06-10 22:15:28,950 - INFO - Checking for new message requests...
+2026-06-10 22:15:30,226 - WARNING - Error clicking Requests icon (attempt 1): ElementClickInterceptedException: Message: element click intercepted: Element <a aria-current="false" aria-label="Requests" class="x1i10hfl xjbqb8w xjqpnuy xc5r6h4 xqeqjp1 x1phubyo x13fuv20 x18b5jzi x1q0q8m5 x1t7ytsu x972fbf x10w94by x1qhh985 x14e42zd x9f619 x1ypdohk xdl72j9 x2lah0s x3ct3a4 x2lwn1j xeuugli xyri2b x1c1uobl x1n2onr6 x16tdsg8 x1hl2dhg xggy1nq x1ja2u2z x1t137rt x87ps6o x1lku1pv x1a2a7pz x6s0dn4 x1q0g3np xn3w4p2 x1nn3v0j x1120s5i x1obq294 x5a5i1n xde0f50 x15x8krk xdj266r x14z9mp xat24cr x1lziwak x78zum5" href="/requests/t/1341377541235167/?focus_target=2" id="left-sidebar-button-requests" role="link" tabindex="0" target="_self">...</a> is not clickable at point (38, 126). Other element would receive the click: <div class="__fb-dark-mode x1qjc9v5 x9f619 x78zum5 xdt5ytf xl56j7k x1c4vz4f xg6iff7">...</div>
+  (Session info: chrome=149.0.7827.102)
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x118fa13+106c3]
+	chromedriver!GetHandleVerifier [0x118fa54+10704]
+	chromedriver!(No symbol) [0xf8a830]
+	chromedriver!(No symbol) [0xfd9b98]
+	chromedriver!(No symbol) [0xfd8229]
+	chromedriver!(No symbol) [0xfd6015]
+	chromedriver!(No symbol) [0xfd5224]
+	chromedriver!(No symbol) [0xfcad17]
+	chromedriver!(No symbol) [0xff628c]
+	chromedriver!(No symbol) [0xfca754]
+	chromedriver!(No symbol) [0xff6454]
+	chromedriver!(No symbol) [0x10132fa]
+	chromedriver!(No symbol) [0xff6026]
+	chromedriver!(No symbol) [0xfc9289]
+	chromedriver!(No symbol) [0xfca054]
+	chromedriver!GetHandleVerifier [0x14144fa+2951aa]
+	chromedriver!GetHandleVerifier [0x140fb56+290806]
+	chromedriver!GetHandleVerifier [0x142ff8b+2b0c3b]
+	chromedriver!GetHandleVerifier [0x11a9ed6+2ab86]
+	chromedriver!GetHandleVerifier [0x11b124d+31efd]
+	chromedriver!GetHandleVerifier [0x11983d8+19088]
+	chromedriver!GetHandleVerifier [0x1198585+19235]
+	chromedriver!GetHandleVerifier [0x118125f+1f0f]
+	KERNEL32!(No symbol) [0x751a5d49]
+	ntdll!RtlInitializeExceptionChain [0x77aad83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x77aad7c1+231]
+
+2026-06-10 22:15:33,421 - WARNING - Error clicking Requests icon (attempt 2): ElementClickInterceptedException: Message: element click intercepted: Element <a aria-current="false" aria-label="Requests" class="x1i10hfl xjbqb8w xjqpnuy xc5r6h4 xqeqjp1 x1phubyo x13fuv20 x18b5jzi x1q0q8m5 x1t7ytsu x972fbf x10w94by x1qhh985 x14e42zd x9f619 x1ypdohk xdl72j9 x2lah0s x3ct3a4 x2lwn1j xeuugli xyri2b x1c1uobl x1n2onr6 x16tdsg8 x1hl2dhg xggy1nq x1ja2u2z x1t137rt x87ps6o x1lku1pv x1a2a7pz x6s0dn4 x1q0g3np xn3w4p2 x1nn3v0j x1120s5i x1obq294 x5a5i1n xde0f50 x15x8krk xdj266r x14z9mp xat24cr x1lziwak x78zum5" href="/requests/t/1341377541235167/?focus_target=2" id="left-sidebar-button-requests" role="link" tabindex="0" target="_self">...</a> is not clickable at point (38, 126). Other element would receive the click: <div class="__fb-dark-mode x1qjc9v5 x9f619 x78zum5 xdt5ytf xl56j7k x1c4vz4f xg6iff7">...</div>
+  (Session info: chrome=149.0.7827.102)
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x118fa13+106c3]
+	chromedriver!GetHandleVerifier [0x118fa54+10704]
+	chromedriver!(No symbol) [0xf8a830]
+	chromedriver!(No symbol) [0xfd9b98]
+	chromedriver!(No symbol) [0xfd8229]
+	chromedriver!(No symbol) [0xfd6015]
+	chromedriver!(No symbol) [0xfd5224]
+	chromedriver!(No symbol) [0xfcad17]
+	chromedriver!(No symbol) [0xff628c]
+	chromedriver!(No symbol) [0xfca754]
+	chromedriver!(No symbol) [0xff6454]
+	chromedriver!(No symbol) [0x10132fa]
+	chromedriver!(No symbol) [0xff6026]
+	chromedriver!(No symbol) [0xfc9289]
+	chromedriver!(No symbol) [0xfca054]
+	chromedriver!GetHandleVerifier [0x14144fa+2951aa]
+	chromedriver!GetHandleVerifier [0x140fb56+290806]
+	chromedriver!GetHandleVerifier [0x142ff8b+2b0c3b]
+	chromedriver!GetHandleVerifier [0x11a9ed6+2ab86]
+	chromedriver!GetHandleVerifier [0x11b124d+31efd]
+	chromedriver!GetHandleVerifier [0x11983d8+19088]
+	chromedriver!GetHandleVerifier [0x1198585+19235]
+	chromedriver!GetHandleVerifier [0x118125f+1f0f]
+	KERNEL32!(No symbol) [0x751a5d49]
+	ntdll!RtlInitializeExceptionChain [0x77aad83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x77aad7c1+231]
+
+2026-06-10 22:15:36,617 - WARNING - Error clicking Requests icon (attempt 3): ElementClickInterceptedException: Message: element click intercepted: Element <a aria-current="false" aria-label="Requests" class="x1i10hfl xjbqb8w xjqpnuy xc5r6h4 xqeqjp1 x1phubyo x13fuv20 x18b5jzi x1q0q8m5 x1t7ytsu x972fbf x10w94by x1qhh985 x14e42zd x9f619 x1ypdohk xdl72j9 x2lah0s x3ct3a4 x2lwn1j xeuugli xyri2b x1c1uobl x1n2onr6 x16tdsg8 x1hl2dhg xggy1nq x1ja2u2z x1t137rt x87ps6o x1lku1pv x1a2a7pz x6s0dn4 x1q0g3np xn3w4p2 x1nn3v0j x1120s5i x1obq294 x5a5i1n xde0f50 x15x8krk xdj266r x14z9mp xat24cr x1lziwak x78zum5" href="/requests/t/1341377541235167/?focus_target=2" id="left-sidebar-button-requests" role="link" tabindex="0" target="_self">...</a> is not clickable at point (38, 126). Other element would receive the click: <div class="__fb-dark-mode x1qjc9v5 x9f619 x78zum5 xdt5ytf xl56j7k x1c4vz4f xg6iff7">...</div>
+  (Session info: chrome=149.0.7827.102)
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x118fa13+106c3]
+	chromedriver!GetHandleVerifier [0x118fa54+10704]
+	chromedriver!(No symbol) [0xf8a830]
+	chromedriver!(No symbol) [0xfd9b98]
+	chromedriver!(No symbol) [0xfd8229]
+	chromedriver!(No symbol) [0xfd6015]
+	chromedriver!(No symbol) [0xfd5224]
+	chromedriver!(No symbol) [0xfcad17]
+	chromedriver!(No symbol) [0xff628c]
+	chromedriver!(No symbol) [0xfca754]
+	chromedriver!(No symbol) [0xff6454]
+	chromedriver!(No symbol) [0x10132fa]
+	chromedriver!(No symbol) [0xff6026]
+	chromedriver!(No symbol) [0xfc9289]
+	chromedriver!(No symbol) [0xfca054]
+	chromedriver!GetHandleVerifier [0x14144fa+2951aa]
+	chromedriver!GetHandleVerifier [0x140fb56+290806]
+	chromedriver!GetHandleVerifier [0x142ff8b+2b0c3b]
+	chromedriver!GetHandleVerifier [0x11a9ed6+2ab86]
+	chromedriver!GetHandleVerifier [0x11b124d+31efd]
+	chromedriver!GetHandleVerifier [0x11983d8+19088]
+	chromedriver!GetHandleVerifier [0x1198585+19235]
+	chromedriver!GetHandleVerifier [0x118125f+1f0f]
+	KERNEL32!(No symbol) [0x751a5d49]
+	ntdll!RtlInitializeExceptionChain [0x77aad83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x77aad7c1+231]
+
+2026-06-10 22:15:39,773 - WARNING - Error clicking Requests icon (attempt 4): ElementClickInterceptedException: Message: element click intercepted: Element <a aria-current="false" aria-label="Requests" class="x1i10hfl xjbqb8w xjqpnuy xc5r6h4 xqeqjp1 x1phubyo x13fuv20 x18b5jzi x1q0q8m5 x1t7ytsu x972fbf x10w94by x1qhh985 x14e42zd x9f619 x1ypdohk xdl72j9 x2lah0s x3ct3a4 x2lwn1j xeuugli xyri2b x1c1uobl x1n2onr6 x16tdsg8 x1hl2dhg xggy1nq x1ja2u2z x1t137rt x87ps6o x1lku1pv x1a2a7pz x6s0dn4 x1q0g3np xn3w4p2 x1nn3v0j x1120s5i x1obq294 x5a5i1n xde0f50 x15x8krk xdj266r x14z9mp xat24cr x1lziwak x78zum5" href="/requests/t/1341377541235167/?focus_target=2" id="left-sidebar-button-requests" role="link" tabindex="0" target="_self">...</a> is not clickable at point (38, 126). Other element would receive the click: <div class="__fb-dark-mode x1qjc9v5 x9f619 x78zum5 xdt5ytf xl56j7k x1c4vz4f xg6iff7">...</div>
+  (Session info: chrome=149.0.7827.102)
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x118fa13+106c3]
+	chromedriver!GetHandleVerifier [0x118fa54+10704]
+	chromedriver!(No symbol) [0xf8a830]
+	chromedriver!(No symbol) [0xfd9b98]
+	chromedriver!(No symbol) [0xfd8229]
+	chromedriver!(No symbol) [0xfd6015]
+	chromedriver!(No symbol) [0xfd5224]
+	chromedriver!(No symbol) [0xfcad17]
+	chromedriver!(No symbol) [0xff628c]
+	chromedriver!(No symbol) [0xfca754]
+	chromedriver!(No symbol) [0xff6454]
+	chromedriver!(No symbol) [0x10132fa]
+	chromedriver!(No symbol) [0xff6026]
+	chromedriver!(No symbol) [0xfc9289]
+	chromedriver!(No symbol) [0xfca054]
+	chromedriver!GetHandleVerifier [0x14144fa+2951aa]
+	chromedriver!GetHandleVerifier [0x140fb56+290806]
+	chromedriver!GetHandleVerifier [0x142ff8b+2b0c3b]
+	chromedriver!GetHandleVerifier [0x11a9ed6+2ab86]
+	chromedriver!GetHandleVerifier [0x11b124d+31efd]
+	chromedriver!GetHandleVerifier [0x11983d8+19088]
+	chromedriver!GetHandleVerifier [0x1198585+19235]
+	chromedriver!GetHandleVerifier [0x118125f+1f0f]
+	KERNEL32!(No symbol) [0x751a5d49]
+	ntdll!RtlInitializeExceptionChain [0x77aad83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x77aad7c1+231]
+
+2026-06-10 22:15:42,966 - WARNING - Error clicking Requests icon (attempt 5): ElementClickInterceptedException: Message: element click intercepted: Element <a aria-current="false" aria-label="Requests" class="x1i10hfl xjbqb8w xjqpnuy xc5r6h4 xqeqjp1 x1phubyo x13fuv20 x18b5jzi x1q0q8m5 x1t7ytsu x972fbf x10w94by x1qhh985 x14e42zd x9f619 x1ypdohk xdl72j9 x2lah0s x3ct3a4 x2lwn1j xeuugli xyri2b x1c1uobl x1n2onr6 x16tdsg8 x1hl2dhg xggy1nq x1ja2u2z x1t137rt x87ps6o x1lku1pv x1a2a7pz x6s0dn4 x1q0g3np xn3w4p2 x1nn3v0j x1120s5i x1obq294 x5a5i1n xde0f50 x15x8krk xdj266r x14z9mp xat24cr x1lziwak x78zum5" href="/requests/t/1341377541235167/?focus_target=2" id="left-sidebar-button-requests" role="link" tabindex="0" target="_self">...</a> is not clickable at point (38, 126). Other element would receive the click: <div class="__fb-dark-mode x1qjc9v5 x9f619 x78zum5 xdt5ytf xl56j7k x1c4vz4f xg6iff7">...</div>
+  (Session info: chrome=149.0.7827.102)
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x118fa13+106c3]
+	chromedriver!GetHandleVerifier [0x118fa54+10704]
+	chromedriver!(No symbol) [0xf8a830]
+	chromedriver!(No symbol) [0xfd9b98]
+	chromedriver!(No symbol) [0xfd8229]
+	chromedriver!(No symbol) [0xfd6015]
+	chromedriver!(No symbol) [0xfd5224]
+	chromedriver!(No symbol) [0xfcad17]
+	chromedriver!(No symbol) [0xff628c]
+	chromedriver!(No symbol) [0xfca754]
+	chromedriver!(No symbol) [0xff6454]
+	chromedriver!(No symbol) [0x10132fa]
+	chromedriver!(No symbol) [0xff6026]
+	chromedriver!(No symbol) [0xfc9289]
+	chromedriver!(No symbol) [0xfca054]
+	chromedriver!GetHandleVerifier [0x14144fa+2951aa]
+	chromedriver!GetHandleVerifier [0x140fb56+290806]
+	chromedriver!GetHandleVerifier [0x142ff8b+2b0c3b]
+	chromedriver!GetHandleVerifier [0x11a9ed6+2ab86]
+	chromedriver!GetHandleVerifier [0x11b124d+31efd]
+	chromedriver!GetHandleVerifier [0x11983d8+19088]
+	chromedriver!GetHandleVerifier [0x1198585+19235]
+	chromedriver!GetHandleVerifier [0x118125f+1f0f]
+	KERNEL32!(No symbol) [0x751a5d49]
+	ntdll!RtlInitializeExceptionChain [0x77aad83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x77aad7c1+231]
+
+2026-06-10 22:15:44,970 - ERROR - Failed to load Requests page after 5 attempts
+2026-06-10 22:15:44,971 - WARNING - Could not load Requests page, will retry in next iteration...
+2026-06-10 22:16:46,900 - INFO - Auto-clicked 'Don't restore messages' button (strategy 1)
+2026-06-10 22:16:47,402 - INFO - Checking for new message requests...
+2026-06-10 22:16:47,659 - INFO - Clicked Requests icon (attempt 1)
+2026-06-10 22:16:49,757 - INFO - Requests page verified loaded (method 2, attempt 1)
+2026-06-10 22:17:14,061 - INFO - Switched to 'You may know' tab (attempt 1, no active indicator found)
+2026-06-10 22:17:14,086 - INFO - No new threads in 'You may know'. Switching to 'Spam'...
+2026-06-10 22:17:33,469 - INFO - Switched to 'Spam' tab (attempt 1, no active indicator found)
+2026-06-10 22:17:33,491 - INFO - No new threads in 'Spam'. Waiting for 60 seconds...

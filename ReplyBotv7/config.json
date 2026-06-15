@@ -1,0 +1,57 @@
+{
+    "delay_between_messages": 3,
+    "delay_resend_same_chat": 900,
+    "delay_window_launch": 0,
+    "delay_click_request": 3,
+    "delay_accept": 2,
+    "delay_retry_login": 4,
+    "delay_failed_login": 10,
+    "delay_check_requests": 60,
+    "delay_chat_load": 5,
+    "repeat_count": 0,
+    "message_count": 1,
+    "keep_browser_open_on_fail": true,
+    "max_auto_relogin_attempts": 0,
+    "auto_login_with_credentials": true,
+
+    "google_sheets": {
+        "enabled": true,
+        "mode": "api",
+        "service_account_json": "service_account.json",
+        "spreadsheet_id": "1IeRitONX3rBeD1mu2QSwI-Uij1tCZhAqlil0QOFjdMU",
+        "sheet_name": "Sheet1",
+        "account_column": "account_file",
+        "json_column": "cookies_json",
+        "published_csv_url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQazhG_nDbOQEboO0-CaHsN0MDAKf6R9NSScSiXnazINq-g2Lfs8HRoAnTObj3In7blDMeHPNw_jg2G/pub?gid=0&single=true&output=csv"
+    },
+
+    "telegram": {
+        "bot_token": "6582805256:AAE_SEYuHjKf7PHXlL7jTHICMKJHzRDYPRA",
+        "chat_id": "1670086536",
+        "alerts_only": true,
+        "alerts_via_broker": true,
+        "min_interval_sec": 900,
+        "auto_report_minutes": 30,
+        "status_heartbeat_seconds": 60
+    },
+
+    "watchdog": {
+        "inactivity_minutes": 15,
+        "rdp_disconnect_grace_minutes": 10,
+        "session_limit_hours": 6
+    },
+
+    "window": {
+        "mode": "maximized",
+        "width": 800,
+        "height": 600,
+        "stagger_offset": 40
+    },
+    "telegram_bot_token": "6582805256:AAE_SEYuHjKf7PHXlL7jTHICMKJHzRDYPRA",
+    "telegram_chat_id": "1670086536",
+    "telegram_min_interval_sec": 900,
+
+    "_comment_credentials": "CREDENTIALS NOW STORED IN SEPARATE FILES - See accounts/*.credentials.json",
+    "_credentials_example": "accounts/2_cookies.credentials.json contains: username, password, totp_secret",
+    "fb_credentials": {}
+}
