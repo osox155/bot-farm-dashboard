@@ -13,7 +13,7 @@
     "WaitAfterLaunchSeconds": 5
   },
   "CommentsReplyBot": {
-    "Enabled": false,
+    "Enabled": true,
     "DesktopIndex": 2,
     "ExePath": "CommentsReplyBot/facebook_bot.py",
     "OptionSequence": 1,
@@ -31,7 +31,7 @@
     "WaitAfterEachStepSeconds": 5
   },
   "FewFeed": {
-    "Enabled": false,
+    "Enabled": true,
     "DesktopIndex": 3,
     "ExePath": "fewfeedbotv6/fewfeed_bot_template.py",
     "MenuOptionToLaunch": 1,
