@@ -333,16 +333,80 @@ function Move-LauncherToDesktop {
   try {
     $hwnd = (Get-Process -Id $PID).MainWindowHandle
     if ($hwnd -eq 0) { return $false }
-    if (Get-Command Move-WindowToDesktop -ErrorAction SilentlyContinue) {
+    # NOTE: the cmdlet is Move-Window in the VirtualDesktop module (1.5.x).
+    # There is no Move-WindowToDesktop — guarding on it made this a silent no-op.
+    if (Get-Command Move-Window -ErrorAction SilentlyContinue) {
       $desktop = Get-Desktop -Index ($Index - 1)
       if ($desktop) {
-        Move-WindowToDesktop -Window $hwnd -Desktop $desktop
+        Move-Window -Desktop $desktop -Hwnd $hwnd | Out-Null
         Write-Host ("Moved launcher window to Desktop {0}." -f $Index) -ForegroundColor DarkCyan
         return $true
       }
     }
   } catch {}
   return $false
+}
+
+function Place-BotWindowsOnDesktop {
+  # Move a bot's windows (its console + the Chrome windows it spawns) onto the
+  # target virtual desktop via the COM Move-Window cmdlet. This works even when
+  # the RDP session is disconnected (no input focus / no active desktop needed),
+  # unlike switching the active desktop or sending Win+Ctrl+Arrow keystrokes.
+  #
+  # BaselineChromePids = chrome.exe PIDs that existed BEFORE this bot launched, so
+  # only the windows this bot creates are moved. Chrome windows appear staggered
+  # (one per account, plus as the login loop brings accounts up) and their
+  # MainWindowHandle is 0 until realized, so we poll for SettleSeconds.
+  param(
+    [System.Diagnostics.Process] $RootProcess,
+    [Parameter(Mandatory)] [int] $Index,
+    [int[]] $BaselineChromePids = @(),
+    [int] $SettleSeconds = 25
+  )
+  if (-not (Get-Command Move-Window -ErrorAction SilentlyContinue)) {
+    Write-Host "Place-BotWindowsOnDesktop: Move-Window unavailable; skipping placement." -ForegroundColor Yellow
+    return
+  }
+  $desktop = $null
+  try { $desktop = Get-Desktop -Index ($Index - 1) } catch {}
+  if ($null -eq $desktop) {
+    Write-Host ("Place-BotWindowsOnDesktop: Desktop {0} not available; skipping." -f $Index) -ForegroundColor Yellow
+    return
+  }
+
+  $baseline = @{}
+  foreach ($bp in $BaselineChromePids) { $baseline[[int]$bp] = $true }
+  $moved = @{}
+
+  # Best-effort: move the bot's own console window first.
+  if ($RootProcess) {
+    try {
+      $RootProcess.Refresh()
+      $consoleHwnd = $RootProcess.MainWindowHandle
+      if ($consoleHwnd -ne 0) { Move-Window -Desktop $desktop -Hwnd $consoleHwnd | Out-Null }
+    } catch {}
+  }
+
+  Write-Host ("Placing this bot's Chrome windows on Desktop {0} (COM move, RDP-safe)..." -f $Index) -ForegroundColor DarkYellow
+  $sw = [System.Diagnostics.Stopwatch]::StartNew()
+  while ($sw.Elapsed.TotalSeconds -lt $SettleSeconds) {
+    foreach ($cp in @(Get-Process -Name chrome -ErrorAction SilentlyContinue)) {
+      if ($baseline.ContainsKey([int]$cp.Id)) { continue }
+      if ($moved.ContainsKey([int]$cp.Id)) { continue }
+      $hwnd = $cp.MainWindowHandle
+      if ($hwnd -ne 0) {
+        try {
+          Move-Window -Desktop $desktop -Hwnd $hwnd | Out-Null
+          $moved[[int]$cp.Id] = $true
+          Write-Host ("  Placed Chrome (pid {0}) on Desktop {1}." -f $cp.Id, $Index) -ForegroundColor DarkCyan
+        } catch {
+          Write-Host ("  Move-Window failed for pid {0}: {1}" -f $cp.Id, $_.Exception.Message) -ForegroundColor DarkYellow
+        }
+      }
+    }
+    Start-Sleep -Milliseconds 1500
+  }
+  Write-Host ("Placed {0} Chrome window(s) on Desktop {1}." -f $moved.Count, $Index) -ForegroundColor Green
 }
 
 function Switch-ToDesktopIndex {
@@ -375,22 +439,6 @@ function Switch-ToDesktopIndex {
     }
   }
 
-  # --- Method 2: Keystroke fallback with SendInput ---
-  if (-not $switched) {
-    $current = Get-CurrentDesktopIndexSafe
-    $diff = $Index - $current
-    if ($diff -ne 0) {
-      $action = if ($diff -gt 0) { 'Right' } else { 'Left' }
-      $count = [Math]::Abs($diff)
-      Write-Host ("Using keystroke navigation ({0} x {1})" -f $action, $count) -ForegroundColor DarkYellow
-      Focus-PowerShellWindow -DelayMs 500
-      Start-Sleep -Milliseconds 200
-      for ($i = 0; $i -lt $count; $i++) {
-        Send-DesktopKeystroke -Action $action -DelayAfterMs 800
-      }
-    }
-    $switched = $true
-  }
 
   # --- Finalize: focus, sleep, and move launcher window if not already moved ---
   Focus-PowerShellWindow -DelayMs 500
@@ -534,6 +582,7 @@ if ($config.PSObject.Properties.Name -contains 'AutoJoinBot') {
     }
     
     $ajExe = [string]$config.AutoJoinBot.ExePath
+    $ajBaselineChrome = @(Get-Process -Name chrome -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Id)
     $aj = Start-ConsoleApp -ExePath $ajExe
     $ajAccountsRaw = ''
     
@@ -602,6 +651,9 @@ if ($config.PSObject.Properties.Name -contains 'AutoJoinBot') {
     Write-Host ("Waiting for AutoJoinBot Chrome launches (expected: {0})..." -f $ajExpectedCount) -ForegroundColor DarkYellow
     [void](Wait-ChromeProcesses -ExpectedCount $ajExpectedCount -TimeoutSeconds 180 -QuietPeriodSeconds 15)
   }
+  if ($config.NewDesktop.UseNewVirtualDesktop) {
+    Place-BotWindowsOnDesktop -RootProcess $aj -Index $ajIdx -BaselineChromePids $ajBaselineChrome -SettleSeconds 25
+  }
   }
 }
 
@@ -621,6 +673,7 @@ if ($config.PSObject.Properties.Name -contains 'CommentsReplyBot') {
     
     Write-Host 'Starting CommentsReplyBot (pre-FewFeed)...' -ForegroundColor Cyan
     $crbExe = [string]$config.CommentsReplyBot.ExePath
+    $crbBaselineChrome = @(Get-Process -Name chrome -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Id)
     $crb = Start-ConsoleApp -ExePath $crbExe
 
     # Check RotationEnabled toggle
@@ -701,7 +754,9 @@ if ($config.PSObject.Properties.Name -contains 'CommentsReplyBot') {
   $expectedChrome = [Math]::Max(1, $expectedAccounts.Count)
   Write-Host ("Waiting for CommentsReplyBot Chrome launches (expected: {0})..." -f $expectedChrome) -ForegroundColor DarkYellow
   [void](Wait-ChromeProcesses -ExpectedCount $expectedChrome -TimeoutSeconds 240 -QuietPeriodSeconds 20)
-
+  if ($config.NewDesktop.UseNewVirtualDesktop) {
+    Place-BotWindowsOnDesktop -RootProcess $crb -Index $crbIdx -BaselineChromePids $crbBaselineChrome -SettleSeconds 25
+  }
   Write-Host 'CommentsReplyBot finished launching accounts.' -ForegroundColor Green
 
 
@@ -800,7 +855,7 @@ if ($config.PSObject.Properties.Name -contains 'FewFeed') {
     if ($config.FewFeed.PSObject.Properties.Name -contains 'BatchSize') { $batchSize = [int]$config.FewFeed.BatchSize }
 
     # Capture Chrome baseline BEFORE launching FewFeed so we can wait reliably afterwards
-    $ffBaselineChrome = @(Get-Process -Name chrome -ErrorAction SilentlyContinue).Length
+    $ffBaselineChrome = @(Get-Process -Name chrome -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Id)
 
     if ($launchMode -in @('sequential','batch')) {
       $accountsList = $ffAccountsRaw.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne '' }
@@ -847,7 +902,9 @@ if ($config.PSObject.Properties.Name -contains 'FewFeed') {
       
       Write-Host "Ensuring all FewFeed Chrome processes are settled..." -ForegroundColor DarkYellow
       Start-Sleep -Seconds 5
-      
+      if ($config.NewDesktop.UseNewVirtualDesktop -and $lastFF) {
+        Place-BotWindowsOnDesktop -RootProcess $lastFF -Index $ffIdx -BaselineChromePids $ffBaselineChrome -SettleSeconds 25
+      }
     } catch {
       Write-Warning ('Failed waiting for FewFeed Chrome processes: ' + $_.Exception.Message)
     }
@@ -881,6 +938,9 @@ if ($config.PSObject.Properties.Name -contains 'ReplyBot') {
     # 3) Start ReplyBot and run steps
     Write-Host 'Starting ReplyBot...' -ForegroundColor Cyan
     $rbExe = $config.ReplyBot.ExePath
+    # Snapshot existing Chrome PIDs so we can attribute (and move) only the
+    # windows this bot opens.
+    $rbBaselineChrome = @(Get-Process -Name chrome -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Id)
     $rb = Start-ConsoleApp $rbExe
 
     # Check RotationEnabled toggle
@@ -1001,6 +1061,11 @@ if ($config.PSObject.Properties.Name -contains 'ReplyBot') {
         Write-Host ("Waiting for ReplyBot Chrome launches (expected: {0})..." -f $rbAllAccounts.Count) -ForegroundColor DarkYellow
         [void](Wait-ChromeProcesses -ExpectedCount $rbAllAccounts.Count -TimeoutSeconds 240 -QuietPeriodSeconds 15)
     }
+    # Move ReplyBot's Chrome windows onto its desktop via COM (works under
+    # disconnected RDP; does not rely on the active-desktop switch).
+    if ($config.NewDesktop.UseNewVirtualDesktop) {
+        Place-BotWindowsOnDesktop -RootProcess $rb -Index $rbIdx -BaselineChromePids $rbBaselineChrome -SettleSeconds 25
+    }
   } else {
     Write-Host 'ReplyBot is disabled via config. Skipping launch.' -ForegroundColor Yellow
   }
@@ -1056,8 +1121,7 @@ if ($returnIndex) {
     }
   }
   if (-not $doneReturn -and $config.NewDesktop.UseNewVirtualDesktop) {
-    Write-Warning ("Could not return to Desktop {0} via module. Attempting fallback create/switch..." -f $returnIndex)
-    [void](Ensure-DesktopSwitch -Purpose ("ReturnTo{0}" -f $returnIndex))
+    Write-Warning ("Could not return to Desktop {0} via module." -f $returnIndex)
   }
 }
 
