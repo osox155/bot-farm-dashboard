@@ -1,0 +1,7 @@
+requests>=2.25
+pyperclip>=1.8
+pyotp>=2.6
+selenium>=4.15
+webdriver-manager>=4.0
+gspread>=5.12
+google-auth>=2.29
