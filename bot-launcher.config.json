@@ -24,7 +24,7 @@
     },
     "RotationPreset": {
       "RotationMode": "DayOfWeek",
-      "AccountPool": "2,3,4",
+      "AccountPool": "3,4",
       "BatchSizeForOption1": 1,
       "BatchSizeForOption5": 2
     },
@@ -59,7 +59,7 @@
     },
     "RotationPreset": {
       "RotationMode": "DayOfWeek",
-      "AccountPool": "2,3,4",
+      "AccountPool": "3,4",
       "BatchSizeForOption2": 2,
       "BatchSizeForOption11": 1
     },
