@@ -426,15 +426,58 @@ def build_statistics_report(stats_data):
 dashboard_keyboard = {
     "inline_keyboard": [
         [
-            {"text": "🤖 FewFeed Details", "callback_data": "view_fewfeed"},
-            {"text": "💬 ReplyBot Details", "callback_data": "view_replybot"}
+            {"text": "🤖 FewFeed", "callback_data": "view_fewfeed"},
+            {"text": "💬 ReplyBot", "callback_data": "view_replybot"},
+            {"text": "💬 Comments", "callback_data": "view_comments"},
+            {"text": "👥 AutoJoin", "callback_data": "view_autojoin"}
         ],
         [
-            {"text": "💬 CommentsReply Details", "callback_data": "view_comments"},
-            {"text": "👥 AutoJoin Details", "callback_data": "view_autojoin"}
+            {"text": "🔄 Refresh", "callback_data": "refresh_dash"},
+            {"text": "🎮 Control Panel", "callback_data": "show_control"},
+            {"text": "⚠️ Problems", "callback_data": "show_problems"}
+        ]
+    ]
+}
+
+control_keyboard = {
+    "inline_keyboard": [
+        [
+            {"text": "▶️ Start All Bots", "callback_data": "ctrl_start_all"},
+            {"text": "⏹️ Stop All Bots",  "callback_data": "ctrl_stop_all"}
         ],
         [
-            {"text": "🔄 Refresh Dashboard", "callback_data": "refresh_dash"}
+            {"text": "🔄 Restart All",    "callback_data": "ctrl_restart_all"}
+        ],
+        [
+            {"text": "⏹️ Stop ReplyBot",       "callback_data": "ctrl_stop_replybot"},
+            {"text": "▶️ Start ReplyBot",       "callback_data": "ctrl_start_replybot"}
+        ],
+        [
+            {"text": "⏹️ Stop Comments",        "callback_data": "ctrl_stop_comments"},
+            {"text": "▶️ Start Comments",        "callback_data": "ctrl_start_comments"}
+        ],
+        [
+            {"text": "⏹️ Stop FewFeed",          "callback_data": "ctrl_stop_fewfeed"},
+            {"text": "▶️ Start FewFeed",          "callback_data": "ctrl_start_fewfeed"}
+        ],
+        [
+            {"text": "⏹️ Stop AutoJoin",          "callback_data": "ctrl_stop_autojoin"},
+            {"text": "▶️ Start AutoJoin",          "callback_data": "ctrl_start_autojoin"}
+        ],
+        [
+            {"text": "📋 Logs ReplyBot",     "callback_data": "logs_replybot"},
+            {"text": "📋 Logs Comments",     "callback_data": "logs_comments"}
+        ],
+        [
+            {"text": "📋 Logs FewFeed",      "callback_data": "logs_fewfeed"},
+            {"text": "📋 Logs AutoJoin",     "callback_data": "logs_autojoin"}
+        ],
+        [
+            {"text": "📦 Git Log",           "callback_data": "ctrl_git"},
+            {"text": "🗑️ Reset Stats",       "callback_data": "ctrl_reset"}
+        ],
+        [
+            {"text": "🖥️ Back to Dashboard", "callback_data": "refresh_dash"}
         ]
     ]
 }
@@ -679,67 +722,238 @@ def parent_monitor_worker(parent_pid, notifier):
             
         time.sleep(1.5)
 
+def _force_kill_all_bots():
+    """Kill all running bot processes and Chrome/ChromeDriver instances."""
+    import subprocess
+    patterns = [
+        '*new.py*', '*new.exe*', '*facebook_bot*', '*fewfeed_bot_template*',
+        '*auto_join*', '*join_groups*', '*start-bots*', '*start_bots*'
+    ]
+    where = " -or ".join(f"$_.CommandLine -like '{p}'" for p in patterns)
+    cmd = f'powershell -Command "Get-CimInstance Win32_Process | Where-Object {{ {where} }} | ForEach-Object {{ Stop-Process $_.ProcessId -Force -ErrorAction SilentlyContinue }}"'
+    subprocess.run(cmd, shell=True, capture_output=True, timeout=15)
+    subprocess.run("taskkill /f /im chromedriver.exe 2>nul", shell=True, capture_output=True)
+    subprocess.run("taskkill /f /im chrome.exe 2>nul", shell=True, capture_output=True)
+
+def _stop_one_bot(bot_arg):
+    """Kill processes for a single bot. Returns count killed."""
+    import subprocess
+    kill_map = {
+        "replybot":         ["*new.py*", "*new.exe*"],
+        "comments":         ["*facebook_bot*"],
+        "fewfeed":          ["*fewfeed_bot_template*"],
+        "autojoin":         ["*auto_join*", "*join_groups*"],
+    }
+    patterns = kill_map.get(bot_arg, [])
+    if not patterns:
+        return 0
+    where = " -or ".join(f"$_.CommandLine -like '{p}'" for p in patterns)
+    cmd = f'powershell -Command "Get-CimInstance Win32_Process | Where-Object {{ {where} }} | ForEach-Object {{ Stop-Process $_.ProcessId -Force -ErrorAction SilentlyContinue }}"'
+    subprocess.run(cmd, shell=True, capture_output=True, timeout=10)
+    return 1
+
+def _start_one_bot(bot_arg):
+    """Launch a single bot's Python script directly."""
+    import subprocess
+    start_map = {
+        "replybot":  os.path.join(BASE_DIR, "ReplyBotv7", "new.py"),
+        "comments":  os.path.join(BASE_DIR, "CommentsReplyBot", "facebook_bot.py"),
+        "fewfeed":   os.path.join(BASE_DIR, "fewfeedbotv6", "fewfeed_bot_template.py"),
+        "autojoin":  os.path.join(BASE_DIR, "AutoJoinBot", "auto_join.py"),
+    }
+    script = start_map.get(bot_arg)
+    if not script or not os.path.exists(script):
+        return False
+    subprocess.Popen(
+        ["python", script],
+        cwd=os.path.dirname(script),
+        creationflags=subprocess.CREATE_NEW_CONSOLE
+    )
+    return True
+
+def _tail_log(bot_arg, lines=30):
+    """Return last N lines of the most recent log for bot_arg."""
+    log_map = {
+        "replybot":  os.path.join(BASE_DIR, "ReplyBotv7", "logs"),
+        "comments":  os.path.join(BASE_DIR, "CommentsReplyBot", "logs"),
+        "fewfeed":   os.path.join(BASE_DIR, "fewfeedbotv6", "logs"),
+        "autojoin":  os.path.join(BASE_DIR, "AutoJoinBot", "logs"),
+        "broker":    TELEMETRY_DIR,
+    }
+    if bot_arg == "broker":
+        candidates = [os.path.join(TELEMETRY_DIR, "broker.log")]
+    else:
+        d = log_map.get(bot_arg, "")
+        try:
+            candidates = sorted(
+                [os.path.join(d, f) for f in os.listdir(d) if f.endswith(".log")],
+                key=os.path.getmtime, reverse=True
+            )
+        except Exception:
+            candidates = []
+    if not candidates or not os.path.exists(candidates[0]):
+        return f"No log found for {bot_arg}."
+    try:
+        with open(candidates[0], "r", encoding="utf-8", errors="replace") as f:
+            tail = "".join(f.readlines()[-lines:]).strip() or "(empty)"
+        if len(tail) > 3800:
+            tail = "..." + tail[-3800:]
+        return tail
+    except Exception as e:
+        return f"Could not read log: {e}"
+
 def handle_callback_query(cb_id, cb_data, notifier, msg_id):
     """Handle Telegram Inline Keyboard button click callbacks by editing the message in-place."""
-    # Bypassing rate limit for answerCallbackQuery removes clicking lag completely!
+    import subprocess
     notifier._api_call("answerCallbackQuery", {"callback_query_id": cb_id}, enforce_rate_limit=False)
-    
+
+    def _reply(text, keyboard=None):
+        payload = {
+            "chat_id": notifier.chat_id,
+            "message_id": msg_id,
+            "text": text,
+            "parse_mode": "HTML",
+            "disable_web_page_preview": True
+        }
+        if keyboard:
+            payload["reply_markup"] = json.dumps(keyboard)
+        notifier._api_call("editMessageText", payload, enforce_rate_limit=False)
+
+    def _send(text):
+        notifier._api_call("sendMessage", {
+            "chat_id": notifier.chat_id, "text": text,
+            "parse_mode": "HTML", "disable_web_page_preview": True
+        })
+
     if cb_data == "refresh_dash":
         notifier.state["current_view"] = "dashboard"
         notifier.state["status_msg_id"] = msg_id
         save_broker_state(notifier.state)
-        
         bots_data, logout_alerts, stats_data = compile_telemetry()
-        status_text = build_status_dashboard(bots_data, stats_data, logout_alerts)
-        notifier._api_call("editMessageText", {
-            "chat_id": notifier.chat_id,
-            "message_id": msg_id,
-            "text": status_text,
-            "parse_mode": "HTML",
-            "reply_markup": json.dumps(dashboard_keyboard)
-        }, enforce_rate_limit=False)
-        
+        _reply(build_status_dashboard(bots_data, stats_data, logout_alerts), dashboard_keyboard)
+
+    elif cb_data == "show_control":
+        _reply(
+            "🎮 <b>Bot Farm Control Panel</b>\n"
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            "Select an action below.\n\n"
+            "⚠️ <i>Start/Stop individual bots without restarting others.</i>\n"
+            "🔄 <i>Restart All kills everything and re-runs start-bots.bat.</i>",
+            control_keyboard
+        )
+
+    elif cb_data == "show_problems":
+        files = glob.glob(os.path.join(TELEMETRY_DIR, '*_*.json'))
+        lines = ["⚠️ <b>Active Problems</b>", "━━━━━━━━━━━━━━━━━━━━━━"]
+        found = False
+        now_ts = time.time()
+        for fp in files:
+            try:
+                with open(fp, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                last_update = data.get("last_update", 0)
+                if (now_ts - last_update) > 120:
+                    continue
+                failed = data.get("failed_logins") or {}
+                if failed:
+                    found = True
+                    bot = data.get("bot_name", "?")
+                    acc = data.get("account", "?")
+                    for a, reason in failed.items():
+                        lines.append(f"❌ <b>{bot}</b> acc <b>{acc}</b>: {reason}")
+            except Exception:
+                pass
+        if not found:
+            lines.append("✅ No active login problems detected.")
+        lines.append("")
+        lines.append("<i>Tap Back to return to dashboard.</i>")
+        _reply("\n".join(lines), {"inline_keyboard": [[
+            {"text": "🔄 Refresh Problems", "callback_data": "show_problems"},
+            {"text": "🖥️ Dashboard", "callback_data": "refresh_dash"}
+        ]]})
+
     elif cb_data.startswith("view_"):
-        bot_target = cb_data.split("_")[1]
+        bot_target = cb_data.split("_", 1)[1]
         notifier.state["current_view"] = bot_target
         notifier.state["status_msg_id"] = msg_id
         save_broker_state(notifier.state)
-        
-        bot_details = build_detailed_bot_report(bot_target)
-        notifier._api_call("editMessageText", {
-            "chat_id": notifier.chat_id,
-            "message_id": msg_id,
-            "text": bot_details,
-            "parse_mode": "HTML",
-            "reply_markup": json.dumps({
-                "inline_keyboard": [
-                    [
-                        {"text": "🔄 Refresh Details", "callback_data": f"view_{bot_target}"},
-                        {"text": "🖥️ Back to Dashboard", "callback_data": "refresh_dash"}
-                    ]
-                ]
-            })
-        }, enforce_rate_limit=False)
-        
+        _reply(build_detailed_bot_report(bot_target), {"inline_keyboard": [[
+            {"text": "🔄 Refresh", "callback_data": f"view_{bot_target}"},
+            {"text": "🖥️ Dashboard", "callback_data": "refresh_dash"}
+        ]]})
+
     elif cb_data == "show_help":
         notifier.state["current_view"] = "help"
         notifier.state["status_msg_id"] = msg_id
         save_broker_state(notifier.state)
-        
-        help_text = build_help_message()
-        notifier._api_call("editMessageText", {
-            "chat_id": notifier.chat_id,
-            "message_id": msg_id,
-            "text": help_text,
-            "parse_mode": "HTML",
-            "reply_markup": json.dumps({
-                "inline_keyboard": [
-                    [
-                        {"text": "🖥️ Back to Dashboard", "callback_data": "refresh_dash"}
-                    ]
-                ]
-            })
-        }, enforce_rate_limit=False)
+        _reply(build_help_message(), {"inline_keyboard": [[
+            {"text": "🖥️ Back to Dashboard", "callback_data": "refresh_dash"}
+        ]]})
+
+    # ── Control actions ──────────────────────────────────────────────────────
+    elif cb_data == "ctrl_stop_all":
+        _force_kill_all_bots()
+        _reply("⏹️ <b>All bots stopped.</b>\nChrome and ChromeDriver processes killed.", control_keyboard)
+
+    elif cb_data == "ctrl_start_all":
+        bat = os.path.join(BASE_DIR, "start-bots.bat")
+        if os.path.exists(bat):
+            subprocess.Popen([bat], cwd=BASE_DIR, shell=True, creationflags=subprocess.CREATE_NEW_CONSOLE)
+            _reply("▶️ <b>start-bots.bat launched.</b>\nBots starting in background.", control_keyboard)
+        else:
+            _reply("❌ start-bots.bat not found.", control_keyboard)
+
+    elif cb_data == "ctrl_restart_all":
+        _force_kill_all_bots()
+        time.sleep(2)
+        bat = os.path.join(BASE_DIR, "start-bots.bat")
+        if os.path.exists(bat):
+            subprocess.Popen([bat], cwd=BASE_DIR, shell=True, creationflags=subprocess.CREATE_NEW_CONSOLE)
+            _reply("🔄 <b>Restart complete.</b>\nAll previous processes killed → start-bots.bat launched.", control_keyboard)
+        else:
+            _reply("⚠️ Processes killed but start-bots.bat not found.", control_keyboard)
+
+    elif cb_data.startswith("ctrl_stop_"):
+        bot = cb_data.replace("ctrl_stop_", "")
+        _stop_one_bot(bot)
+        _reply(f"⏹️ <b>{bot}</b> stop signal sent.", control_keyboard)
+
+    elif cb_data.startswith("ctrl_start_"):
+        bot = cb_data.replace("ctrl_start_", "")
+        ok = _start_one_bot(bot)
+        if ok:
+            _reply(f"▶️ <b>{bot}</b> launched.", control_keyboard)
+        else:
+            _reply(f"❌ Could not find script for <b>{bot}</b>.", control_keyboard)
+
+    elif cb_data.startswith("logs_"):
+        bot = cb_data.replace("logs_", "")
+        tail = _tail_log(bot)
+        _send(f"📋 <b>{bot} log</b> (last 30 lines):\n<pre>{tail}</pre>")
+
+    elif cb_data == "ctrl_git":
+        try:
+            result = subprocess.check_output(
+                ["git", "-C", BASE_DIR, "log", "--oneline", "-5"],
+                timeout=8, stderr=subprocess.DEVNULL
+            ).decode(errors="ignore").strip() or "(no commits)"
+        except Exception as e:
+            result = str(e)
+        _send(f"📦 <b>Last 5 commits:</b>\n<pre>{result}</pre>")
+
+    elif cb_data == "ctrl_reset":
+        try:
+            for fn in os.listdir(TELEMETRY_DIR):
+                fp = os.path.join(TELEMETRY_DIR, fn)
+                if os.path.isfile(fp):
+                    try:
+                        os.remove(fp)
+                    except Exception:
+                        pass
+        except Exception:
+            pass
+        _reply("🗑️ <b>Telemetry reset.</b> Stats cleared — bots will regenerate on next loop.", control_keyboard)
+
 
 def command_polling_worker(notifier):
     """Poll for Telegram updates and process command requests and callback queries in the chat."""

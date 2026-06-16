@@ -4510,12 +4510,9 @@ def launch_account(account_id, detach_after_post=False, manual_mode=False):
         active_drivers[driver.session_id] = {'driver': driver, 'account_id': account_id, 'profile_path': session_profile_path}
         acc_log(account_id, "Browser launched successfully.", silent=True)
 
-        # Enable Extensions Developer Mode via Selenium (Preferences-file approach
-        # is reset by Chrome on launch, so we toggle it through the UI instead)
-        enable_developer_mode_via_selenium(driver)
-
-        # Load fewfeedv2 extension if not already installed, then pin it
-        ensure_extension_loaded_and_pinned(driver, ext_folder=ext_path)
+        # Extension is already loaded via --load-extension flag at Chrome launch.
+        # ensure_extension_loaded_and_pinned() used pyautogui on the native OS folder
+        # picker which doesn't work in disconnected RDP — skip it entirely.
 
         # --- Automation Flow ---
         cookie_path = os.path.join(ACCOUNTS_DIR, f"{account_id}_cookies.json")

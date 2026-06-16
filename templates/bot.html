@@ -255,9 +255,7 @@ function load() {
         '<div class="card"><div class="label">Failed Accounts</div><div class="value red">' + failedCount + '</div>' +
           '<div class="sub">Logged out / cookie expired</div></div>' +
         '<div class="card"><div class="label">Replies Today</div><div class="value blue">' + (d.today.replies || 0) + '</div></div>' +
-        '<div class="card"><div class="label">Messages Today</div><div class="value blue">' + (d.today.messages || 0) + '</div></div>' +
-        '<div class="card"><div class="label">Failures Today</div><div class="value yellow">' + (d.today.failures || 0) + '</div></div>' +
-        '<div class="card"><div class="label">Login Failures Today</div><div class="value red">' + (d.today.login_failures || 0) + '</div></div>';
+        '<div class="card"><div class="label">Messages Today</div><div class="value blue">' + (d.today.messages || 0) + '</div></div>';
       
       renderAccountsTable();
       renderEventsList();
