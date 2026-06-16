@@ -4503,9 +4503,9 @@ def launch_account(account_id, detach_after_post=False, manual_mode=False):
         options.add_argument("--disable-component-update")
 
     try:
-        # Suppress ChromeDriver logs
+        import subprocess as _sp
         service = ChromeService(ChromeDriverManager().install())
-        service.log_output = os.devnull
+        service.log_output = _sp.DEVNULL
         driver = webdriver.Chrome(service=service, options=options)
         active_drivers[driver.session_id] = {'driver': driver, 'account_id': account_id, 'profile_path': session_profile_path}
         acc_log(account_id, "Browser launched successfully.", silent=True)
