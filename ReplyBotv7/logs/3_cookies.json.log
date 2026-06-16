@@ -1,2 +1,10 @@
-2026-06-11 23:37:06,546 - INFO - Google Sheets API: Found cookies for 3_cookies.json (length=1962)
-2026-06-11 23:37:06,550 - INFO - Updated cookies for 3_cookies.json from Google Sheets API
+2026-06-16 12:37:12,321 - ERROR - Google Sheets API error for 3_cookies.json: RefreshError: ('invalid_grant: Invalid JWT Signature.', {'error': 'invalid_grant', 'error_description': 'Invalid JWT Signature.'})
+2026-06-16 12:37:12,325 - ERROR - Google Sheets API failed to refresh cookies for 3_cookies.json. Check logs above for details.
+2026-06-16 12:37:54,769 - INFO - Window maximized for 3_cookies.json
+2026-06-16 12:38:30,704 - INFO - Login successful for 3_cookies.json on attempt 1.
+2026-06-16 12:39:04,089 - INFO - Saved fresh cookies locally for 3_cookies.json
+2026-06-16 12:39:04,092 - INFO - Account 3_cookies.json has no credentials - skipping Google Sheets cookie update (manual mode)
+2026-06-16 12:40:50,294 - ERROR - Google Sheets API error for 3_cookies.json: RefreshError: ('invalid_grant: Invalid JWT Signature.', {'error': 'invalid_grant', 'error_description': 'Invalid JWT Signature.'})
+2026-06-16 12:40:50,296 - ERROR - Google Sheets API failed to refresh cookies for 3_cookies.json. Check logs above for details.
+2026-06-16 12:40:50,298 - WARNING - No credentials/TOTP found for 3_cookies.json. Keeping cookie-only mode.
+2026-06-16 12:40:50,300 - INFO - Please update cookies in Google Sheets manually for 3_cookies.json

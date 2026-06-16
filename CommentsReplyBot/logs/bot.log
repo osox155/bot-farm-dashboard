@@ -597,3 +597,121 @@ Current browser version is 149.0.7827.53 with binary path C:\Program
 2026-06-07 16:39:19,455 - ERROR - Rate-limit dialog detected. Starting cooldown.
 2026-06-07 16:39:19,456 - WARNING - Entering cooldown for 30m due to rate_limit_dialog
 2026-06-07 16:39:19,456 - ERROR - Reply blocked by rate-limit. Entering cooldown and aborting this comment.
+2026-06-16 12:12:02,364 - INFO - Loaded 3 groups from public CSV
+2026-06-16 12:12:11,989 - INFO - Loaded 0 posts from public CSV
+2026-06-16 12:12:12,194 - INFO - ====== WebDriver manager ======
+2026-06-16 12:12:19,722 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-16 12:12:24,366 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-16 12:12:26,892 - INFO - Driver [C:\Users\HP\.wdm\drivers\chromedriver\win64\149.0.7827.115\chromedriver-win32/chromedriver.exe] found in cache
+2026-06-16 12:12:30,298 - INFO - ChromeDriver setup successful (webdriver-manager)
+2026-06-16 12:12:49,740 - INFO - Loaded cookies for 4_cookies.json from Google Sheets
+2026-06-16 12:12:49,748 - INFO - Navigating to Facebook...
+2026-06-16 12:13:11,961 - INFO - Successfully added 15/15 cookies
+2026-06-16 12:13:11,961 - INFO - Navigating directly to first group: https://facebook.com/groups/512636450889209/
+2026-06-16 12:13:41,708 - INFO - Successfully logged in with 15 cookies
+2026-06-16 12:13:54,417 - INFO - Processing group: https://facebook.com/groups/512636450889209/
+2026-06-16 12:14:03,308 - INFO - Group name: MONOPOLY GO!! en español cambio de cartas.
+2026-06-16 12:14:03,308 - INFO - Collecting post permalinks by scrolling the feed...
+2026-06-16 12:14:05,404 - INFO - Scroll 1/10: collected +0, total=0
+2026-06-16 12:14:11,493 - INFO - Scroll 2/10: collected +3, total=3
+2026-06-16 12:14:16,004 - INFO - Scroll 3/10: collected +0, total=3
+2026-06-16 12:14:19,804 - INFO - Scroll 4/10: collected +1, total=4
+2026-06-16 12:14:24,211 - INFO - Scroll 5/10: collected +2, total=6
+2026-06-16 12:14:29,046 - INFO - Scroll 6/10: collected +2, total=8
+2026-06-16 12:14:34,096 - INFO - Scroll 7/10: collected +0, total=8
+2026-06-16 12:14:39,912 - INFO - Scroll 8/10: collected +1, total=9
+2026-06-16 12:14:45,126 - INFO - Scroll 9/10: collected +1, total=10
+2026-06-16 12:14:49,898 - INFO - Scroll 10/10: collected +2, total=12
+2026-06-16 12:14:55,789 - INFO - Final pass added 1; total unique URLs: 13
+2026-06-16 12:14:55,789 - INFO - [1/13] Processing post URL: https://web.facebook.com/groups/512636450889209/posts/1319693686850144/
+2026-06-16 12:15:25,234 - INFO - Found 3 comments on post page using selector: div[aria-label*="Comment by"]
+2026-06-16 12:15:28,220 - INFO - Processing 3 unique root comments from post page (found=3)
+2026-06-16 12:15:29,058 - INFO - Attempting to reply to Kelvin Javier Rivera's comment: MGO566E9A7ZZ...
+2026-06-16 12:15:30,135 - INFO - Clicked Reply button
+2026-06-16 12:15:39,340 - WARNING - Composer does not reference target user 'Kelvin Javier Rivera'. Retrying binder...
+2026-06-16 12:15:44,296 - INFO - Typed reply message: Puedo enviarte lo que necesitas, MD
+2026-06-16 12:15:44,612 - INFO - Sent reply using Enter key
+2026-06-16 12:15:46,767 - ERROR - Rate-limit dialog detected. Starting cooldown.
+2026-06-16 12:15:46,767 - WARNING - Entering cooldown for 30m due to rate_limit_dialog
+2026-06-16 12:15:46,767 - ERROR - Reply blocked by rate-limit. Entering cooldown and aborting this comment.
+2026-06-16 12:16:56,770 - INFO - Loaded 3 groups from public CSV
+2026-06-16 12:17:05,547 - INFO - Loaded 0 posts from public CSV
+2026-06-16 12:17:05,653 - INFO - ====== WebDriver manager ======
+2026-06-16 12:17:14,752 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-16 12:17:20,394 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-16 12:17:23,602 - INFO - Driver [C:\Users\HP\.wdm\drivers\chromedriver\win64\149.0.7827.115\chromedriver-win32/chromedriver.exe] found in cache
+2026-06-16 12:17:26,180 - INFO - ChromeDriver setup successful (webdriver-manager)
+2026-06-16 12:17:35,427 - INFO - Loaded cookies for 4_cookies.json from Google Sheets
+2026-06-16 12:17:35,441 - INFO - Navigating to Facebook...
+2026-06-16 12:31:43,391 - INFO - Loaded 3 groups from public CSV
+2026-06-16 12:31:53,091 - INFO - Loaded 0 posts from public CSV
+2026-06-16 12:31:53,227 - INFO - ====== WebDriver manager ======
+2026-06-16 12:32:01,174 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-16 12:32:04,501 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-16 12:32:07,508 - INFO - Driver [C:\Users\HP\.wdm\drivers\chromedriver\win64\149.0.7827.115\chromedriver-win32/chromedriver.exe] found in cache
+2026-06-16 12:32:09,667 - INFO - ChromeDriver setup successful (webdriver-manager)
+2026-06-16 12:32:18,292 - INFO - Loaded cookies for 4_cookies.json from Google Sheets
+2026-06-16 12:32:18,299 - INFO - Navigating to Facebook...
+2026-06-16 12:32:42,499 - INFO - Successfully added 15/15 cookies
+2026-06-16 12:32:42,499 - INFO - Navigating directly to first group: https://facebook.com/groups/512636450889209/
+2026-06-16 12:33:09,305 - INFO - Successfully logged in with 15 cookies
+2026-06-16 12:33:22,418 - INFO - Processing group: https://facebook.com/groups/512636450889209/
+2026-06-16 12:33:31,813 - INFO - Group name: MONOPOLY GO!! en español cambio de cartas.
+2026-06-16 12:33:31,813 - INFO - Collecting post permalinks by scrolling the feed...
+2026-06-16 12:33:34,286 - INFO - Scroll 1/10: collected +1, total=1
+2026-06-16 12:33:39,058 - INFO - Scroll 2/10: collected +2, total=3
+2026-06-16 12:33:43,228 - INFO - Scroll 3/10: collected +1, total=4
+2026-06-16 12:33:47,966 - INFO - Scroll 4/10: collected +1, total=5
+2026-06-16 12:33:51,601 - INFO - Scroll 5/10: collected +1, total=6
+2026-06-16 12:33:55,629 - INFO - Scroll 6/10: collected +2, total=8
+2026-06-16 12:34:00,042 - INFO - Scroll 7/10: collected +1, total=9
+2026-06-16 12:34:04,058 - INFO - Scroll 8/10: collected +1, total=10
+2026-06-16 12:34:08,831 - INFO - Scroll 9/10: collected +1, total=11
+2026-06-16 12:34:13,585 - INFO - Scroll 10/10: collected +0, total=11
+2026-06-16 12:34:20,447 - INFO - Final pass added 1; total unique URLs: 12
+2026-06-16 12:34:20,447 - INFO - [1/12] Processing post URL: https://web.facebook.com/groups/512636450889209/posts/1319699550182891
+2026-06-16 12:34:53,467 - INFO - Found 1 comments on post page using selector: div[aria-label*="Comment by"]
+2026-06-16 12:34:55,373 - INFO - Processing 1 unique root comments from post page (found=1)
+2026-06-16 12:34:56,816 - INFO - Attempting to reply to Jhossy Sulca's comment: MGO666AUY6EW...
+2026-06-16 12:34:59,420 - INFO - Clicked Reply button
+2026-06-16 12:35:09,228 - WARNING - Composer does not reference target user 'Jhossy Sulca'. Retrying binder...
+2026-06-16 12:35:15,269 - INFO - Typed reply message: ¿Buscas intercambios? Escríbeme
+2026-06-16 12:35:20,441 - ERROR - Rate-limit dialog detected. Starting cooldown.
+2026-06-16 12:35:20,444 - WARNING - Entering cooldown for 30m due to rate_limit_dialog
+2026-06-16 12:35:20,452 - ERROR - Reply blocked by rate-limit. Entering cooldown and aborting this comment.
+2026-06-16 12:40:21,335 - INFO - Replied to 0 comments for post 1319699550182891 (current tab)
+2026-06-16 12:40:41,575 - WARNING - Cooldown active (1478s). Pausing before processing next post.
+2026-06-16 13:16:44,695 - INFO - Loaded 3 groups from public CSV
+2026-06-16 13:16:51,930 - INFO - Loaded 0 posts from public CSV
+2026-06-16 13:16:52,050 - INFO - ====== WebDriver manager ======
+2026-06-16 13:16:58,194 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-16 13:17:02,402 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-16 13:17:04,522 - INFO - Driver [C:\Users\HP\.wdm\drivers\chromedriver\win64\149.0.7827.115\chromedriver-win32/chromedriver.exe] found in cache
+2026-06-16 13:17:06,641 - INFO - ChromeDriver setup successful (webdriver-manager)
+2026-06-16 13:17:15,254 - INFO - Loaded cookies for 4_cookies.json from Google Sheets
+2026-06-16 13:17:15,262 - INFO - Navigating to Facebook...
+2026-06-16 13:17:40,900 - INFO - Successfully added 15/15 cookies
+2026-06-16 13:17:40,900 - INFO - Navigating directly to first group: https://facebook.com/groups/512636450889209/
+2026-06-16 13:18:08,780 - INFO - Successfully logged in with 15 cookies
+2026-06-16 13:18:22,658 - INFO - Processing group: https://facebook.com/groups/512636450889209/
+2026-06-16 13:18:34,800 - INFO - Group name: MONOPOLY GO!! en español cambio de cartas.
+2026-06-16 13:18:34,800 - INFO - Collecting post permalinks by scrolling the feed...
+2026-06-16 13:18:37,522 - INFO - Scroll 1/10: collected +3, total=3
+2026-06-16 13:18:41,340 - INFO - Scroll 2/10: collected +0, total=3
+2026-06-16 13:18:46,573 - INFO - Scroll 3/10: collected +2, total=5
+2026-06-16 13:18:51,879 - INFO - Scroll 4/10: collected +2, total=7
+2026-06-16 13:18:56,427 - INFO - Scroll 5/10: collected +0, total=7
+2026-06-16 13:19:01,652 - INFO - Scroll 6/10: collected +1, total=8
+2026-06-16 13:19:06,523 - INFO - Scroll 7/10: collected +1, total=9
+2026-06-16 13:19:11,623 - INFO - Scroll 8/10: collected +1, total=10
+2026-06-16 13:19:16,007 - INFO - Scroll 9/10: collected +2, total=12
+2026-06-16 13:19:22,158 - INFO - Scroll 10/10: collected +2, total=14
+2026-06-16 13:19:28,429 - INFO - Final pass added 0; total unique URLs: 14
+2026-06-16 13:19:28,433 - INFO - [1/14] Processing post URL: https://www.facebook.com/groups/512636450889209/posts/1319663986853114/
+2026-06-16 13:20:18,289 - INFO - Found 4 comments on post page using selector: div[aria-label*="Comment by"]
+2026-06-16 13:20:29,870 - INFO - Processing 4 unique root comments from post page (found=4)
+2026-06-16 13:20:30,743 - INFO - Attempting to reply to lolaparrendero's comment: salir de la cárcel por pintora...
+2026-06-16 13:20:32,120 - INFO - Clicked Reply button
+2026-06-16 13:20:41,774 - WARNING - Composer does not reference target user 'lolaparrendero'. Retrying binder...
+2026-06-16 13:20:49,303 - INFO - Typed reply message: Tengo extras, escríbeme por privado
+2026-06-16 13:20:49,560 - INFO - Sent reply using Enter key

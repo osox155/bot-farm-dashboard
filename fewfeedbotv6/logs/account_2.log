@@ -1,46 +1,30 @@
-2026-06-03 06:21:00,396 [account_2] Preparing to launch...
-2026-06-03 06:21:00,484 [account_2] Created isolated session profile.
-2026-06-03 06:21:04,173 [account_2] Browser launched successfully.
-2026-06-03 06:21:22,286 [account_2] Cookies injected (12 entries). Navigating to Facebook Settings...
-2026-06-03 06:21:28,232 [account_2] An error occurred: Message: no such window: target window already closed
+2026-06-16 12:30:03,321 [account_2] Preparing to launch...
+2026-06-16 12:30:05,461 [account_2] Created minimal session profile.
+2026-06-16 12:30:05,461 [account_2] Loading extension from: C:\Users\HP\Downloads\claude\BOT Py\fewfeedbotv6\fewfeedv2
+2026-06-16 12:30:22,970 [account_2] Browser launched successfully.
+2026-06-16 12:30:30,523 [account_2] Cookies injected (14 entries). Navigating to Facebook Settings...
+2026-06-16 12:30:52,330 [account_2] An error occurred: Message: no such window: target window already closed
 from unknown error: web view not found
-  (Session info: chrome=148.0.7778.217)
+  (Session info: chrome=149.0.7827.102)
 Stacktrace:
-	chromedriver!GetHandleVerifier [0x7ff639157de5+14895]
-	chromedriver!GetHandleVerifier [0x7ff639157e50+14900]
-	chromedriver!(No symbol) [0x7ff638ebd5ad]
-	chromedriver!(No symbol) [0x7ff638e940f2]
-	chromedriver!(No symbol) [0x7ff638f46f56]
-	chromedriver!(No symbol) [0x7ff638f64172]
-	chromedriver!(No symbol) [0x7ff638f09df8]
-	chromedriver!(No symbol) [0x7ff638f0ace3]
-	chromedriver!GetHandleVerifier [0x7ff63946cc49+3296f9]
-	chromedriver!GetHandleVerifier [0x7ff639467375+323e25]
-	chromedriver!GetHandleVerifier [0x7ff63948bc82+348732]
-	chromedriver!GetHandleVerifier [0x7ff639176045+32af5]
-	chromedriver!GetHandleVerifier [0x7ff63917ecec+3b79c]
-	chromedriver!GetHandleVerifier [0x7ff639161bc4+1e674]
-	chromedriver!GetHandleVerifier [0x7ff639161d54+1e804]
-	chromedriver!GetHandleVerifier [0x7ff6391460e7+2b97]
-	KERNEL32!(No symbol) [0x7ffaaa27e8d7]
-	ntdll!RtlUserThreadStart [0x7ffaaab8c3fc+2c]
+	chromedriver!GetHandleVerifier [0x128a823+10083]
+	chromedriver!GetHandleVerifier [0x128a864+100c4]
+	chromedriver!(No symbol) [0x106a6f0]
+	chromedriver!(No symbol) [0x1049613]
+	chromedriver!(No symbol) [0x10dc41b]
+	chromedriver!(No symbol) [0x10f2b69]
+	chromedriver!(No symbol) [0x10d5e26]
+	chromedriver!(No symbol) [0x10a9139]
+	chromedriver!(No symbol) [0x10a9f04]
+	chromedriver!GetHandleVerifier [0x1508fca+28e82a]
+	chromedriver!GetHandleVerifier [0x15044fd+289d5d]
+	chromedriver!GetHandleVerifier [0x152505b+2aa8bb]
+	chromedriver!GetHandleVerifier [0x12a4416+29c76]
+	chromedriver!GetHandleVerifier [0x12ab3ad+30c0d]
+	chromedriver!GetHandleVerifier [0x1293108+18968]
+	chromedriver!GetHandleVerifier [0x12932b5+18b15]
+	chromedriver!GetHandleVerifier [0x127c3ef+1c4f]
+	KERNEL32!(No symbol) [0x751a5d49]
+	ntdll!RtlInitializeExceptionChain [0x77aad83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x77aad7c1+231]
 
-2026-06-06 22:17:37,302 [account_2] Preparing to launch...
-2026-06-06 22:17:37,933 [account_2] Created isolated session profile.
-2026-06-06 22:17:37,933 [account_2] Loading extension from: C:\Users\HP\Downloads\BOT Py\fewfeedbotv6\fewfeedv2
-2026-06-06 22:18:04,258 [account_2] Browser launched successfully.
-2026-06-06 22:18:11,587 [account_2] Cookies injected (12 entries). Navigating to Facebook Settings...
-2026-06-06 22:18:43,914 [account_2] Login may have failed; current URL: https://web.facebook.com/login/?next=https%3A%2F%2Fwww.facebook.com%2Findex.php%3Fnext%3Dhttps%253A%252F%252Fwww.facebook.com%252Fsettings%26deoia%3D1%26no_universal_links%3D1&_rdc=5&_rdr#
-2026-06-06 22:18:43,914 [account_2] Verifying Facebook login before starting tool...
-2026-06-06 22:18:54,241 [account_2] [Sheet] Keys available: ['1_cookies.json', '2_cookies.json', '3_cookies.json', '4_cookies.json', '5_cookies.json']...
-2026-06-06 22:18:54,246 [account_2] [Sheet] Saved 14 cookies to 2_cookies.json
-2026-06-06 22:19:13,497 [account_2] Login restored during pre-check.
-2026-06-06 22:19:13,497 [account_2] Opening FewFeed tool page directly (web mode)...
-2026-06-07 16:20:18,243 [account_2] Preparing to launch...
-2026-06-07 16:20:19,690 [account_2] Created isolated session profile.
-2026-06-07 16:20:19,691 [account_2] Loading extension from: C:\Users\HP\Downloads\Bot Py\fewfeedbotv6\fewfeedv2
-2026-06-07 16:20:30,400 [account_2] An error occurred: 'str' object has no attribute 'fileno'
-2026-06-07 16:36:17,083 [account_2] Preparing to launch...
-2026-06-07 16:36:17,396 [account_2] Created isolated session profile.
-2026-06-07 16:36:17,396 [account_2] Loading extension from: C:\Users\HP\Downloads\Bot Py\fewfeedbotv6\fewfeedv2
-2026-06-07 16:36:28,951 [account_2] An error occurred: 'str' object has no attribute 'fileno'
