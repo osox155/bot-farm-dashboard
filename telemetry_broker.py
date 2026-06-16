@@ -226,10 +226,13 @@ def compile_telemetry():
                 "events": data.get("recent_events", [])
             }
             
-            # Collect logout/failed logins
-            failed = data.get("failed_logins") or {}
-            for acc_name, reason in failed.items():
-                logout_alerts.setdefault(bot_name, {})[acc_name] = reason
+            # Collect logout/failed logins — only from files that are still active.
+            # Stale files (bot not running this session) keep old failed_logins on disk
+            # forever, causing ghost accounts to appear in alerts. Skip them.
+            if not is_offline:
+                failed = data.get("failed_logins") or {}
+                for acc_name, reason in failed.items():
+                    logout_alerts.setdefault(bot_name, {})[acc_name] = reason
                 
             # Collect statistics
             stats = data.get("stats") or {}
