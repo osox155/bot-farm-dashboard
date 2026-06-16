@@ -8,6 +8,7 @@
   "step_delay": 6,
   "images_path": "C:/Users/runneradmin/Downloads/bot/fewfeedbotv6/images",
   "template_created": true,
+  "profile_mode": "minimal",
   "google_sheets": {
     "enabled": true,
     "spreadsheet_id": "1FGqdi6wesStTBPzhniHIzykJRSYx7zjfFxWmRdPiWyo",

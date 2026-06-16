@@ -794,8 +794,165 @@ def handle_telegram_command(cmd, notifier):
         status_text = build_status_dashboard(bots_data, stats_data, logout_alerts)
         notifier.send_or_update(status_text, "status", reply_markup=dashboard_keyboard)
         notifier._api_call("sendMessage", {"chat_id": notifier.chat_id, "text": "🔄 Dashboard status refreshed instantly!"})
-        
+
+    elif cmd == "/help":
+        help_text = (
+            "🤖 <b>Bot Farm Telegram Commands</b>\n"
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            "/status — refresh dashboard\n"
+            "/errors — show login failures\n"
+            "/reset — clear all telemetry\n"
+            "/logs replybot — last 30 lines of ReplyBot log\n"
+            "/logs commentsreplybot — last 30 lines of CommentsReplyBot log\n"
+            "/logs fewfeed — last 30 lines of FewFeed log\n"
+            "/logs autojoin — last 30 lines of AutoJoinBot log\n"
+            "/logs broker — last 30 lines of broker log\n"
+            "/stop replybot — kill ReplyBot process\n"
+            "/stop commentsreplybot — kill CommentsReplyBot process\n"
+            "/stop fewfeed — kill FewFeed process\n"
+            "/restart — restart all bots (re-run start-bots.bat)\n"
+            "/git — last 5 commits (what changed recently)\n"
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        )
+        notifier._api_call("sendMessage", {"chat_id": notifier.chat_id, "text": help_text, "parse_mode": "HTML"})
+
+    elif cmd.startswith("/logs"):
+        import subprocess
+        parts = cmd.split(maxsplit=1)
+        bot_arg = parts[1].strip().lower() if len(parts) > 1 else ""
+        log_map = {
+            "replybot":          os.path.join(BASE_DIR, "ReplyBotv7", "logs"),
+            "commentsreplybot":  os.path.join(BASE_DIR, "CommentsReplyBot", "logs"),
+            "fewfeed":           os.path.join(BASE_DIR, "fewfeedbotv6", "logs"),
+            "autojoin":          os.path.join(BASE_DIR, "AutoJoinBot", "logs"),
+            "broker":            TELEMETRY_DIR,
+        }
+        broker_log = os.path.join(TELEMETRY_DIR, "broker.log")
+
+        if not bot_arg or bot_arg not in log_map:
+            notifier._api_call("sendMessage", {"chat_id": notifier.chat_id,
+                "text": "Usage: /logs replybot | commentsreplybot | fewfeed | autojoin | broker"})
+            return
+
+        if bot_arg == "broker":
+            log_files = [broker_log] if os.path.exists(broker_log) else []
+        else:
+            log_dir = log_map[bot_arg]
+            try:
+                log_files = sorted(
+                    [os.path.join(log_dir, f) for f in os.listdir(log_dir) if f.endswith(".log")],
+                    key=os.path.getmtime, reverse=True
+                )
+            except Exception:
+                log_files = []
+
+        if not log_files:
+            notifier._api_call("sendMessage", {"chat_id": notifier.chat_id,
+                "text": f"No log files found for {bot_arg}."})
+            return
+
+        log_path = log_files[0]
+        try:
+            with open(log_path, "r", encoding="utf-8", errors="replace") as f:
+                lines = f.readlines()
+            tail = "".join(lines[-30:]).strip()
+            if not tail:
+                tail = "(log file is empty)"
+            # Telegram message limit is 4096 chars
+            if len(tail) > 3800:
+                tail = "..." + tail[-3800:]
+            notifier._api_call("sendMessage", {"chat_id": notifier.chat_id,
+                "text": f"📋 <b>{bot_arg} log</b> (last 30 lines):\n<pre>{tail}</pre>",
+                "parse_mode": "HTML"})
+        except Exception as e:
+            notifier._api_call("sendMessage", {"chat_id": notifier.chat_id,
+                "text": f"Could not read log: {e}"})
+
+    elif cmd.startswith("/stop"):
+        import subprocess
+        parts = cmd.split(maxsplit=1)
+        bot_arg = parts[1].strip().lower() if len(parts) > 1 else ""
+        # Map bot names to the script/exe patterns to kill
+        kill_map = {
+            "replybot":         ["new.py"],
+            "commentsreplybot": ["facebook_bot.py", "main.py"],
+            "fewfeed":          ["fewfeed_bot_template.py"],
+            "autojoin":         ["auto_join.py", "main.py"],
+        }
+        if not bot_arg or bot_arg not in kill_map:
+            notifier._api_call("sendMessage", {"chat_id": notifier.chat_id,
+                "text": "Usage: /stop replybot | commentsreplybot | fewfeed | autojoin"})
+            return
+
+        patterns = kill_map[bot_arg]
+        killed = 0
+        try:
+            result = subprocess.check_output(
+                ["powershell", "-NoProfile", "-Command",
+                 "Get-WmiObject Win32_Process | Select-Object ProcessId,CommandLine | ConvertTo-Json"],
+                timeout=10, stderr=subprocess.DEVNULL
+            ).decode(errors="ignore")
+            procs = json.loads(result) if result.strip() else []
+            if isinstance(procs, dict):
+                procs = [procs]
+            for p in procs:
+                cmdline = str(p.get("CommandLine") or "").lower()
+                pid = p.get("ProcessId")
+                if pid and any(pat.lower() in cmdline for pat in patterns):
+                    try:
+                        subprocess.run(["taskkill", "/PID", str(pid), "/F"],
+                                       capture_output=True, timeout=5)
+                        killed += 1
+                    except Exception:
+                        pass
+        except Exception as e:
+            notifier._api_call("sendMessage", {"chat_id": notifier.chat_id,
+                "text": f"Error listing processes: {e}"})
+            return
+
+        if killed:
+            notifier._api_call("sendMessage", {"chat_id": notifier.chat_id,
+                "text": f"✅ Stopped {killed} process(es) for <b>{bot_arg}</b>.",
+                "parse_mode": "HTML"})
+        else:
+            notifier._api_call("sendMessage", {"chat_id": notifier.chat_id,
+                "text": f"ℹ️ No running process found for <b>{bot_arg}</b>.",
+                "parse_mode": "HTML"})
+
+    elif cmd == "/restart":
+        import subprocess
+        bat = os.path.join(BASE_DIR, "start-bots.bat")
+        if not os.path.exists(bat):
+            notifier._api_call("sendMessage", {"chat_id": notifier.chat_id,
+                "text": "start-bots.bat not found."})
+            return
+        try:
+            subprocess.Popen([bat], cwd=BASE_DIR, shell=True,
+                             creationflags=subprocess.CREATE_NEW_CONSOLE)
+            notifier._api_call("sendMessage", {"chat_id": notifier.chat_id,
+                "text": "🔄 Restart command sent — start-bots.bat launching in background."})
+        except Exception as e:
+            notifier._api_call("sendMessage", {"chat_id": notifier.chat_id,
+                "text": f"Failed to restart: {e}"})
+
+    elif cmd == "/git":
+        import subprocess
+        try:
+            result = subprocess.check_output(
+                ["git", "-C", BASE_DIR, "log", "--oneline", "-5"],
+                timeout=8, stderr=subprocess.DEVNULL
+            ).decode(errors="ignore").strip()
+            if not result:
+                result = "(no commits found)"
+            notifier._api_call("sendMessage", {"chat_id": notifier.chat_id,
+                "text": f"📦 <b>Last 5 commits:</b>\n<pre>{result}</pre>",
+                "parse_mode": "HTML"})
+        except Exception as e:
+            notifier._api_call("sendMessage", {"chat_id": notifier.chat_id,
+                "text": f"git log failed: {e}"})
+
     elif cmd.startswith("/errors"):
+        files = glob.glob(os.path.join(TELEMETRY_DIR, '*_*.json'))
         files = glob.glob(os.path.join(TELEMETRY_DIR, '*_*.json'))
         errors_found = False
         lines = ["<b>❗ Detailed Bot Errors / Issues</b>", "━━━━━━━━━━━━━━━━━━━━━"]
