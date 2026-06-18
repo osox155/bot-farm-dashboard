@@ -153,6 +153,18 @@ Per-account and per-bot detail pages still show login history.
 
 ---
 
+## ✅ Fixed — `_parse_ts` NameError in `dashboard.py` broke `/api/overview`
+
+`dashboard.py` called `_fmt_ts(_parse_ts(m.get("last_seen")))` in both `api_overview()` (line 130)
+and `api_machines()` (line 330), but `_parse_ts` is only defined in `stats_tracker.py` — not imported
+into `dashboard.py`. This would raise `NameError` the first time a machine heartbeat appeared, making
+the `/api/overview` endpoint return `{"ok": false, "error": "name '_parse_ts' is not defined"}`.
+
+**Fix:** removed the `_parse_ts()` wrapper — `_fmt_ts()` already handles ISO strings with a `T` in them
+directly (`if "T" in ts: return ts`), so `_fmt_ts(m.get("last_seen"))` is correct and sufficient.
+
+---
+
 ## ✅ Fixed — bot_commands table prerequisite (remote control not working)
 
 **Root cause:** stop/restart buttons in the dashboard appeared to succeed ("queued") but nothing

@@ -127,7 +127,7 @@ def api_overview():
                     bot_accounts[bn]["idle"] += 1
 
         for m in machines:
-            m["last_seen"] = _fmt_ts(_parse_ts(m.get("last_seen")))
+            m["last_seen"] = _fmt_ts(m.get("last_seen"))
 
         return json.dumps({
             "ok": True,
@@ -327,7 +327,7 @@ def api_machines():
     try:
         machines = tracker.get_active_machines()
         for m in machines:
-            m["last_seen"] = _fmt_ts(_parse_ts(m.get("last_seen")))
+            m["last_seen"] = _fmt_ts(m.get("last_seen"))
         return json.dumps({"ok": True, "machines": machines})
     except Exception as e:
         return json.dumps({"ok": False, "error": str(e)})
