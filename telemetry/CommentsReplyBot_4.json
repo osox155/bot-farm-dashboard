@@ -1,16 +1,13 @@
 {
   "bot_name": "CommentsReplyBot",
   "account": "4",
-  "last_update": 1781612459.386585,
-  "status": "Active - processing group comments",
+  "last_update": 1781782786.2960787,
+  "status": "Active - processing group 1/3",
   "failed_logins": {},
   "stats": {
     "posts": 7,
-    "comments": 2,
-    "replied": 1,
+    "comments": 1,
+    "replied": 0,
     "skipped": 0
-  },
-  "recent_events": [
-    "\u2705 <b>Replied to</b> lolaparrendero in <a href=\"https://facebook.com/groups/512636450889209/\">MONOPOLY GO!! en espa\u00f1ol cambio de cartas.</a>\n     \ud83d\udcee <b>Post:</b> <a href=\"https://www.facebook.com/groups/512636450889209/posts/1319663986853114/\">Click here to view Post</a>\n     \ud83d\udcac <b>User Comment:</b> \"<i>salir de la c\u00e1rcel por pintora</i>\"\n     \ud83d\udcdd <b>Reply Sent:</b> \"<i>Tengo extras, escr\u00edbeme por privado</i>\""
-  ]
+  }
 }

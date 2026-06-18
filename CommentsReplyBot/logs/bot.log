@@ -715,3 +715,44 @@ Current browser version is 149.0.7827.53 with binary path C:\Program
 2026-06-16 13:20:41,774 - WARNING - Composer does not reference target user 'lolaparrendero'. Retrying binder...
 2026-06-16 13:20:49,303 - INFO - Typed reply message: Tengo extras, escríbeme por privado
 2026-06-16 13:20:49,560 - INFO - Sent reply using Enter key
+2026-06-18 12:37:35,450 - INFO - Loaded 3 groups from public CSV
+2026-06-18 12:37:45,483 - INFO - Loaded 0 posts from public CSV
+2026-06-18 12:37:45,674 - INFO - ====== WebDriver manager ======
+2026-06-18 12:37:53,686 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-18 12:37:59,046 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-18 12:38:02,628 - INFO - There is no [win64] chromedriver "149.0.7827.155" for browser google-chrome "149.0.7827" in cache
+2026-06-18 12:38:02,628 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-18 12:38:14,064 - INFO - WebDriver version 149.0.7827.155 selected
+2026-06-18 12:38:14,076 - INFO - Modern chrome version https://storage.googleapis.com/chrome-for-testing-public/149.0.7827.155/win32/chromedriver-win32.zip
+2026-06-18 12:38:14,076 - INFO - About to download new driver from https://storage.googleapis.com/chrome-for-testing-public/149.0.7827.155/win32/chromedriver-win32.zip
+2026-06-18 12:38:20,610 - INFO - Driver downloading response is 200
+2026-06-18 12:38:27,735 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-18 12:38:31,606 - INFO - Driver has been saved in cache [C:\Users\HP\.wdm\drivers\chromedriver\win64\149.0.7827.155]
+2026-06-18 12:38:34,792 - INFO - ChromeDriver setup successful (webdriver-manager)
+2026-06-18 12:38:45,199 - INFO - Loaded cookies for 4_cookies.json from Google Sheets
+2026-06-18 12:38:45,212 - INFO - Navigating to Facebook...
+2026-06-18 12:39:08,049 - INFO - Successfully added 12/12 cookies
+2026-06-18 12:39:08,050 - INFO - Navigating directly to first group: https://facebook.com/groups/512636450889209/
+2026-06-18 12:39:36,386 - INFO - Successfully logged in with 12 cookies
+2026-06-18 12:39:46,373 - INFO - Processing group: https://facebook.com/groups/512636450889209/
+2026-06-18 12:39:55,162 - INFO - Group name: MONOPOLY GO!! en español cambio de cartas.
+2026-06-18 12:39:55,162 - INFO - Collecting post permalinks by scrolling the feed...
+2026-06-18 12:39:57,521 - INFO - Scroll 1/10: collected +1, total=1
+2026-06-18 12:40:04,294 - INFO - Scroll 2/10: collected +6, total=7
+2026-06-18 12:40:09,301 - INFO - Scroll 3/10: collected +1, total=8
+2026-06-18 12:40:13,734 - INFO - Scroll 4/10: collected +0, total=8
+2026-06-18 12:40:18,623 - INFO - Scroll 5/10: collected +2, total=10
+2026-06-18 12:40:23,412 - INFO - Scroll 6/10: collected +0, total=10
+2026-06-18 12:40:28,259 - INFO - Scroll 7/10: collected +1, total=11
+2026-06-18 12:40:32,581 - INFO - Scroll 8/10: collected +1, total=12
+2026-06-18 12:40:36,473 - INFO - Scroll 9/10: collected +0, total=12
+2026-06-18 12:40:40,670 - INFO - Scroll 10/10: collected +0, total=12
+2026-06-18 12:40:47,074 - INFO - Final pass added 1; total unique URLs: 13
+2026-06-18 12:40:47,074 - INFO - [1/13] Processing post URL: https://web.facebook.com/groups/512636450889209/posts/1446818407620154
+2026-06-18 12:41:15,986 - INFO - No comments found on post page for 1446818407620154
+2026-06-18 12:41:34,094 - INFO - [2/13] Processing post URL: https://web.facebook.com/groups/251039804519758/posts/1003220259301705/
+2026-06-18 12:42:12,693 - INFO - Found 9 comments on post page using selector: div[aria-label*="Comment by"]
+2026-06-18 12:42:16,405 - INFO - Processing 4 unique root comments from post page (found=4)
+2026-06-18 12:42:16,415 - INFO - Attempting to reply to Wright John's comment: THANK YOU...
+2026-06-18 12:42:16,423 - WARNING - No reply button found within comment block
+2026-06-18 12:42:16,423 - WARNING - Could not find reply button

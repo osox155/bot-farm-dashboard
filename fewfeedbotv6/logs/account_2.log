@@ -28,3 +28,10 @@ Stacktrace:
 	ntdll!RtlInitializeExceptionChain [0x77aad83b+6b]
 	ntdll!RtlGetAppContainerNamedObjectPath [0x77aad7c1+231]
 
+2026-06-18 12:40:08,901 [account_2] Preparing to launch...
+2026-06-18 12:40:08,905 [account_2] Created minimal session profile.
+2026-06-18 12:40:08,905 [account_2] Loading extension from: C:\Users\HP\Downloads\claude\BOT Py\fewfeedbotv6\fewfeedv2
+2026-06-18 12:40:27,886 [account_2] Browser launched successfully.
+2026-06-18 12:40:28,133 [account_2] Cookies injected (14 entries). Navigating to Facebook Settings...
+2026-06-18 12:41:01,120 [account_2] Login may have failed; current URL: https://web.facebook.com/login/?next=https%3A%2F%2Fwww.facebook.com%2Findex.php%3Fnext%3Dhttps%253A%252F%252Fwww.facebook.com%252Fsettings%26deoia%3D1%26no_universal_links%3D1&_rdc=5&_rdr#
+2026-06-18 12:41:01,120 [account_2] Verifying Facebook login before starting tool...
