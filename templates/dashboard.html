@@ -91,9 +91,31 @@
       </div>
     </div>
 
+    <div class="panel" id="ctrl-panel">
+      <div class="panel-header">
+        <h3>🎮 Bot Control</h3>
+      </div>
+      <div class="ctrl-global-btns">
+        <button class="btn btn-primary" onclick="ctrlAll('start-all')">▶ Start All</button>
+        <button class="btn btn-danger"  onclick="ctrlAll('stop-all')">⏹ Stop All</button>
+        <button class="btn btn-outline" onclick="ctrlAll('restart-all')">🔄 Restart All</button>
+      </div>
+      <div class="bot-ctrl-grid" id="bot-ctrl-grid"></div>
+    </div>
+
     <div style="display: flex; justify-content: flex-end; margin-top: 24px; padding-bottom: 24px;">
       <button class="btn btn-danger" onclick="confirmResetAll()">⚠ Reset All History</button>
     </div>
+  </div>
+</div>
+
+<div class="logs-modal-overlay" id="logsModal">
+  <div class="logs-modal-box">
+    <div class="logs-modal-header">
+      <h3 id="logsModalTitle">Logs</h3>
+      <button class="btn btn-outline btn-sm" onclick="closeLogsModal()">✕ Close</button>
+    </div>
+    <pre class="logs-pre" id="logsModalPre">Loading…</pre>
   </div>
 </div>
 
@@ -326,7 +348,8 @@ function loadOverview() {
       }
 
       renderBotsList();
-      
+      _updateCtrlGridFromDash(d);
+
       var tabs = '<div class="chart-tab active" data-bot="" onclick="setChartFilter(\'\')">All Bots</div>';
       (d.bots || []).forEach(function(b) {
         tabs += '<div class="chart-tab' + (chartFilter === b ? ' active' : '') + '" data-bot="' + esc(b) + '" onclick="setChartFilter(\'' + esc(b) + '\')">' + esc(b) + '</div>';
@@ -394,6 +417,95 @@ function renderBotsList() {
 function filterBots() {
   renderBotsList();
 }
+
+var CTRL_BOTS = ['ReplyBot', 'CommentsReplyBot', 'FewFeed', 'AutoJoinBot'];
+
+function renderCtrlGrid(activeBotNames) {
+  var grid = '';
+  CTRL_BOTS.forEach(function(name) {
+    var isActive = activeBotNames && activeBotNames.indexOf(name) !== -1;
+    var dot = isActive ? 'green' : 'gray';
+    grid +=
+      '<div class="bot-ctrl-card">' +
+        '<div class="bot-ctrl-name"><span class="dot ' + dot + '"></span>' + esc(name) + '</div>' +
+        '<div class="bot-ctrl-btns">' +
+          '<button class="btn btn-sm" style="background:var(--green-bg);border-color:var(--green);color:var(--green);" ' +
+            'onclick="ctrlBot(\'start\',\'' + esc(name) + '\')">▶ Start</button>' +
+          '<button class="btn btn-sm btn-danger" ' +
+            'onclick="ctrlBot(\'stop\',\'' + esc(name) + '\')">⏹ Stop</button>' +
+          '<button class="btn btn-sm btn-outline" ' +
+            'onclick="openLogs(\'' + esc(name) + '\')">📋 Logs</button>' +
+        '</div>' +
+      '</div>';
+  });
+  document.getElementById('bot-ctrl-grid').innerHTML = grid;
+}
+
+function ctrlAll(action) {
+  var label = {
+    'start-all': 'Start All',
+    'stop-all':  'Stop All',
+    'restart-all': 'Restart All'
+  }[action] || action;
+  showModal(label, 'Send "' + label + '" command to the bot farm?', function() {
+    fetch('/api/control/' + action, { method: 'POST' })
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        toast(d.ok ? (d.message || 'Done') : (d.error || 'Failed'), d.ok ? 'success' : 'error');
+        if (d.ok) setTimeout(loadOverview, 1500);
+      })
+      .catch(function() { toast('Network error', 'error'); });
+  });
+}
+
+function ctrlBot(action, name) {
+  showModal(action === 'stop' ? 'Stop ' + name : 'Start ' + name,
+    action + ' "' + name + '"?', function() {
+    fetch('/api/control/' + action + '/' + encodeURIComponent(name), { method: 'POST' })
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        toast(d.ok ? (d.message || 'Done') : (d.error || 'Failed'), d.ok ? 'success' : 'error');
+        if (d.ok) setTimeout(loadOverview, 1500);
+      })
+      .catch(function() { toast('Network error', 'error'); });
+  });
+}
+
+function openLogs(name) {
+  document.getElementById('logsModalTitle').textContent = name + ' — Logs';
+  document.getElementById('logsModalPre').textContent = 'Loading…';
+  var modal = document.getElementById('logsModal');
+  modal.style.display = 'flex';
+  setTimeout(function() { modal.classList.add('show'); }, 10);
+  fetch('/api/control/logs/' + encodeURIComponent(name) + '?lines=60')
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      document.getElementById('logsModalPre').textContent = d.ok ? d.log : ('Error: ' + d.error);
+      var pre = document.getElementById('logsModalPre');
+      pre.scrollTop = pre.scrollHeight;
+    })
+    .catch(function() {
+      document.getElementById('logsModalPre').textContent = 'Failed to fetch logs.';
+    });
+}
+
+function closeLogsModal() {
+  var modal = document.getElementById('logsModal');
+  modal.classList.remove('show');
+  setTimeout(function() { modal.style.display = 'none'; }, 250);
+}
+
+function _updateCtrlGridFromDash(d) {
+  var activeNames = [];
+  (d.accounts || []).forEach(function(a) {
+    if ((a.status === 'active' || a.status === 'running') && activeNames.indexOf(a.bot_name) === -1) {
+      activeNames.push(a.bot_name);
+    }
+  });
+  renderCtrlGrid(activeNames);
+}
+
+renderCtrlGrid([]);
 
 document.getElementById('menu-overview').classList.add('active');
 initTheme();

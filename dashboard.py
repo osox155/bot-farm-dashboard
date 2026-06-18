@@ -230,6 +230,154 @@ def api_events():
     except Exception as e:
         return json.dumps({"ok": False, "error": str(e)})
 
+@app.route('/api/control/stop-all', method='POST')
+def api_control_stop_all():
+    response.content_type = 'application/json'
+    try:
+        import subprocess
+        patterns = [
+            '*new.py*', '*new.exe*', '*facebook_bot*', '*fewfeed_bot_template*',
+            '*join_groups*', '*auto_join*'
+        ]
+        where = " -or ".join(f"$_.CommandLine -like '{p}'" for p in patterns)
+        cmd = f'powershell -Command "Get-CimInstance Win32_Process | Where-Object {{ {where} }} | ForEach-Object {{ Stop-Process $_.ProcessId -Force -ErrorAction SilentlyContinue }}"'
+        subprocess.run(cmd, shell=True, capture_output=True, timeout=15)
+        subprocess.run("taskkill /f /im chromedriver.exe 2>nul", shell=True, capture_output=True)
+        subprocess.run("taskkill /f /im chrome.exe 2>nul", shell=True, capture_output=True)
+        return json.dumps({"ok": True, "message": "All bots and Chrome processes stopped"})
+    except Exception as e:
+        return json.dumps({"ok": False, "error": str(e)})
+
+@app.route('/api/control/start-all', method='POST')
+def api_control_start_all():
+    response.content_type = 'application/json'
+    try:
+        import subprocess
+        base = os.path.dirname(os.path.abspath(__file__))
+        bat = os.path.join(base, "start-bots.bat")
+        ps1 = os.path.join(base, "start-bots.ps1")
+        if os.path.exists(bat):
+            subprocess.Popen([bat], cwd=base, shell=True, creationflags=subprocess.CREATE_NEW_CONSOLE)
+            return json.dumps({"ok": True, "message": "start-bots.bat launched"})
+        if os.path.exists(ps1):
+            subprocess.Popen(
+                ["powershell", "-ExecutionPolicy", "Bypass", "-File", ps1],
+                cwd=base, creationflags=subprocess.CREATE_NEW_CONSOLE
+            )
+            return json.dumps({"ok": True, "message": "start-bots.ps1 launched"})
+        return json.dumps({"ok": False, "error": "start-bots.bat / start-bots.ps1 not found"})
+    except Exception as e:
+        return json.dumps({"ok": False, "error": str(e)})
+
+@app.route('/api/control/restart-all', method='POST')
+def api_control_restart_all():
+    response.content_type = 'application/json'
+    try:
+        import subprocess
+        patterns = [
+            '*new.py*', '*new.exe*', '*facebook_bot*', '*fewfeed_bot_template*',
+            '*join_groups*', '*auto_join*'
+        ]
+        where = " -or ".join(f"$_.CommandLine -like '{p}'" for p in patterns)
+        cmd = f'powershell -Command "Get-CimInstance Win32_Process | Where-Object {{ {where} }} | ForEach-Object {{ Stop-Process $_.ProcessId -Force -ErrorAction SilentlyContinue }}"'
+        subprocess.run(cmd, shell=True, capture_output=True, timeout=15)
+        subprocess.run("taskkill /f /im chromedriver.exe 2>nul", shell=True, capture_output=True)
+        subprocess.run("taskkill /f /im chrome.exe 2>nul", shell=True, capture_output=True)
+        time.sleep(2)
+        base = os.path.dirname(os.path.abspath(__file__))
+        bat = os.path.join(base, "start-bots.bat")
+        ps1 = os.path.join(base, "start-bots.ps1")
+        if os.path.exists(bat):
+            subprocess.Popen([bat], cwd=base, shell=True, creationflags=subprocess.CREATE_NEW_CONSOLE)
+            return json.dumps({"ok": True, "message": "All bots restarted via start-bots.bat"})
+        if os.path.exists(ps1):
+            subprocess.Popen(
+                ["powershell", "-ExecutionPolicy", "Bypass", "-File", ps1],
+                cwd=base, creationflags=subprocess.CREATE_NEW_CONSOLE
+            )
+            return json.dumps({"ok": True, "message": "All bots restarted via start-bots.ps1"})
+        return json.dumps({"ok": False, "error": "Processes killed but start-bots not found"})
+    except Exception as e:
+        return json.dumps({"ok": False, "error": str(e)})
+
+_BOT_STOP_PATTERNS = {
+    "ReplyBot":         ["*new.py*", "*new.exe*"],
+    "CommentsReplyBot": ["*facebook_bot*"],
+    "FewFeed":          ["*fewfeed_bot_template*"],
+    "AutoJoinBot":      ["*auto_join*", "*join_groups*"],
+}
+
+_BOT_SCRIPTS = {
+    "ReplyBot":         os.path.join(os.path.dirname(os.path.abspath(__file__)), "ReplyBotv7", "new.py"),
+    "CommentsReplyBot": os.path.join(os.path.dirname(os.path.abspath(__file__)), "CommentsReplyBot", "facebook_bot.py"),
+    "FewFeed":          os.path.join(os.path.dirname(os.path.abspath(__file__)), "fewfeedbotv6", "fewfeed_bot_template.py"),
+    "AutoJoinBot":      os.path.join(os.path.dirname(os.path.abspath(__file__)), "AutoJoinBot", "join_groups.py"),
+}
+
+_BOT_LOG_DIRS = {
+    "ReplyBot":         os.path.join(os.path.dirname(os.path.abspath(__file__)), "ReplyBotv7", "logs"),
+    "CommentsReplyBot": os.path.join(os.path.dirname(os.path.abspath(__file__)), "CommentsReplyBot", "logs"),
+    "FewFeed":          os.path.join(os.path.dirname(os.path.abspath(__file__)), "fewfeedbotv6", "logs"),
+    "AutoJoinBot":      os.path.join(os.path.dirname(os.path.abspath(__file__)), "AutoJoinBot", "logs"),
+}
+
+@app.route('/api/control/stop/<name>', method='POST')
+def api_control_stop(name):
+    response.content_type = 'application/json'
+    try:
+        import subprocess
+        patterns = _BOT_STOP_PATTERNS.get(name)
+        if not patterns:
+            return json.dumps({"ok": False, "error": f"Unknown bot: {name}"})
+        where = " -or ".join(f"$_.CommandLine -like '{p}'" for p in patterns)
+        cmd = f'powershell -Command "Get-CimInstance Win32_Process | Where-Object {{ {where} }} | ForEach-Object {{ Stop-Process $_.ProcessId -Force -ErrorAction SilentlyContinue }}"'
+        subprocess.run(cmd, shell=True, capture_output=True, timeout=10)
+        return json.dumps({"ok": True, "message": f"{name} stop signal sent"})
+    except Exception as e:
+        return json.dumps({"ok": False, "error": str(e)})
+
+@app.route('/api/control/start/<name>', method='POST')
+def api_control_start(name):
+    response.content_type = 'application/json'
+    try:
+        import subprocess
+        script = _BOT_SCRIPTS.get(name)
+        if not script:
+            return json.dumps({"ok": False, "error": f"Unknown bot: {name}"})
+        if not os.path.exists(script):
+            return json.dumps({"ok": False, "error": f"Script not found: {script}"})
+        subprocess.Popen(
+            ["python", script],
+            cwd=os.path.dirname(script),
+            creationflags=subprocess.CREATE_NEW_CONSOLE
+        )
+        return json.dumps({"ok": True, "message": f"{name} launched"})
+    except Exception as e:
+        return json.dumps({"ok": False, "error": str(e)})
+
+@app.route('/api/control/logs/<name>')
+def api_control_logs(name):
+    response.content_type = 'application/json'
+    try:
+        log_dir = _BOT_LOG_DIRS.get(name)
+        if not log_dir:
+            return json.dumps({"ok": False, "error": f"Unknown bot: {name}"})
+        lines_n = int(request.query.get("lines", 50))
+        try:
+            candidates = sorted(
+                [os.path.join(log_dir, f) for f in os.listdir(log_dir) if f.endswith(".log")],
+                key=os.path.getmtime, reverse=True
+            )
+        except Exception:
+            candidates = []
+        if not candidates:
+            return json.dumps({"ok": True, "log": f"No log files found in {log_dir}"})
+        with open(candidates[0], "r", encoding="utf-8", errors="replace") as f:
+            tail = "".join(f.readlines()[-lines_n:])
+        return json.dumps({"ok": True, "log": tail or "(empty)", "file": os.path.basename(candidates[0])})
+    except Exception as e:
+        return json.dumps({"ok": False, "error": str(e)})
+
 @app.route('/api/reset/today', method='POST')
 def api_reset_today():
     response.content_type = 'application/json'
