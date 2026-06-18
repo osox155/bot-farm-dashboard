@@ -756,3 +756,46 @@ Current browser version is 149.0.7827.53 with binary path C:\Program
 2026-06-18 12:42:16,415 - INFO - Attempting to reply to Wright John's comment: THANK YOU...
 2026-06-18 12:42:16,423 - WARNING - No reply button found within comment block
 2026-06-18 12:42:16,423 - WARNING - Could not find reply button
+2026-06-18 12:56:32,429 - INFO - Loaded 3 groups from public CSV
+2026-06-18 12:56:42,517 - INFO - Loaded 0 posts from public CSV
+2026-06-18 12:56:42,658 - INFO - ====== WebDriver manager ======
+2026-06-18 12:56:50,605 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-18 12:56:53,327 - INFO - Get LATEST chromedriver version for google-chrome
+2026-06-18 12:56:56,093 - INFO - Driver [C:\Users\HP\.wdm\drivers\chromedriver\win64\149.0.7827.155\chromedriver-win32/chromedriver.exe] found in cache
+2026-06-18 12:56:58,396 - INFO - ChromeDriver setup successful (webdriver-manager)
+2026-06-18 12:57:06,898 - INFO - Loaded cookies for 4_cookies.json from Google Sheets
+2026-06-18 12:57:06,907 - INFO - Navigating to Facebook...
+2026-06-18 12:57:24,575 - INFO - Successfully added 12/12 cookies
+2026-06-18 12:57:24,575 - INFO - Navigating directly to first group: https://facebook.com/groups/512636450889209/
+2026-06-18 12:57:50,312 - INFO - Successfully logged in with 12 cookies
+2026-06-18 12:58:00,526 - INFO - Processing group: https://facebook.com/groups/512636450889209/
+2026-06-18 12:58:09,717 - INFO - Group name: MONOPOLY GO!! en español cambio de cartas.
+2026-06-18 12:58:09,717 - INFO - Collecting post permalinks by scrolling the feed...
+2026-06-18 12:58:14,492 - INFO - Scroll 1/10: collected +3, total=3
+2026-06-18 12:58:19,787 - INFO - Scroll 2/10: collected +0, total=3
+2026-06-18 12:58:25,110 - INFO - Scroll 3/10: collected +1, total=4
+2026-06-18 12:58:29,098 - INFO - Scroll 4/10: collected +1, total=5
+2026-06-18 12:58:32,920 - INFO - Scroll 5/10: collected +1, total=6
+2026-06-18 12:58:36,961 - INFO - Scroll 6/10: collected +1, total=7
+2026-06-18 12:58:40,873 - INFO - Scroll 7/10: collected +2, total=9
+2026-06-18 12:58:46,539 - INFO - Scroll 8/10: collected +2, total=11
+2026-06-18 12:58:52,465 - INFO - Scroll 9/10: collected +0, total=11
+2026-06-18 12:58:59,086 - INFO - Scroll 10/10: collected +1, total=12
+2026-06-18 12:59:06,637 - INFO - Final pass added 0; total unique URLs: 12
+2026-06-18 12:59:06,637 - INFO - [1/12] Processing post URL: https://web.facebook.com/groups/512636450889209/posts/1321608556658657/
+2026-06-18 12:59:40,124 - WARNING - Post page comment selector div[role="article"] div[data-testid="comment"] failed: Message: tab crashed
+  (Session info: chrome=149.0.7827.115)
+
+2026-06-18 12:59:40,126 - WARNING - Post page comment selector [data-testid="UFI2Comment/root_depth_0"] failed: Message: tab crashed
+  (Session info: chrome=149.0.7827.115)
+
+2026-06-18 12:59:40,130 - WARNING - Post page comment selector div[aria-label*="Comment by"] failed: Message: tab crashed
+  (Session info: chrome=149.0.7827.115)
+
+2026-06-18 12:59:40,132 - WARNING - Post page comment selector div[data-testid="comment"] failed: Message: tab crashed
+  (Session info: chrome=149.0.7827.115)
+
+2026-06-18 12:59:40,136 - WARNING - Post page comment selector li[role="article"] failed: Message: tab crashed
+  (Session info: chrome=149.0.7827.115)
+
+2026-06-18 12:59:40,136 - INFO - No comments found on post page for 1321608556658657
