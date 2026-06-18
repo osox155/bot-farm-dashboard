@@ -4421,6 +4421,42 @@ def automate_fewfeed(driver, account_id, assume_page_loaded=False, silent=False,
             _thread_ctx.account_id = None
 
 
+def _clear_chrome_extension_policies():
+    """Remove Windows registry Chrome policies that block --load-extension.
+    On RDP / Windows Server machines (including GitHub Actions runners) Chrome
+    is often put in 'managed by organisation' mode via GPO, which silently
+    ignores --load-extension. Clearing the per-user policies (no admin needed)
+    and attempting the machine-level ones (fails silently if non-admin) lets
+    the unpacked extension load correctly."""
+    import winreg
+    _BLOCK_VALUES = [
+        "ExtensionInstallBlocklist",
+        "ExtensionInstallAllowlist",
+        "ExtensionInstallForcelist",
+        "ExtensionSettings",
+        "DeveloperToolsDisabled",
+        "DeveloperToolsAvailability",
+    ]
+    _CHROME_POLICY_PATHS = [
+        (winreg.HKEY_CURRENT_USER,  r"SOFTWARE\Policies\Google\Chrome"),
+        (winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Policies\Google\Chrome"),
+        (winreg.HKEY_CURRENT_USER,  r"SOFTWARE\Policies\Google\Chrome\ExtensionInstallBlocklist"),
+        (winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Policies\Google\Chrome\ExtensionInstallBlocklist"),
+    ]
+    for hive, path in _CHROME_POLICY_PATHS:
+        try:
+            key = winreg.OpenKey(hive, path, 0,
+                                 winreg.KEY_SET_VALUE | winreg.KEY_QUERY_VALUE)
+            for name in _BLOCK_VALUES:
+                try:
+                    winreg.DeleteValue(key, name)
+                except FileNotFoundError:
+                    pass
+            winreg.CloseKey(key)
+        except Exception:
+            pass
+
+
 def launch_account(account_id, detach_after_post=False, manual_mode=False):
     """Launches a browser session for a specific account using the template.
 
@@ -4453,6 +4489,9 @@ def launch_account(account_id, detach_after_post=False, manual_mode=False):
             acc_log(account_id, f"Error: Could not create session profile from template. {e}", silent=True)
             return
 
+    # Clear Chrome GPO policies that block unpacked extensions on RDP/Server machines
+    _clear_chrome_extension_policies()
+
     # Launch Chrome with the new session profile
     options = Options()
     options.add_argument(f'--user-data-dir={session_profile_path}')
@@ -4474,14 +4513,21 @@ def launch_account(account_id, detach_after_post=False, manual_mode=False):
     options.add_experimental_option("excludeSwitches", ["enable-automation", "enable-logging"])
     options.add_experimental_option('useAutomationExtension', False)
 
-    # Always load the FewFeed extension via --load-extension flag (no dialog needed)
-    ext_path = os.path.join(BASE_DIR, 'fewfeedv2')
-    ext_path = os.path.abspath(ext_path)
-    ext_path_norm = ext_path.replace('\\', '/')
+    # Remove any profile-level management policy files copied from the template —
+    # these can cause Chrome to ignore --load-extension even after clearing the registry.
+    for _policy_sub in ("Policy", "managed_storage", "Managed Users"):
+        _pd = os.path.join(session_profile_path, "Default", _policy_sub)
+        if os.path.isdir(_pd):
+            shutil.rmtree(_pd, ignore_errors=True)
+
+    # Always load the FewFeed extension via --load-extension flag (no dialog needed).
+    # Use the native Windows path (backslashes) — forward-slash conversion can silently
+    # break --load-extension on some Chrome/Windows combinations.
+    ext_path = os.path.abspath(os.path.join(BASE_DIR, 'fewfeedv2'))
     if os.path.isdir(ext_path) and os.path.isfile(os.path.join(ext_path, 'manifest.json')):
         acc_log(account_id, f"Loading extension from: {ext_path}", silent=True)
         options.add_argument("--enable-extensions")
-        options.add_argument(f"--load-extension={ext_path_norm}")
+        options.add_argument(f"--load-extension={ext_path}")
     else:
         acc_log(account_id, f"Extension folder not found at: {ext_path}", silent=True)
 

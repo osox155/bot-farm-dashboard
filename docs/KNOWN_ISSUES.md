@@ -106,6 +106,29 @@ dashboard counts. `self.session_replies/session_failures` are incremented but ne
 
 ---
 
+## ✅ Fixed — FewFeed extension (`fewfeedv2`) not loading in Chrome
+
+**File:** `fewfeedbotv6/fewfeed_bot_template.py` · **Status: fixed.**
+
+On RDP / Windows Server machines (including GitHub Actions runners), Chrome is put
+into **"managed by your organisation"** mode via Windows Group Policy registry keys.
+This silently ignores the `--load-extension` flag, so the `fewfeedv2` extension never
+appeared in Chrome even though the code was passing the right path.
+
+**Three-part fix applied:**
+1. `_clear_chrome_extension_policies()` — called before every Chrome launch. Removes
+   `ExtensionInstallBlocklist`, `DeveloperToolsDisabled`, and related values from both
+   `HKCU` (no admin needed) and `HKLM` (succeeds silently if admin, skipped if not).
+2. Profile-level policy folders (`Default/Policy`, `Default/managed_storage`,
+   `Default/Managed Users`) are deleted from the session profile copy before Chrome
+   starts, removing any management state inherited from the template profile.
+3. Path fix: the extension path was being converted to forward slashes
+   (`ext_path.replace('\\', '/')`) before being passed to `--load-extension`. Some
+   Chrome/Windows combinations fail silently with forward-slash paths in this flag.
+   Now the native Windows backslash path is used directly.
+
+---
+
 ## 🟡 BUG-7 — FewFeed: first `load_config` returns `None`
 
 **File:** `fewfeedbotv6/fewfeed_bot_template.py:272`

@@ -1,0 +1,9 @@
+{
+  "bot_name": "FewFeed",
+  "account": "2",
+  "last_update": 1781786567.410385,
+  "status": "Logged Out",
+  "failed_logins": {
+    "2": "Logged out \u2014 cookie expired or needs 2FA recovery"
+  }
+}
