@@ -62,15 +62,6 @@
       </div>
     </div>
 
-    <div class="panel" id="attention-alert" style="border-color: var(--red); background: rgba(239, 68, 68, 0.05); margin-bottom: 24px; display: none;">
-      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; color: var(--red);">
-        <span style="font-size: 16px;">🚨</span>
-        <h3 style="color: var(--red); margin-bottom: 0; text-transform: uppercase; font-size: 13px; letter-spacing: 1px;">Attention Required</h3>
-      </div>
-      <p style="font-size: 13px; color: var(--text2); margin-bottom: 12px;">The following accounts have encountered login failures or expired cookies and require action:</p>
-      <ul id="alert-list" style="font-size: 13px; list-style-type: none; padding-left: 0; line-height: 1.6;"></ul>
-    </div>
-
     <div class="cards" id="cards"></div>
     
     <div class="panel">
@@ -94,6 +85,9 @@
     <div class="panel" id="ctrl-panel">
       <div class="panel-header">
         <h3>🎮 Bot Control</h3>
+      </div>
+      <div id="machine-status" style="margin-bottom: 14px; font-size: 12px; color: var(--text2); padding: 8px 12px; background: var(--surface2); border-radius: 8px; border: 1px solid var(--border);">
+        Loading PC status…
       </div>
       <div class="ctrl-global-btns">
         <button class="btn btn-primary" onclick="ctrlAll('start-all')">▶ Start All</button>
@@ -322,30 +316,13 @@ function loadOverview() {
 
       document.getElementById('cards').innerHTML =
         '<div class="card"><div class="label">Total Accounts</div><div class="value">' + total + '</div>' +
-          '<div class="sub">' + d.active_count + ' running · ' + d.failed_count + ' failed' + (paused ? ' · ' + paused + ' paused' : '') + '</div></div>' +
+          '<div class="sub">' + d.active_count + ' running' + (paused ? ' · ' + paused + ' paused' : '') + '</div></div>' +
         '<div class="card"><div class="label">Running Accounts</div><div class="value green">' + d.active_count + '</div>' +
           '<div class="sub">Logged in &amp; active</div></div>' +
-        '<div class="card"><div class="label">Failed Accounts</div><div class="value red">' + d.failed_count + '</div>' +
-          '<div class="sub">Logged out / cookie expired</div></div>' +
         '<div class="card"><div class="label">Replies Today</div><div class="value blue">' + (d.today.replies || 0) + '</div></div>' +
         '<div class="card"><div class="label">Messages Today</div><div class="value blue">' + (d.today.messages || 0) + '</div></div>';
-      
-      // Attention Required alert handling
-      var alertPanel = document.getElementById('attention-alert');
-      var failedAccts = (d.accounts || []).filter(function(a) { return a.status === 'logged_out'; });
-      if (failedAccts.length > 0) {
-        var alertList = '';
-        failedAccts.forEach(function(a) {
-          alertList += '<li style="margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">' +
-            '<span class="status logged_out" style="padding: 2px 6px; font-size: 10px; line-height:1.2;">Logged Out</span>' +
-            '<span>Account <a href="/account/' + encodeURIComponent(a.name) + '" style="color:var(--accent); text-decoration:none; font-weight:600;">' + esc(a.name) + '</a> on <b>' + esc(a.bot_name) + '</b></span>' +
-            '</li>';
-        });
-        document.getElementById('alert-list').innerHTML = alertList;
-        alertPanel.style.display = 'block';
-      } else {
-        alertPanel.style.display = 'none';
-      }
+
+      _updateMachineStatus(d.machines || []);
 
       renderBotsList();
       _updateCtrlGridFromDash(d);
@@ -521,6 +498,21 @@ function closeLogsModal() {
   var modal = document.getElementById('logsModal');
   modal.classList.remove('show');
   setTimeout(function() { modal.style.display = 'none'; }, 250);
+}
+
+function _updateMachineStatus(machines) {
+  var el = document.getElementById('machine-status');
+  if (!el) return;
+  if (!machines || machines.length === 0) {
+    el.innerHTML = '<span style="color:var(--red);">⚠ No active PC broker detected</span> — is <code>start-bots.bat</code> running on your PC?';
+    return;
+  }
+  var parts = machines.map(function(m) {
+    var ts = m.last_seen ? fmtDateTime(m.last_seen) : '?';
+    return '<b style="color:var(--green);">✓ ' + esc(m.machine_id) + '</b>' +
+           ' <small style="color:var(--text3);">(last seen ' + ts + ')</small>';
+  });
+  el.innerHTML = '🖥 Active PC: ' + parts.join(' &nbsp;·&nbsp; ');
 }
 
 function _updateCtrlGridFromDash(d) {

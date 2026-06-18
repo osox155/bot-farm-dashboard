@@ -82,6 +82,7 @@ def api_overview():
         recent = tracker.get_recent_events(limit=20)
         daily = tracker.get_daily_stats(days=14)
         bots = tracker.get_bots_list()
+        machines = tracker.get_active_machines()
 
         now_ts = time.time()
         for a in accounts:
@@ -125,6 +126,9 @@ def api_overview():
                 elif a["status"] in ("idle", "offline"):
                     bot_accounts[bn]["idle"] += 1
 
+        for m in machines:
+            m["last_seen"] = _fmt_ts(_parse_ts(m.get("last_seen")))
+
         return json.dumps({
             "ok": True,
             "active_count": active_count,
@@ -141,6 +145,7 @@ def api_overview():
             "bot_daily": bot_daily,
             "bot_accounts": bot_accounts,
             "session": dict(session) if session else None,
+            "machines": machines,
             "now": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         })
     except Exception as e:
@@ -312,6 +317,18 @@ def api_control_commands():
             r["executed_at"] = _fmt_ts(r.get("executed_at"))
         pending = sum(1 for r in rows if r.get("status") == "pending")
         return json.dumps({"ok": True, "commands": rows, "pending": pending})
+    except Exception as e:
+        return json.dumps({"ok": False, "error": str(e)})
+
+@app.route('/api/machines')
+def api_machines():
+    """Active broker machines (PCs where start-bots.bat is running)."""
+    response.content_type = 'application/json'
+    try:
+        machines = tracker.get_active_machines()
+        for m in machines:
+            m["last_seen"] = _fmt_ts(_parse_ts(m.get("last_seen")))
+        return json.dumps({"ok": True, "machines": machines})
     except Exception as e:
         return json.dumps({"ok": False, "error": str(e)})
 

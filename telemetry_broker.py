@@ -10,6 +10,7 @@ import sys
 import json
 import time
 import glob
+import socket
 import logging
 import threading
 from datetime import datetime
@@ -864,14 +865,14 @@ def _execute_remote_command(action, bot_name):
 
     return f"Unknown action: {action}"
 
-def process_remote_commands():
+def process_remote_commands(machine_id=None):
     """Drain the Supabase command queue the cloud dashboard writes to. Executes
     each pending command on this PC (the only machine that can touch the bots)
     and marks it done/error so the dashboard can show the outcome."""
     if _stats_tracker is None:
         return
     try:
-        pending = _stats_tracker.fetch_pending_commands(limit=20)
+        pending = _stats_tracker.fetch_pending_commands(machine_id=machine_id, limit=20)
     except Exception as e:
         logger.error(f"Could not fetch remote commands: {e}")
         return
@@ -1297,15 +1298,19 @@ def handle_telegram_command(cmd, notifier):
 
 def main():
     logger.info("Initializing Central Telegram Telemetry Broker...")
-    
+
+    # Identify this machine — used to target remote-control commands correctly.
+    machine_id = socket.gethostname()
+    logger.info(f"Machine ID: {machine_id}")
+
     # 1. Load configuration
     cfg = load_config_with_retry()
     if not cfg:
         logger.error("Could not initialize Telegram settings. Exiting.")
         sys.exit(1)
-        
+
     notifier = CentralTelegramNotifier(cfg)
-    
+
     # Parse parent process ID to monitor for clean shutdown on exit
     import argparse
     parser = argparse.ArgumentParser()
@@ -1350,16 +1355,35 @@ def main():
     # except Exception as e:
     #     logger.error(f"Failed to send welcome message: {e}")
     
+    # Register this machine in Supabase so the dashboard knows it is online.
+    if _stats_tracker:
+        try:
+            _stats_tracker.register_machine(machine_id)
+            logger.info(f"Registered machine '{machine_id}' in Supabase.")
+        except Exception as e:
+            logger.warning(f"Could not register machine in Supabase: {e}")
+
     logger.info("Broker running successfully. Entering main update loop...")
-    
+
     # 4. Main Update Loop
     last_status_hash = ""
+    last_heartbeat_ts = 0.0
 
     while True:
         try:
+            # Heartbeat: keep this machine's last_seen fresh every 60 s so the
+            # dashboard can tell the broker is still running on this PC.
+            now_ts = time.time()
+            if _stats_tracker and (now_ts - last_heartbeat_ts) >= 60:
+                try:
+                    _stats_tracker.register_machine(machine_id)
+                except Exception:
+                    pass
+                last_heartbeat_ts = now_ts
+
             # Drain remote-control commands from the cloud dashboard first, so
             # start/stop/restart issued from the web UI actually run on this PC.
-            process_remote_commands()
+            process_remote_commands(machine_id=machine_id)
 
             # Aggregate all telemetry files
             bots_data, logout_alerts, stats_data = compile_telemetry()

@@ -144,6 +144,28 @@ runs would see `None`.
 
 ---
 
+## ✅ Removed — "Failed Accounts" / "Attention Required" dashboard display
+
+The **Failed Accounts** card and the **Attention Required** red alert panel have been removed from
+`templates/dashboard.html`. The underlying data (`logged_out` status in the `accounts` table,
+`login_failures` in `daily_stats`) is still recorded; it just is not prominently surfaced in the UI.
+Per-account and per-bot detail pages still show login history.
+
+---
+
+## ✅ Fixed — bot_commands table prerequisite (remote control not working)
+
+**Root cause:** stop/restart buttons in the dashboard appeared to succeed ("queued") but nothing
+happened because the `bot_commands` (and `machines`) tables did not yet exist in Supabase. The
+`_supa_post` helper swallows non-200 responses silently, so the table-not-found 404 was invisible.
+
+**Fix:** `setup_supabase.sql` now includes `bot_commands` (with `machine_id` column) and `machines`.
+Run the full file once in the Supabase SQL Editor — all statements use `IF NOT EXISTS` so existing
+data is safe. Once the tables exist, the full flow works:
+`Dashboard → bot_commands → broker polls → executes on PC → marks done → dashboard shows result`.
+
+---
+
 ## 🔴 Security — committed secrets
 
 Across the repo (and ignored only partially by `.gitignore`): live **Telegram bot tokens** in each

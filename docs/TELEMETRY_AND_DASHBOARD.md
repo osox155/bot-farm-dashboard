@@ -11,8 +11,14 @@ system. They don't share storage.
 
 ## 1. Supabase data model (`setup_supabase.sql`)
 
-Five tables. RLS is enabled but with **permissive anon policies** (`USING true` / `CHECK true`), so the
+Seven tables. RLS is enabled but with **permissive anon policies** (`USING true` / `CHECK true`), so the
 committed anon key can read+write+delete everything.
+
+> **First-time setup:** paste the full `setup_supabase.sql` into the Supabase SQL Editor
+> (https://supabase.com/dashboard/project/stfrmlgckxnzlmvietcx/sql/new) and click **Run**.
+> All `CREATE TABLE IF NOT EXISTS` statements are idempotent — safe to re-run; existing data is
+> preserved. The `bot_commands` and `machines` tables **must** exist before the remote-control
+> buttons in the dashboard will work.
 
 | Table | Grain | Key columns |
 |-------|-------|-------------|
@@ -21,6 +27,8 @@ committed anon key can read+write+delete everything.
 | `events` | append-only **activity log** | `session_id`, `bot_name`, `account_name`, `event_type`, `option_type`, `details` (JSONB), `created_at` |
 | `login_attempts` | one row per **login attempt** | `account_name`, `success` (0/1), `reason`, `attempted_at` |
 | `daily_stats` | per **(date, account, bot)** | `total_replies/total_messages/total_failures/login_failures`; `UNIQUE(date, bot_name, account_name)` |
+| `bot_commands` | one row per **remote-control command** | `action`, `bot_name`, `machine_id` (NULL = broadcast), `status` (`pending`/`done`/`error`), `result`, `created_at`, `executed_at` |
+| `machines` | one row per **active PC** | `machine_id` (TEXT PK = `socket.gethostname()`), `last_seen` (TIMESTAMPTZ) — upserted every 60 s by the broker |
 
 Indexes on `events(session_id, bot_name, account_name, created_at)` and `daily_stats(date)`.
 
@@ -139,7 +147,50 @@ placeholders) consumes `/api/overview`. Cards use the `*_count` fields; the 14-d
 
 ---
 
-## 5. Telegram broker (`telemetry_broker.py`)
+## 5. Remote control & machine tracking
+
+The cloud dashboard (PythonAnywhere/Render) **cannot run local processes** — so stop/restart buttons
+work through an indirection:
+
+```
+Dashboard → enqueue_command() → bot_commands (Supabase) ← broker polls every 10 s → executes locally
+```
+
+### Machine identification
+
+When the broker starts (`telemetry_broker.py`), it calls `socket.gethostname()` to get a **machine_id**
+and immediately upserts that name into the `machines` table (`stats_tracker.register_machine`). It
+re-upserts every **60 seconds** as a heartbeat.
+
+The dashboard `/api/overview` and `/api/machines` endpoints query `machines` for rows with
+`last_seen` within the last 5 minutes. The **Bot Control** panel shows:
+- **"✓ DESKTOP-ABC123 (last seen 12:34:56)"** when the broker is online.
+- **"⚠ No active PC broker detected"** when nothing has checked in.
+
+### Command targeting
+
+| `machine_id` value in `bot_commands` | Which brokers pick it up |
+|--------------------------------------|--------------------------|
+| `NULL` | **All** running brokers (broadcast) |
+| `"DESKTOP-ABC123"` | Only the broker on that specific PC |
+
+Dashboard currently enqueues commands with `machine_id=NULL` (broadcast), which is correct for a
+single-PC setup. If you run brokers on two PCs simultaneously, both will execute every command.
+
+### Stop / restart flow
+
+1. Operator clicks "Stop All" in dashboard → `POST /api/control/stop-all` → `enqueue_command("stop-all")`.
+2. Broker's main loop calls `process_remote_commands(machine_id=...)` every 10 s.
+3. Broker finds the pending row → calls `_force_kill_all_bots()` (taskkill + PowerShell) → marks command `done`.
+4. Dashboard's `pollCommandStatus()` polls `/api/control/commands` and shows the PC's result in a toast.
+
+**Prerequisite:** the `bot_commands` and `machines` tables must exist. Run `setup_supabase.sql` once.
+Without them, commands silently fail: `_supa_post` returns `None` (the table 404 is swallowed) and
+the dashboard incorrectly shows "queued" while nothing was written.
+
+---
+
+## 6. Telegram broker (`telemetry_broker.py`)
 
 A **separate** process (started by the launcher). It does **not** touch Supabase or `stats_tracker`.
 
@@ -177,7 +228,7 @@ the direct Telegram send, so the operator gets exactly one consolidated message 
 
 ---
 
-## 6. `reset_account_states.py`
+## 7. `reset_account_states.py`
 
 Standalone `urllib` maintenance script. `PATCH accounts SET status='idle' WHERE status=eq.active`
 (optionally `--bot NAME`). Prints affected rows. Use it to clean up stale `active` rows left by the

@@ -65,10 +65,18 @@ CREATE TABLE IF NOT EXISTS bot_commands (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     action TEXT NOT NULL,          -- start | stop | restart | start-all | stop-all | restart-all
     bot_name TEXT,                 -- target bot for single-bot actions; NULL for *-all
+    machine_id TEXT,               -- NULL = all brokers pick it up; set = only that PC's broker
     status TEXT NOT NULL DEFAULT 'pending',  -- pending | done | error
     result TEXT,                   -- broker's execution result/message
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     executed_at TIMESTAMPTZ
+);
+
+-- Broker heartbeat: each PC running the broker upserts its hostname here every
+-- 60 s so the dashboard can show which machine(s) are currently active.
+CREATE TABLE IF NOT EXISTS machines (
+    machine_id TEXT PRIMARY KEY,
+    last_seen TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX IF NOT EXISTS idx_bot_commands_status ON bot_commands(status);
@@ -87,10 +95,16 @@ ALTER TABLE events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE login_attempts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE daily_stats ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bot_commands ENABLE ROW LEVEL SECURITY;
+ALTER TABLE machines ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "anon_all_accounts" ON accounts FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "anon_all_sessions" ON sessions FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "anon_all_events" ON events FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "anon_all_login_attempts" ON login_attempts FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "anon_all_daily_stats" ON daily_stats FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "anon_all_bot_commands" ON bot_commands FOR ALL USING (true) WITH CHECK (true);
+-- Use DO block so CREATE POLICY is idempotent (safe to re-run even if policies already exist)
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='accounts'       AND policyname='anon_all_accounts')       THEN CREATE POLICY "anon_all_accounts"       ON accounts       FOR ALL USING (true) WITH CHECK (true); END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='sessions'       AND policyname='anon_all_sessions')       THEN CREATE POLICY "anon_all_sessions"       ON sessions       FOR ALL USING (true) WITH CHECK (true); END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='events'         AND policyname='anon_all_events')         THEN CREATE POLICY "anon_all_events"         ON events         FOR ALL USING (true) WITH CHECK (true); END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='login_attempts' AND policyname='anon_all_login_attempts') THEN CREATE POLICY "anon_all_login_attempts" ON login_attempts FOR ALL USING (true) WITH CHECK (true); END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='daily_stats'    AND policyname='anon_all_daily_stats')    THEN CREATE POLICY "anon_all_daily_stats"    ON daily_stats    FOR ALL USING (true) WITH CHECK (true); END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='bot_commands'   AND policyname='anon_all_bot_commands')   THEN CREATE POLICY "anon_all_bot_commands"   ON bot_commands   FOR ALL USING (true) WITH CHECK (true); END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='machines'       AND policyname='anon_all_machines')       THEN CREATE POLICY "anon_all_machines"       ON machines       FOR ALL USING (true) WITH CHECK (true); END IF;
+END $$;

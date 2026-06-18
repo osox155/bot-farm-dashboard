@@ -552,18 +552,39 @@ class StatsTracker:
     # the actual PC, polls + executes it locally. This guarantees control hits
     # the correct machine where the bots really run.
     # ------------------------------------------------------------------
-    def enqueue_command(self, action, bot_name=None):
-        """Dashboard side: queue a control command for the local broker."""
+    def enqueue_command(self, action, bot_name=None, machine_id=None):
+        """Dashboard side: queue a control command for the local broker.
+        machine_id=None means every running broker picks it up (broadcast)."""
         row = _supa_post("bot_commands", {
             "action": action,
             "bot_name": bot_name,
+            "machine_id": machine_id,
             "status": "pending",
             "created_at": _iso_now(),
         })
         return row
 
-    def fetch_pending_commands(self, limit=20):
-        """Broker side: read pending commands oldest-first."""
+    def fetch_pending_commands(self, machine_id=None, limit=20):
+        """Broker side: read pending commands oldest-first.
+        Picks up commands targeted at this machine AND broadcast commands (machine_id IS NULL)."""
+        if machine_id:
+            # Two separate queries to avoid complex OR filter syntax differences across
+            # PostgREST versions: one for this machine, one for broadcast (null machine_id).
+            targeted = _supa_get("bot_commands", {
+                "machine_id": f"eq.{machine_id}",
+                "status": "eq.pending",
+                "order": "created_at.asc",
+                "limit": str(limit),
+            })
+            broadcast = _supa_get("bot_commands", {
+                "machine_id": "is.null",
+                "status": "eq.pending",
+                "order": "created_at.asc",
+                "limit": str(limit),
+            })
+            combined = targeted + broadcast
+            combined.sort(key=lambda x: x.get("created_at", ""))
+            return combined[:limit]
         return _supa_get("bot_commands", {
             "status": "eq.pending",
             "order": "created_at.asc",
@@ -584,6 +605,23 @@ class StatsTracker:
             _supa_delete("bot_commands", {"status": "neq.pending"})
         else:
             _supa_delete("bot_commands", {"id": "gte.0"})
+
+    def register_machine(self, machine_id):
+        """Broker heartbeat: upsert this PC's hostname + current timestamp so the
+        dashboard can show which machine(s) are currently running the broker."""
+        _supa_upsert("machines", {
+            "machine_id": machine_id,
+            "last_seen": _iso_now(),
+        }, on_conflict="machine_id")
+
+    def get_active_machines(self, stale_seconds=300):
+        """Return machines that checked in within the last stale_seconds."""
+        from datetime import timedelta
+        cutoff = (datetime.utcnow() - timedelta(seconds=stale_seconds)).isoformat() + "Z"
+        return _supa_get("machines", {
+            "last_seen": f"gte.{cutoff}",
+            "order": "last_seen.desc",
+        })
 
 tracker = StatsTracker()
 
