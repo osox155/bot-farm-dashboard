@@ -57,6 +57,23 @@ CREATE TABLE IF NOT EXISTS daily_stats (
     UNIQUE(date, bot_name, account_name)
 );
 
+-- Remote control command queue: the cloud dashboard enqueues a command here,
+-- and the broker running on the operator's PC polls + executes it locally, then
+-- marks it done. This is how the web dashboard controls the bots on the correct
+-- machine (the dashboard itself runs in the cloud and cannot touch the PC).
+CREATE TABLE IF NOT EXISTS bot_commands (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    action TEXT NOT NULL,          -- start | stop | restart | start-all | stop-all | restart-all
+    bot_name TEXT,                 -- target bot for single-bot actions; NULL for *-all
+    status TEXT NOT NULL DEFAULT 'pending',  -- pending | done | error
+    result TEXT,                   -- broker's execution result/message
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    executed_at TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS idx_bot_commands_status ON bot_commands(status);
+CREATE INDEX IF NOT EXISTS idx_bot_commands_created ON bot_commands(created_at);
+
 CREATE INDEX IF NOT EXISTS idx_events_session ON events(session_id);
 CREATE INDEX IF NOT EXISTS idx_events_bot ON events(bot_name);
 CREATE INDEX IF NOT EXISTS idx_events_account ON events(account_name);
@@ -69,9 +86,11 @@ ALTER TABLE sessions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE login_attempts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE daily_stats ENABLE ROW LEVEL SECURITY;
+ALTER TABLE bot_commands ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "anon_all_accounts" ON accounts FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "anon_all_sessions" ON sessions FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "anon_all_events" ON events FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "anon_all_login_attempts" ON login_attempts FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "anon_all_daily_stats" ON daily_stats FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "anon_all_bot_commands" ON bot_commands FOR ALL USING (true) WITH CHECK (true);

@@ -20,6 +20,15 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TELEMETRY_DIR = os.path.join(BASE_DIR, 'telemetry')
 STATE_FILE = os.path.join(TELEMETRY_DIR, 'broker_state.json')
 
+# Shared Supabase tracker — used to drain the remote-control command queue the
+# cloud dashboard writes to. The broker runs on the operator's PC, so it is the
+# component that can actually start/stop the local bot processes.
+sys.path.insert(0, BASE_DIR)
+try:
+    from stats_tracker import tracker as _stats_tracker
+except Exception:
+    _stats_tracker = None
+
 # Create telemetry folder if not exists
 os.makedirs(TELEMETRY_DIR, exist_ok=True)
 
@@ -759,7 +768,7 @@ def _start_one_bot(bot_arg):
         "replybot":  os.path.join(BASE_DIR, "ReplyBotv7", "new.py"),
         "comments":  os.path.join(BASE_DIR, "CommentsReplyBot", "facebook_bot.py"),
         "fewfeed":   os.path.join(BASE_DIR, "fewfeedbotv6", "fewfeed_bot_template.py"),
-        "autojoin":  os.path.join(BASE_DIR, "AutoJoinBot", "auto_join.py"),
+        "autojoin":  os.path.join(BASE_DIR, "AutoJoinBot", "join_groups.py"),
     }
     script = start_map.get(bot_arg)
     if not script or not os.path.exists(script):
@@ -801,6 +810,86 @@ def _tail_log(bot_arg, lines=30):
         return tail
     except Exception as e:
         return f"Could not read log: {e}"
+
+# Dashboard sends full bot names; the local control helpers use short keys.
+_DASH_TO_KEY = {
+    "ReplyBot": "replybot",
+    "CommentsReplyBot": "comments",
+    "FewFeed": "fewfeed",
+    "AutoJoinBot": "autojoin",
+}
+
+def _launch_start_bats():
+    """Launch start-bots.bat on this PC (the full-fleet launcher)."""
+    import subprocess
+    bat = os.path.join(BASE_DIR, "start-bots.bat")
+    if os.path.exists(bat):
+        subprocess.Popen([bat], cwd=BASE_DIR, shell=True,
+                         creationflags=subprocess.CREATE_NEW_CONSOLE)
+        return True
+    return False
+
+def _execute_remote_command(action, bot_name):
+    """Run a single dashboard control command locally. Returns a result string."""
+    import subprocess
+    action = (action or "").strip().lower()
+
+    if action == "stop-all":
+        _force_kill_all_bots()
+        return "All bots + Chrome stopped on PC."
+
+    if action == "start-all":
+        return "start-bots.bat launched." if _launch_start_bats() else "start-bots.bat not found."
+
+    if action == "restart-all":
+        _force_kill_all_bots()
+        time.sleep(2)
+        return "Restarted via start-bots.bat." if _launch_start_bats() else "Killed bots but start-bots.bat not found."
+
+    key = _DASH_TO_KEY.get(bot_name)
+    if not key:
+        return f"Unknown bot: {bot_name}"
+
+    if action == "stop":
+        _stop_one_bot(key)
+        return f"{bot_name} stop signal sent."
+
+    if action == "start":
+        return f"{bot_name} launched." if _start_one_bot(key) else f"Could not find script for {bot_name}."
+
+    if action == "restart":
+        _stop_one_bot(key)
+        time.sleep(2)
+        return f"{bot_name} restarted." if _start_one_bot(key) else f"Killed {bot_name} but could not relaunch it."
+
+    return f"Unknown action: {action}"
+
+def process_remote_commands():
+    """Drain the Supabase command queue the cloud dashboard writes to. Executes
+    each pending command on this PC (the only machine that can touch the bots)
+    and marks it done/error so the dashboard can show the outcome."""
+    if _stats_tracker is None:
+        return
+    try:
+        pending = _stats_tracker.fetch_pending_commands(limit=20)
+    except Exception as e:
+        logger.error(f"Could not fetch remote commands: {e}")
+        return
+    for cmd in pending or []:
+        cid = cmd.get("id")
+        action = cmd.get("action")
+        bot_name = cmd.get("bot_name")
+        logger.info(f"Executing remote command #{cid}: {action} {bot_name or ''}".strip())
+        try:
+            result = _execute_remote_command(action, bot_name)
+            _stats_tracker.mark_command_done(cid, status="done", result=result)
+            logger.info(f"Remote command #{cid} done: {result}")
+        except Exception as e:
+            try:
+                _stats_tracker.mark_command_done(cid, status="error", result=str(e))
+            except Exception:
+                pass
+            logger.error(f"Remote command #{cid} failed: {e}")
 
 def handle_callback_query(cb_id, cb_data, notifier, msg_id):
     """Handle Telegram Inline Keyboard button click callbacks by editing the message in-place."""
@@ -1268,6 +1357,10 @@ def main():
 
     while True:
         try:
+            # Drain remote-control commands from the cloud dashboard first, so
+            # start/stop/restart issued from the web UI actually run on this PC.
+            process_remote_commands()
+
             # Aggregate all telemetry files
             bots_data, logout_alerts, stats_data = compile_telemetry()
 

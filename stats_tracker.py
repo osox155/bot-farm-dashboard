@@ -542,6 +542,49 @@ class StatsTracker:
                     report += f"  - [{a['bot_name']}] `{a['name']}`\n"
         return report
 
+    # ------------------------------------------------------------------
+    # Remote control command queue
+    #
+    # The web dashboard runs in the cloud and cannot touch the operator's PC,
+    # so a direct subprocess/taskkill from dashboard.py would try to kill
+    # processes on the cloud host (the wrong machine) and silently do nothing.
+    # Instead the dashboard enqueues a command here and the broker, running on
+    # the actual PC, polls + executes it locally. This guarantees control hits
+    # the correct machine where the bots really run.
+    # ------------------------------------------------------------------
+    def enqueue_command(self, action, bot_name=None):
+        """Dashboard side: queue a control command for the local broker."""
+        row = _supa_post("bot_commands", {
+            "action": action,
+            "bot_name": bot_name,
+            "status": "pending",
+            "created_at": _iso_now(),
+        })
+        return row
+
+    def fetch_pending_commands(self, limit=20):
+        """Broker side: read pending commands oldest-first."""
+        return _supa_get("bot_commands", {
+            "status": "eq.pending",
+            "order": "created_at.asc",
+            "limit": str(limit),
+        })
+
+    def mark_command_done(self, command_id, status="done", result=None):
+        """Broker side: mark a command executed (or errored)."""
+        _supa_patch("bot_commands", {
+            "status": status,
+            "result": result,
+            "executed_at": _iso_now(),
+        }, {"id": f"eq.{command_id}"})
+
+    def clear_old_commands(self, keep_pending=True):
+        """Maintenance: delete finished commands so the queue stays small."""
+        if keep_pending:
+            _supa_delete("bot_commands", {"status": "neq.pending"})
+        else:
+            _supa_delete("bot_commands", {"id": "gte.0"})
+
 tracker = StatsTracker()
 
 def get_tracker(bot_name="Bot"):

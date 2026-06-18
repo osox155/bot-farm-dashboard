@@ -406,8 +406,6 @@ function renderBotsList() {
         '<div class="row"><span>Total Accounts</span><span class="val">' + (accts.total || 0) + '</span></div>' +
         '<div class="row"><span>Replies</span><span class="val">' + b.replies + '</span></div>' +
         '<div class="row"><span>Messages</span><span class="val">' + b.messages + '</span></div>' +
-        '<div class="row"><span>Failures</span><span class="val" style="color:' + (b.failures > 0 ? 'var(--yellow)' : 'inherit') + '">' + b.failures + '</span></div>' +
-        '<div class="row"><span>Login Fails</span><span class="val" style="color:' + ((b.login_failures || 0) > 0 ? 'var(--red)' : 'inherit') + '">' + (b.login_failures || 0) + '</span></div>' +
       '</div></a>';
   });
   
@@ -434,6 +432,8 @@ function renderCtrlGrid(activeBotNames) {
           '<button class="btn btn-sm btn-danger" ' +
             'onclick="ctrlBot(\'stop\',\'' + esc(name) + '\')">⏹ Stop</button>' +
           '<button class="btn btn-sm btn-outline" ' +
+            'onclick="ctrlBot(\'restart\',\'' + esc(name) + '\')">🔄 Restart</button>' +
+          '<button class="btn btn-sm btn-outline" ' +
             'onclick="openLogs(\'' + esc(name) + '\')">📋 Logs</button>' +
         '</div>' +
       '</div>';
@@ -447,28 +447,56 @@ function ctrlAll(action) {
     'stop-all':  'Stop All',
     'restart-all': 'Restart All'
   }[action] || action;
-  showModal(label, 'Send "' + label + '" command to the bot farm?', function() {
+  showModal(label, 'Send "' + label + '" command to the bot farm? It runs on the PC where the bots live.', function() {
     fetch('/api/control/' + action, { method: 'POST' })
       .then(function(r) { return r.json(); })
       .then(function(d) {
         toast(d.ok ? (d.message || 'Done') : (d.error || 'Failed'), d.ok ? 'success' : 'error');
-        if (d.ok) setTimeout(loadOverview, 1500);
+        if (d.ok) { pollCommandStatus(); setTimeout(loadOverview, 1500); }
       })
       .catch(function() { toast('Network error', 'error'); });
   });
 }
 
 function ctrlBot(action, name) {
-  showModal(action === 'stop' ? 'Stop ' + name : 'Start ' + name,
-    action + ' "' + name + '"?', function() {
+  var verb = { start: 'Start', stop: 'Stop', restart: 'Restart' }[action] || action;
+  showModal(verb + ' ' + name,
+    verb + ' "' + name + '"? The command runs on the PC where the bots live.', function() {
     fetch('/api/control/' + action + '/' + encodeURIComponent(name), { method: 'POST' })
       .then(function(r) { return r.json(); })
       .then(function(d) {
         toast(d.ok ? (d.message || 'Done') : (d.error || 'Failed'), d.ok ? 'success' : 'error');
-        if (d.ok) setTimeout(loadOverview, 1500);
+        if (d.ok) { pollCommandStatus(); setTimeout(loadOverview, 1500); }
       })
       .catch(function() { toast('Network error', 'error'); });
   });
+}
+
+function pollCommandStatus() {
+  // Commands are queued in Supabase and executed by the broker on the PC.
+  // Poll a few times so the operator sees whether the PC actually picked it up.
+  var tries = 0;
+  function check() {
+    tries++;
+    fetch('/api/control/commands')
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        if (!d.ok) return;
+        if (d.pending === 0) {
+          var latest = (d.commands || [])[0];
+          if (latest && latest.status === 'done') {
+            toast('PC broker: ' + (latest.result || 'command executed'), 'success');
+          } else if (latest && latest.status === 'error') {
+            toast('PC broker error: ' + (latest.result || 'failed'), 'error');
+          }
+          return;
+        }
+        if (tries < 8) setTimeout(check, 3000);
+        else toast('Command still queued — is the PC broker running?', 'error');
+      })
+      .catch(function() {});
+  }
+  setTimeout(check, 2500);
 }
 
 function openLogs(name) {
