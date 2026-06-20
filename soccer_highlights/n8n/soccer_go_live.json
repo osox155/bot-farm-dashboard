@@ -1,0 +1,87 @@
+{
+  "name": "Soccer SaaS \u2014 OBS Go-Live / Stop",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "039eee15f89b4034",
+      "name": "\u25b6 Go Live (run me)",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        260
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "e557054c09d0482d",
+      "name": "\u23f9 Stop (run me)",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "command": "cd /opt/soccer_highlights && python obs_control.py go-live --scene \"Match\""
+      },
+      "id": "c99aa79b6a864937",
+      "name": "OBS: start stream + record",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        480,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "command": "cd /opt/soccer_highlights && python obs_control.py stop"
+      },
+      "id": "2e8313b4680b4a00",
+      "name": "OBS: stop stream + record",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        480,
+        520
+      ]
+    }
+  ],
+  "connections": {
+    "\u25b6 Go Live (run me)": {
+      "main": [
+        [
+          {
+            "node": "OBS: start stream + record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "\u23f9 Stop (run me)": {
+      "main": [
+        [
+          {
+            "node": "OBS: stop stream + record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "pinData": {},
+  "tags": [
+    {
+      "name": "soccer-saas"
+    }
+  ]
+}

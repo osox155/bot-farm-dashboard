@@ -21,12 +21,13 @@ PLATFORM_LIMITS = {
 def _hashtags(meta, n):
     base = ["football", "soccer", "highlights", "goals", "matchday",
             "footballhighlights", "goal"]
+    import re as _re
     for t in (meta.get("home_team"), meta.get("away_team")):
         if t:
-            base.insert(0, t.replace(" ", "").replace(".", ""))
+            base.insert(0, _re.sub(r"[^A-Za-z0-9]", "", t))
     out, seen = [], set()
     for h in base:
-        h = "#" + h.lower()
+        h = "#" + _re.sub(r"[^a-z0-9]", "", h.lower())
         if h not in seen:
             seen.add(h); out.append(h)
         if len(out) >= n:
@@ -57,33 +58,17 @@ def build_captions(meta: dict, recap_url: str | None = None,
     goalblock = "\n".join(glines) if glines else "All the key moments."
 
     yt_title = f"{matchup} | Goals & Highlights"[:PLATFORM_LIMITS["youtube"]["title"]]
-    yt_desc = textwrap.dedent(f"""\
-        {matchup} \u2014 full match highlights and all the goals.
-
-        \u23f1\ufe0f Goal timeline:
-        {goalblock}
-
-        Watch every goal, key chance and the build-up. Like & subscribe for more
-        match recaps.
-        """).strip()
+    yt_desc = (f"{matchup} \u2014 full match highlights and all the goals.\n\n"
+               f"\u23f1\ufe0f Goal timeline:\n{goalblock}\n\n"
+               "Watch every goal, key chance and the build-up. "
+               "Like & subscribe for more match recaps.")
     yt_tags = [h[1:] for h in _hashtags(meta, PLATFORM_LIMITS["youtube"]["tags"])]
 
-    fb_desc = textwrap.dedent(f"""\
-        \U0001f3df\ufe0f {matchup}
-
-        {goalblock}
-
-        Full recap below \U0001f447
-        """).strip()
+    fb_desc = f"\U0001f3df\ufe0f {matchup}\n\n{goalblock}\n\nFull recap below \U0001f447"
     fb_tags = _hashtags(meta, PLATFORM_LIMITS["facebook"]["tags"])
 
-    ig_desc = textwrap.dedent(f"""\
-        {matchup} \U0001f525\u26bd
-
-        {goalblock}
-
-        Save & share \U0001f4cc  Drop your rating in the comments \U0001f447
-        """).strip()
+    ig_desc = (f"{matchup} \U0001f525\u26bd\n\n{goalblock}\n\n"
+               "Save & share \U0001f4cc  Drop your rating in the comments \U0001f447")
     ig_tags = _hashtags(meta, PLATFORM_LIMITS["instagram"]["tags"])
 
     def cap(text, link, tags, limit):
