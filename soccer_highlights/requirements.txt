@@ -1,0 +1,9 @@
+obsws-python>=1.6
+requests>=2.31
+numpy>=1.24
+Pillow>=10.0
+imageio-ffmpeg>=0.4.9
+# OCR (choose one; easyocr is heavier but more accurate)
+easyocr>=1.7        ; platform_system != "Windows" or python_version >= "3.9"
+opencv-python>=4.8
+# pytesseract>=0.3   # alternative OCR; also needs the Tesseract binary installed
