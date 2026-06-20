@@ -1,9 +1,27 @@
-obsws-python>=1.6
-requests>=2.31
-numpy>=1.24
-Pillow>=10.0
-imageio-ffmpeg>=0.4.9
-# OCR (choose one; easyocr is heavier but more accurate)
-easyocr>=1.7        ; platform_system != "Windows" or python_version >= "3.9"
-opencv-python>=4.8
-# pytesseract>=0.3   # alternative OCR; also needs the Tesseract binary installed
+# ── Core runtime ─────────────────────────────────────────────────────────────
+obsws-python>=1.6          # OBS WebSocket v5 control (obs_control.py)
+requests>=2.31             # poster.py, run_match.py, watcher.py
+Pillow>=10.0               # thumbnail_gen.py
+imageio-ffmpeg>=0.4.9      # bundles a static ffmpeg binary (goal_detection, pipeline)
+numpy>=1.24                # audio energy detection (goal_detection.py)
+opencv-python>=4.8         # scoreboard OCR frame sampling (goal_detection.py)
+
+# ── Gumloop SDK (Firecrawl search for official goal data) ────────────────────
+# Install from PyPI:  pip install gumloop
+# Docs: https://docs.gumloop.com/sdk
+gumloop>=0.1.0
+
+# ── OCR backend (pick ONE — both are optional; audio+official still work without) ─
+# easyocr is more accurate but heavy (~2 GB torch). pytesseract needs the
+# Tesseract binary installed separately (https://github.com/UB-Mannheim/tesseract/wiki).
+#
+# Uncomment to enable easyocr (recommended if you have space + time on first boot):
+# easyocr>=1.7
+#
+# Uncomment to enable pytesseract instead:
+# pytesseract>=0.3.10
+
+# ── Folder-watching (watcher.py) ─────────────────────────────────────────────
+# watchdog provides inotify/FSEvents/ReadDirectoryChangesW but watcher.py uses
+# plain polling (no extra deps). Install only if you want to switch to event-driven:
+# watchdog>=3.0

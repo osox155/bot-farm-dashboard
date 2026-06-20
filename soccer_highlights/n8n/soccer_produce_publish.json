@@ -1,5 +1,5 @@
 {
-  "name": "Soccer SaaS \u2014 Produce & Publish",
+  "name": "Soccer SaaS — Produce & Publish",
   "nodes": [
     {
       "parameters": {
@@ -12,10 +12,7 @@
       "name": "Webhook: recording finished",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1.1,
-      "position": [
-        240,
-        400
-      ],
+      "position": [240, 400],
       "webhookId": "efe6984cc9ab4613"
     },
     {
@@ -26,7 +23,7 @@
               "id": "d81f155b76014e0d",
               "name": "base",
               "type": "string",
-              "value": "/opt/soccer_highlights"
+              "value": "C:\\Users\\runneradmin\\Downloads\\Bot\\soccer_highlights"
             },
             {
               "id": "04c1c55e0ed341f9",
@@ -54,177 +51,94 @@
       "name": "Config",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [
-        460,
-        400
-      ]
+      "position": [460, 400]
     },
     {
       "parameters": {
-        "command": "=cd {{ $json.base }} && python match_pipeline.py \"{{ $json.recording_path }}\" --match-query \"{{ $json.match_query }}\""
+        "command": "=cd /d \"{{ $json.base }}\" && python match_pipeline.py \"{{ $json.recording_path }}\" --match-query \"{{ $json.match_query }}\""
       },
       "id": "9540b40e658f47cf",
       "name": "Detect goals + build recap",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
-      "position": [
-        680,
-        400
-      ]
+      "position": [680, 400]
     },
     {
       "parameters": {
-        "command": "=cd {{ $(\"Config\").item.json.base }} && ffmpeg -y -ss 12 -i recap.mp4 -frames:v 1 thumb_frame.png"
+        "command": "=cd /d \"{{ $(\"Config\").item.json.base }}\" && ffmpeg -y -ss 12 -i recap.mp4 -frames:v 1 thumb_frame.png"
       },
       "id": "1856791ade874196",
       "name": "Grab thumbnail frame",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
-      "position": [
-        900,
-        400
-      ]
+      "position": [900, 400]
     },
     {
       "parameters": {
-        "command": "=cd {{ $(\"Config\").item.json.base }} && python thumbnail_gen.py --background thumb_frame.png --goals-json goals.json --out thumbnail.png"
+        "command": "=cd /d \"{{ $(\"Config\").item.json.base }}\" && python thumbnail_gen.py --background thumb_frame.png --goals-json goals.json --out thumbnail.png"
       },
       "id": "910b4f39f34c4768",
       "name": "Make thumbnail",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
-      "position": [
-        1120,
-        400
-      ]
+      "position": [1120, 400]
     },
     {
       "parameters": {
-        "command": "=cd {{ $(\"Config\").item.json.base }} && python captions.py goals.json --recap-url \"{{ $(\"Config\").item.json.public_url }}\" > captions.json && cat captions.json"
+        "command": "=cd /d \"{{ $(\"Config\").item.json.base }}\" && python captions.py goals.json --recap-url \"{{ $(\"Config\").item.json.public_url }}\""
       },
       "id": "4a34c77a78b94158",
       "name": "Make captions",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
-      "position": [
-        1340,
-        400
-      ]
+      "position": [1340, 400]
     },
     {
       "parameters": {
-        "command": "=# Upload recap.mp4 to public storage (S3/GCS/your CDN) and echo the URL.\n# Example with AWS CLI:\n# aws s3 cp {{ $(\"Config\").item.json.base }}/recap.mp4 s3://your-bucket/recaps/recap.mp4 --acl public-read\necho \"{{ $(\"Config\").item.json.public_url }}\""
+        "command": "=# Upload recap.mp4 to public storage so Instagram can ingest it.\n# Example (AWS CLI — add aws-cli to setup if you use S3):\n# aws s3 cp \"{{ $(\"Config\").item.json.base }}\\recap.mp4\" s3://your-bucket/recaps/recap.mp4 --acl public-read && echo https://your-bucket.s3.amazonaws.com/recaps/recap.mp4\n#\n# If you don't need Instagram or have no S3, just echo the pre-set URL:\necho \"{{ $(\"Config\").item.json.public_url }}\""
       },
       "id": "759d86d058234ae6",
       "name": "Host recap for Instagram (optional)",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
-      "position": [
-        1560,
-        400
-      ]
+      "position": [1560, 400]
     },
     {
       "parameters": {
-        "command": "=cd {{ $(\"Config\").item.json.base }} && python poster.py --recap recap.mp4 --thumbnail thumbnail.png --captions captions.json --public-recap-url \"{{ $(\"Host recap for Instagram (optional)\").item.json.stdout.trim() }}\" --targets youtube,facebook,instagram"
+        "command": "=cd /d \"{{ $(\"Config\").item.json.base }}\" && python poster.py --recap recap.mp4 --thumbnail thumbnail.png --captions captions.json --public-recap-url \"{{ $(\"Host recap for Instagram (optional)\").item.json.stdout.trim() }}\" --targets youtube,facebook,instagram"
       },
       "id": "077e167d3cd5452b",
       "name": "Post to YouTube / Facebook / Instagram",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
-      "position": [
-        1780,
-        400
-      ]
+      "position": [1780, 400]
     }
   ],
   "connections": {
     "Webhook: recording finished": {
-      "main": [
-        [
-          {
-            "node": "Config",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{"node": "Config", "type": "main", "index": 0}]]
     },
     "Config": {
-      "main": [
-        [
-          {
-            "node": "Detect goals + build recap",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{"node": "Detect goals + build recap", "type": "main", "index": 0}]]
     },
     "Detect goals + build recap": {
-      "main": [
-        [
-          {
-            "node": "Grab thumbnail frame",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{"node": "Grab thumbnail frame", "type": "main", "index": 0}]]
     },
     "Grab thumbnail frame": {
-      "main": [
-        [
-          {
-            "node": "Make thumbnail",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{"node": "Make thumbnail", "type": "main", "index": 0}]]
     },
     "Make thumbnail": {
-      "main": [
-        [
-          {
-            "node": "Make captions",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{"node": "Make captions", "type": "main", "index": 0}]]
     },
     "Make captions": {
-      "main": [
-        [
-          {
-            "node": "Host recap for Instagram (optional)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{"node": "Host recap for Instagram (optional)", "type": "main", "index": 0}]]
     },
     "Host recap for Instagram (optional)": {
-      "main": [
-        [
-          {
-            "node": "Post to YouTube / Facebook / Instagram",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{"node": "Post to YouTube / Facebook / Instagram", "type": "main", "index": 0}]]
     }
   },
-  "settings": {
-    "executionOrder": "v1"
-  },
+  "settings": {"executionOrder": "v1"},
   "active": false,
   "pinData": {},
-  "tags": [
-    {
-      "name": "soccer-saas"
-    }
-  ]
+  "tags": [{"name": "soccer-saas"}]
 }

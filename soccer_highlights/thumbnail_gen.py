@@ -29,13 +29,33 @@ def grab_frame(video, sec, out="frame.png"):
 
 
 def _font(size, bold=True):
+    # Search order: Windows system fonts first (RDP), then Linux, then macOS.
+    win = os.environ.get("WINDIR", r"C:\Windows")
+    font_dir = os.path.join(win, "Fonts")
     paths = [
+        # Windows — prefer Impact (punchy) then Arial Bold then fallbacks
+        os.path.join(font_dir, "impact.ttf"),
+        os.path.join(font_dir, "arialbd.ttf"),
+        os.path.join(font_dir, "arial.ttf"),
+        os.path.join(font_dir, "verdanab.ttf"),
+        os.path.join(font_dir, "verdana.ttf"),
+        os.path.join(font_dir, "calibrib.ttf"),
+        os.path.join(font_dir, "calibri.ttf"),
+        # Linux
         "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
         "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
+        # macOS
+        "/System/Library/Fonts/Helvetica.ttc",
+        "/Library/Fonts/Arial Bold.ttf",
     ]
     for p in paths:
         if os.path.exists(p):
-            return ImageFont.truetype(p, size)
+            try:
+                return ImageFont.truetype(p, size)
+            except Exception:
+                continue
+    # Last-resort: Pillow's built-in bitmap font (tiny but always works)
     return ImageFont.load_default()
 
 
