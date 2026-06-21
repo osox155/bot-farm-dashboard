@@ -46,3 +46,90 @@ Stacktrace:
 2026-06-18 13:42:07,059 [account_2] [Sheet] Saved 14 cookies to 2_cookies.json
 2026-06-18 13:42:57,258 [account_2] [Sheet] Keys available: ['1_cookies.json', '2_cookies.json', '3_cookies.json', '4_cookies.json', '5_cookies.json']...
 2026-06-18 13:42:57,262 [account_2] [Sheet] Saved 14 cookies to 2_cookies.json
+2026-06-21 09:12:09,212 [account_2] Preparing to launch...
+2026-06-21 09:12:09,918 [account_2] Created minimal session profile.
+2026-06-21 09:12:09,923 [account_2] [ext] Extension folder found: C:\Users\HP\Downloads\claude\BOT Py\fewfeedbotv6\fewfeedv2
+2026-06-21 09:12:17,790 [account_2] Browser launched successfully.
+2026-06-21 09:12:21,771 [account_2] [ext] --load-extension blocked; running post-launch loader...
+2026-06-21 09:12:21,780 [account_2] [ext] CDP not available (Message: unknown error: unhandled inspector error: {"code":-32000,"message":"Method not available."}
+  (Session info: chrome=149.0.7827.115)
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x3da543+103f3]
+	chromedriver!GetHandleVerifier [0x3da584+10434]
+	chromedriver!(No symbol) [0x1da700]
+	chromedriver!(No symbol) [0x1ca2e5]
+	chromedriver!(No symbol) [0x1c8dd6]
+	chromedriver!(No symbol) [0x1c9456]
+	chromedriver!(No symbol) [0x1c93f8]
+	chromedriver!(No symbol) [0x1dee3a]
+	chromedriver!(No symbol) [0x26ed91]
+	chromedriver!(No symbol) [0x2460cc]
+	chromedriver!(No symbol) [0x26339a]
+	chromedriver!(No symbol) [0x245e66]
+	chromedriver!(No symbol) [0x219159]
+	chromedriver!(No symbol) [0x219f24]
+	chromedriver!GetHandleVerifier [0x664bba+29aa6a]
+	chromedriver!GetHandleVerifier [0x660119+295fc9]
+	chromedriver!GetHandleVerifier [0x68103e+2b6eee]
+	chromedriver!GetHandleVerifier [0x3f37f6+296a6]
+	chromedriver!GetHandleVerifier [0x3fa91d+307cd]
+	chromedriver!GetHandleVerifier [0x3e2d18+18bc8]
+	chromedriver!GetHandleVerifier [0x3e2ec5+18d75]
+	chromedriver!GetHandleVerifier [0x3cc05f+1f0f]
+	KERNEL32!(No symbol) [0x75ef5d49]
+	ntdll!RtlInitializeExceptionChain [0x7711e12b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7711e0b1+231]
+	(No symbol) [(nil)]
+), trying UI...
+2026-06-21 09:12:30,433 [account_2] [ext] Loaded via UI automation from C:\Users\HP\Downloads\claude\BOT Py\fewfeedbotv6\fewfeedv2
+2026-06-21 09:12:30,544 [account_2] Cookies injected (14 entries). Navigating to Facebook Settings...
+2026-06-21 09:12:51,392 [account_2] Login check passed (Settings).
+2026-06-21 09:12:51,392 [account_2] Verifying Facebook login before starting tool...
+2026-06-21 09:12:51,409 [account_2] Facebook session verified.
+2026-06-21 09:12:51,409 [account_2] Opening FewFeed tool page directly (web mode)...
+2026-06-21 09:34:52,975 [account_2] Preparing to launch...
+2026-06-21 09:34:53,773 [account_2] Created minimal session profile.
+2026-06-21 09:34:53,776 [account_2] [ext] Extension folder found: C:\Users\HP\Downloads\claude\BOT Py\fewfeedbotv6\fewfeedv2
+2026-06-21 09:35:04,538 [account_2] Browser launched successfully.
+2026-06-21 09:35:08,461 [account_2] [ext] --load-extension blocked; running post-launch loader...
+2026-06-21 09:35:08,467 [account_2] [ext] CDP not available (Message: unknown error: unhandled inspector error: {"code":-32000,"message":"Method not available."}
+  (Session info: chrome=149.0.7827.115)
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x3da543+103f3]
+	chromedriver!GetHandleVerifier [0x3da584+10434]
+	chromedriver!(No symbol) [0x1da700]
+	chromedriver!(No symbol) [0x1ca2e5]
+	chromedriver!(No symbol) [0x1c8dd6]
+	chromedriver!(No symbol) [0x1c9456]
+	chromedriver!(No symbol) [0x1c93f8]
+	chromedriver!(No symbol) [0x1dee3a]
+	chromedriver!(No symbol) [0x26ed91]
+	chromedriver!(No symbol) [0x2460cc]
+	chromedriver!(No symbol) [0x26339a]
+	chromedriver!(No symbol) [0x245e66]
+	chromedriver!(No symbol) [0x219159]
+	chromedriver!(No symbol) [0x219f24]
+	chromedriver!GetHandleVerifier [0x664bba+29aa6a]
+	chromedriver!GetHandleVerifier [0x660119+295fc9]
+	chromedriver!GetHandleVerifier [0x68103e+2b6eee]
+	chromedriver!GetHandleVerifier [0x3f37f6+296a6]
+	chromedriver!GetHandleVerifier [0x3fa91d+307cd]
+	chromedriver!GetHandleVerifier [0x3e2d18+18bc8]
+	chromedriver!GetHandleVerifier [0x3e2ec5+18d75]
+	chromedriver!GetHandleVerifier [0x3cc05f+1f0f]
+	KERNEL32!(No symbol) [0x75ef5d49]
+	ntdll!RtlInitializeExceptionChain [0x7711e12b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7711e0b1+231]
+	(No symbol) [(nil)]
+), trying UI...
+2026-06-21 09:35:17,757 [account_2] [ext] Loaded via UI automation from C:\Users\HP\Downloads\claude\BOT Py\fewfeedbotv6\fewfeedv2
+2026-06-21 09:35:17,822 [account_2] Cookies injected (14 entries). Navigating to Facebook Settings...
+2026-06-21 09:35:37,175 [account_2] Login check passed (Settings).
+2026-06-21 09:35:37,175 [account_2] Verifying Facebook login before starting tool...
+2026-06-21 09:35:37,190 [account_2] Facebook session verified.
+2026-06-21 09:35:37,190 [account_2] Opening FewFeed tool page directly (web mode)...
+2026-06-21 09:36:10,512 [account_2] FewFeed tool page opened successfully
+2026-06-21 09:36:10,521 [account_2] Auto-post is enabled. Starting FewFeed automation...
+2026-06-21 09:36:10,521 [account_2] Starting FewFeed automation...
+2026-06-21 09:36:11,026 [account_2] Clicked 'Use this tool' — opening Auto Post tool...
+2026-06-21 09:36:20,532 [account_2] [Monitor] Session OK.

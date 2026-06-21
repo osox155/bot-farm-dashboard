@@ -108,24 +108,44 @@ dashboard counts. `self.session_replies/session_failures` are incremented but ne
 
 ## ✅ Fixed — FewFeed extension (`fewfeedv2`) not loading in Chrome
 
-**File:** `fewfeedbotv6/fewfeed_bot_template.py` · **Status: fixed.**
+**File:** `fewfeedbotv6/fewfeed_bot_template.py` · **Status: fixed (multi-layer).**
 
-On RDP / Windows Server machines (including GitHub Actions runners), Chrome is put
-into **"managed by your organisation"** mode via Windows Group Policy registry keys.
-This silently ignores the `--load-extension` flag, so the `fewfeedv2` extension never
-appeared in Chrome even though the code was passing the right path.
+Chrome is placed into **"managed by your organisation"** mode by Windows Group Policy
+machine files (`C:\WINDOWS\System32\GroupPolicy\Machine`) — **not** registry keys.
+Because the policy source is a file (not `HKCU`/`HKLM` registry), clearing the registry
+alone never fixed it. The `--load-extension` flag is silently ignored in this state.
 
-**Three-part fix applied:**
-1. `_clear_chrome_extension_policies()` — called before every Chrome launch. Removes
-   `ExtensionInstallBlocklist`, `DeveloperToolsDisabled`, and related values from both
-   `HKCU` (no admin needed) and `HKLM` (succeeds silently if admin, skipped if not).
-2. Profile-level policy folders (`Default/Policy`, `Default/managed_storage`,
-   `Default/Managed Users`) are deleted from the session profile copy before Chrome
-   starts, removing any management state inherited from the template profile.
-3. Path fix: the extension path was being converted to forward slashes
-   (`ext_path.replace('\\', '/')`) before being passed to `--load-extension`. Some
-   Chrome/Windows combinations fail silently with forward-slash paths in this flag.
-   Now the native Windows backslash path is used directly.
+**Fix — three-layer loading strategy:**
+
+1. **Pre-launch (registry clearing + profile cleanup)** — `_clear_chrome_extension_policies()`
+   still runs to handle machines where GPO comes from registry instead. Profile policy
+   folders (`Default/Policy`, `Default/managed_storage`, `Default/Managed Users`) are
+   deleted from the session copy. `Default/Preferences` is updated with
+   `extensions.ui.developer_mode = true` so the "Load unpacked" button is pre-enabled.
+
+2. **At launch** — `--enable-unsafe-extension-automation` + `--enable-extensions` +
+   `--load-extension={ext_path}` are passed. Works on unmanaged machines. Silent
+   no-op on managed machines (caught by the post-launch check).
+
+3. **Post-launch fallback** (`_load_extension_post_launch`) — called if
+   `_check_extension_loaded()` detects the extension did not load:
+   - **Phase A (CDP):** `Extensions.loadUnpacked` via ChromeDriver CDP — instant,
+     no UI. Works on Chrome 116+ with `--enable-unsafe-extension-automation`.
+   - **Phase B (UI automation):** Opens `chrome://extensions` in a new tab,
+     enables the developer mode toggle via shadow DOM
+     (`extensions-manager → extensions-toolbar → #devMode`), clicks
+     `#loadUnpacked`, pastes the extension path via clipboard (`win32clipboard`)
+     into the filename field, presses Enter (which navigates INTO the folder),
+     then clicks **"Select Folder"** via `win32gui.SendMessage(btn, BM_CLICK)`.
+     This explicit button click is required — pressing Enter a second time does
+     NOT confirm; it either navigates again or is ignored by the Win32 dialog.
+     The dialog class is `#32770`, title `'Select the extension directory.'`.
+     **Tested on Chrome 149 — confirmed working.**
+
+`_check_extension_loaded()` inspects the `extensions-item-list` shadow DOM after
+Chrome starts to decide which path was taken, so the logs will say either
+`[ext] FewFeed extension active.` (flag worked) or
+`[ext] --load-extension blocked; running post-launch loader...` (fallback ran).
 
 ---
 

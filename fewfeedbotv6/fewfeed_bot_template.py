@@ -4457,6 +4457,187 @@ def _clear_chrome_extension_policies():
             pass
 
 
+def _check_extension_loaded(driver):
+    """Return True if FewFeed extension is visible and enabled in chrome://extensions."""
+    original_handle = driver.current_window_handle
+    new_handle = None
+    try:
+        current_handles = set(driver.window_handles)
+        driver.execute_script("window.open('chrome://extensions')")
+        time.sleep(1.5)
+        for h in driver.window_handles:
+            if h not in current_handles:
+                new_handle = h
+                break
+        if not new_handle:
+            return False
+        driver.switch_to.window(new_handle)
+        time.sleep(0.8)
+        found = driver.execute_script("""
+            try {
+                const mgr = document.querySelector('extensions-manager');
+                if (!mgr || !mgr.shadowRoot) return false;
+                const list = mgr.shadowRoot.querySelector('extensions-item-list');
+                if (!list || !list.shadowRoot) return false;
+                const cards = list.shadowRoot.querySelectorAll('extensions-item');
+                for (const card of cards) {
+                    const sr = card.shadowRoot;
+                    if (!sr) continue;
+                    const nameEl = sr.querySelector('#name');
+                    if (nameEl && nameEl.textContent && nameEl.textContent.includes('FewFeed')) return true;
+                }
+                return false;
+            } catch(e) { return false; }
+        """)
+        return bool(found)
+    except Exception:
+        return False
+    finally:
+        try:
+            if new_handle and new_handle in driver.window_handles:
+                driver.close()
+        except Exception:
+            pass
+        try:
+            driver.switch_to.window(original_handle)
+        except Exception:
+            pass
+
+
+def _load_extension_post_launch(driver, ext_path, account_id):
+    """
+    Fallback extension loader called when --load-extension was blocked by GPO.
+
+    Phase 1 — CDP Extensions.loadUnpacked (Chrome 116+, instant, requires
+               --enable-unsafe-extension-automation flag at Chrome start).
+    Phase 2 — chrome://extensions UI: enable developer mode toggle, click
+               'Load unpacked', paste path via clipboard into the file dialog.
+    """
+    # Phase 1: CDP (no UI, fastest)
+    try:
+        result = driver.execute_cdp_cmd('Extensions.loadUnpacked', {'path': ext_path})
+        ext_id = (result or {}).get('id', '')
+        if ext_id:
+            acc_log(account_id, f"[ext] Loaded via CDP id={ext_id[:8]}...", silent=True)
+            return True
+    except Exception as _cdp_err:
+        acc_log(account_id, f"[ext] CDP not available ({_cdp_err}), trying UI...", silent=True)
+
+    # Phase 2: chrome://extensions UI automation
+    original_handle = driver.current_window_handle
+    new_handle = None
+    try:
+        current_handles = set(driver.window_handles)
+        driver.execute_script("window.open('chrome://extensions')")
+        time.sleep(1.8)
+
+        for h in driver.window_handles:
+            if h not in current_handles:
+                new_handle = h
+                break
+        if not new_handle:
+            return False
+        driver.switch_to.window(new_handle)
+        time.sleep(1.0)
+
+        # Enable developer mode toggle
+        driver.execute_script("""
+            try {
+                const mgr = document.querySelector('extensions-manager');
+                const tb  = mgr.shadowRoot.querySelector('extensions-toolbar');
+                const tog = tb.shadowRoot.querySelector('#devMode');
+                if (tog && !tog.checked) tog.click();
+            } catch(e) {}
+        """)
+        time.sleep(0.8)
+
+        # Click 'Load unpacked' button (only visible after dev mode is on)
+        driver.execute_script("""
+            try {
+                const mgr = document.querySelector('extensions-manager');
+                const tb  = mgr.shadowRoot.querySelector('extensions-toolbar');
+                const btn = tb.shadowRoot.querySelector('#loadUnpacked');
+                if (btn) btn.click();
+            } catch(e) {}
+        """)
+        time.sleep(1.8)
+
+        # Paste ext_path into the folder-picker dialog via Windows clipboard,
+        # then click "Select Folder" via pywinauto.
+        #
+        # Why not press Enter? Enter in the dialog's filename field NAVIGATES
+        # into the typed folder — it does NOT confirm the selection. The dialog
+        # stays open showing the folder's contents, and only the "Select Folder"
+        # button actually confirms. We must click that button explicitly.
+        try:
+            import win32clipboard as _wc
+            import win32con as _wcon
+            _wc.OpenClipboard()
+            _wc.EmptyClipboard()
+            _wc.SetClipboardText(ext_path, _wcon.CF_UNICODETEXT)
+            _wc.CloseClipboard()
+        except Exception:
+            pass
+
+        import pyautogui as _pg
+        _pg.hotkey('ctrl', 'a')
+        time.sleep(0.2)
+        _pg.hotkey('ctrl', 'v')   # paste path into the filename field
+        time.sleep(0.4)
+        _pg.press('enter')         # navigate into the folder (address bar updates)
+        time.sleep(1.2)
+
+        # Click "Select Folder" via win32gui BM_CLICK.
+        # Chrome's folder picker is a native Win32 #32770 dialog — pywinauto UIA
+        # backend fails on it; win32gui works reliably.
+        _confirmed = False
+        try:
+            import win32gui as _wg
+            # Exact title confirmed by debug: 'Select the extension directory.'
+            _dlg_hwnd = _wg.FindWindow('#32770', 'Select the extension directory.')
+            if not _dlg_hwnd:
+                _candidates = []
+                def _find_dlg(hwnd, results):
+                    t = _wg.GetWindowText(hwnd)
+                    if 'extension directory' in t.lower():
+                        results.append(hwnd)
+                _wg.EnumWindows(_find_dlg, _candidates)
+                _dlg_hwnd = _candidates[0] if _candidates else 0
+            if _dlg_hwnd:
+                _btn_hwnd = [0]
+                def _find_btn(hwnd, _):
+                    if _wg.GetWindowText(hwnd) == 'Select Folder':
+                        _btn_hwnd[0] = hwnd
+                _wg.EnumChildWindows(_dlg_hwnd, _find_btn, None)
+                if _btn_hwnd[0]:
+                    _wg.SetForegroundWindow(_dlg_hwnd)
+                    time.sleep(0.1)
+                    _wg.SendMessage(_btn_hwnd[0], win32con.BM_CLICK, 0, 0)
+                    _confirmed = True
+        except Exception as _w32_err:
+            acc_log(account_id, f"[ext] win32gui click failed ({_w32_err})", silent=True)
+        if not _confirmed:
+            _pg.hotkey('alt', 's')   # keyboard shortcut fallback
+        time.sleep(1.5)
+
+        acc_log(account_id, f"[ext] Loaded via UI automation from {ext_path}", silent=True)
+        return True
+
+    except Exception as _ui_err:
+        acc_log(account_id, f"[ext] UI automation failed: {_ui_err}", silent=True)
+        return False
+    finally:
+        try:
+            if new_handle and new_handle in driver.window_handles:
+                driver.close()
+        except Exception:
+            pass
+        try:
+            driver.switch_to.window(original_handle)
+        except Exception:
+            pass
+
+
 def launch_account(account_id, detach_after_post=False, manual_mode=False):
     """Launches a browser session for a specific account using the template.
 
@@ -4520,16 +4701,41 @@ def launch_account(account_id, detach_after_post=False, manual_mode=False):
         if os.path.isdir(_pd):
             shutil.rmtree(_pd, ignore_errors=True)
 
-    # Always load the FewFeed extension via --load-extension flag (no dialog needed).
-    # Use the native Windows path (backslashes) — forward-slash conversion can silently
-    # break --load-extension on some Chrome/Windows combinations.
-    ext_path = os.path.abspath(os.path.join(BASE_DIR, 'fewfeedv2'))
-    if os.path.isdir(ext_path) and os.path.isfile(os.path.join(ext_path, 'manifest.json')):
-        acc_log(account_id, f"Loading extension from: {ext_path}", silent=True)
+    # Pre-enable Chrome developer mode in the profile Preferences so the
+    # 'Load unpacked' button is available immediately on chrome://extensions
+    # without any extra toggle click (also survives managed-mode banner).
+    _prefs_file = os.path.join(session_profile_path, "Default", "Preferences")
+    try:
+        _prefs = {}
+        if os.path.exists(_prefs_file):
+            with open(_prefs_file, 'r', encoding='utf-8') as _pf:
+                _prefs = json.load(_pf)
+        _prefs.setdefault('extensions', {}).setdefault('ui', {})['developer_mode'] = True
+        os.makedirs(os.path.dirname(_prefs_file), exist_ok=True)
+        with open(_prefs_file, 'w', encoding='utf-8') as _pf:
+            json.dump(_prefs, _pf)
+    except Exception:
+        pass
+
+    # Extension path — None means folder missing, skip all extension logic.
+    _ext_candidate = os.path.abspath(os.path.join(BASE_DIR, 'fewfeedv2'))
+    ext_path = _ext_candidate if (
+        os.path.isdir(_ext_candidate) and
+        os.path.isfile(os.path.join(_ext_candidate, 'manifest.json'))
+    ) else None
+
+    if ext_path:
+        acc_log(account_id, f"[ext] Extension folder found: {ext_path}", silent=True)
+        # --enable-unsafe-extension-automation enables the CDP Extensions domain
+        # so that Extensions.loadUnpacked works as a post-launch fallback.
+        options.add_argument("--enable-unsafe-extension-automation")
         options.add_argument("--enable-extensions")
+        # Primary attempt: load at Chrome startup via command-line flag.
+        # Blocked on machines with Chrome GPO 'managed by organisation'; if that
+        # happens the post-launch fallback below catches it.
         options.add_argument(f"--load-extension={ext_path}")
     else:
-        acc_log(account_id, f"Extension folder not found at: {ext_path}", silent=True)
+        acc_log(account_id, f"[ext] Extension folder not found at: {_ext_candidate}", silent=True)
 
     # Minimal profile tweaks: keep size tiny
     if profile_mode == 'minimal':
@@ -4556,9 +4762,17 @@ def launch_account(account_id, detach_after_post=False, manual_mode=False):
         active_drivers[driver.session_id] = {'driver': driver, 'account_id': account_id, 'profile_path': session_profile_path}
         acc_log(account_id, "Browser launched successfully.", silent=True)
 
-        # Extension is already loaded via --load-extension flag at Chrome launch.
-        # ensure_extension_loaded_and_pinned() used pyautogui on the native OS folder
-        # picker which doesn't work in disconnected RDP — skip it entirely.
+        # Verify the FewFeed extension actually loaded.
+        # --load-extension is the primary path; on machines with Chrome GPO
+        # ('managed by organisation') it is silently ignored, so we check and
+        # fall back to CDP → chrome://extensions UI automation.
+        if ext_path:
+            time.sleep(1.5)
+            if _check_extension_loaded(driver):
+                acc_log(account_id, "[ext] FewFeed extension active.", silent=True)
+            else:
+                acc_log(account_id, "[ext] --load-extension blocked; running post-launch loader...", silent=True)
+                _load_extension_post_launch(driver, ext_path, account_id)
 
         # --- Automation Flow ---
         cookie_path = os.path.join(ACCOUNTS_DIR, f"{account_id}_cookies.json")
