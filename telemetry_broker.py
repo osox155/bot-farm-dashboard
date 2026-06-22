@@ -10,6 +10,7 @@ import sys
 import json
 import time
 import glob
+import uuid
 import socket
 import logging
 import threading
@@ -830,6 +831,61 @@ def _launch_start_bats():
         return True
     return False
 
+def _scan_running_bots():
+    """Return a list of bot names whose processes are currently running on this PC."""
+    import subprocess
+    checks = {
+        "ReplyBot":         ["*new.py*", "*new.exe*"],
+        "CommentsReplyBot": ["*facebook_bot*"],
+        "FewFeed":          ["*fewfeed_bot_template*"],
+        "AutoJoinBot":      ["*auto_join*", "*join_groups*"],
+    }
+    running = []
+    for name, patterns in checks.items():
+        where = " -or ".join(f"$_.CommandLine -like '{p}'" for p in patterns)
+        cmd = (
+            f'powershell -Command "Get-CimInstance Win32_Process | '
+            f'Where-Object {{ {where} }} | Measure-Object | '
+            f'Select-Object -ExpandProperty Count"'
+        )
+        try:
+            r = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=8)
+            count_str = r.stdout.strip()
+            if count_str and int(count_str) > 0:
+                running.append(name)
+        except Exception:
+            pass
+    return running
+
+
+def _take_screenshot():
+    """Capture the full desktop; return a data-URI string (JPEG) or None."""
+    try:
+        import io, base64
+        from PIL import ImageGrab
+        img = ImageGrab.grab()
+        if img.width > 1280:
+            ratio = 1280 / img.width
+            img = img.resize((1280, int(img.height * ratio)))
+        buf = io.BytesIO()
+        img.convert("RGB").save(buf, format="JPEG", quality=55, optimize=True)
+        return "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()
+    except Exception:
+        pass
+    try:
+        import io, base64, pyautogui
+        img = pyautogui.screenshot()
+        if img.width > 1280:
+            ratio = 1280 / img.width
+            img = img.resize((1280, int(img.height * ratio)))
+        buf = io.BytesIO()
+        img.convert("RGB").save(buf, format="JPEG", quality=55, optimize=True)
+        return "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()
+    except Exception:
+        pass
+    return None
+
+
 def _execute_remote_command(action, bot_name):
     """Run a single dashboard control command locally. Returns a result string."""
     import subprocess
@@ -846,6 +902,32 @@ def _execute_remote_command(action, bot_name):
         _force_kill_all_bots()
         time.sleep(2)
         return "Restarted via start-bots.bat." if _launch_start_bats() else "Killed bots but start-bots.bat not found."
+
+    if action == "git-pull":
+        try:
+            r = subprocess.run(
+                ["git", "pull", "--ff-only"],
+                cwd=BASE_DIR, capture_output=True, text=True, timeout=60
+            )
+            out = (r.stdout + r.stderr).strip()
+            return f"git pull: {out[:400]}" if out else "git pull: no output"
+        except Exception as e:
+            return f"git pull error: {e}"
+
+    if action == "screenshot":
+        data_uri = _take_screenshot()
+        if data_uri and _stats_tracker:
+            try:
+                from stats_tracker import _iso_now as _ts_now
+                _stats_tracker.register_machine(
+                    socket.gethostname(),
+                    screenshot=data_uri,
+                    screenshot_at=_ts_now(),
+                )
+                return "screenshot:ok"
+            except Exception as e:
+                return f"screenshot saved but machine update failed: {e}"
+        return "screenshot:error (PIL/pyautogui not available)"
 
     key = _DASH_TO_KEY.get(bot_name)
     if not key:
@@ -1301,7 +1383,8 @@ def main():
 
     # Identify this machine — used to target remote-control commands correctly.
     machine_id = socket.gethostname()
-    logger.info(f"Machine ID: {machine_id}")
+    run_id = uuid.uuid4().hex[:12]
+    logger.info(f"Machine ID: {machine_id}  Run ID: {run_id}")
 
     # 1. Load configuration
     cfg = load_config_with_retry()
@@ -1355,10 +1438,20 @@ def main():
     # except Exception as e:
     #     logger.error(f"Failed to send welcome message: {e}")
     
-    # Register this machine in Supabase so the dashboard knows it is online.
+    # Register this machine and start a new run in Supabase.
     if _stats_tracker:
         try:
-            _stats_tracker.register_machine(machine_id)
+            _stats_tracker.close_stale_runs(machine_id)
+            logger.info(f"Closed stale runs for '{machine_id}'.")
+        except Exception as e:
+            logger.warning(f"Could not close stale runs: {e}")
+        try:
+            _stats_tracker.start_run(run_id, machine_id, hostname=machine_id)
+            logger.info(f"Started run '{run_id}' in Supabase.")
+        except Exception as e:
+            logger.warning(f"Could not start run in Supabase: {e}")
+        try:
+            _stats_tracker.register_machine(machine_id, run_id=run_id, bots_running=[])
             logger.info(f"Registered machine '{machine_id}' in Supabase.")
         except Exception as e:
             logger.warning(f"Could not register machine in Supabase: {e}")
@@ -1373,10 +1466,13 @@ def main():
         try:
             # Heartbeat: keep this machine's last_seen fresh every 60 s so the
             # dashboard can tell the broker is still running on this PC.
+            # Also scan which bots are running so the dashboard shows live status.
             now_ts = time.time()
             if _stats_tracker and (now_ts - last_heartbeat_ts) >= 60:
                 try:
-                    _stats_tracker.register_machine(machine_id)
+                    bots_running = _scan_running_bots()
+                    _stats_tracker.register_machine(machine_id, run_id=run_id,
+                                                    bots_running=bots_running)
                 except Exception:
                     pass
                 last_heartbeat_ts = now_ts

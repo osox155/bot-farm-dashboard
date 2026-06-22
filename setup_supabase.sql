@@ -79,8 +79,33 @@ CREATE TABLE IF NOT EXISTS machines (
     last_seen TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- ============================================================
+-- Runs: each 5-hour RDP launch = one "run". Bot sessions nest inside.
+-- ============================================================
+CREATE TABLE IF NOT EXISTS runs (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    run_id TEXT UNIQUE NOT NULL,
+    machine_id TEXT,
+    hostname TEXT,
+    started_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    ended_at TIMESTAMPTZ,
+    status TEXT NOT NULL DEFAULT 'running'
+);
+
+-- Add run_id to sessions (links each bot session to an RDP run)
+ALTER TABLE sessions ADD COLUMN IF NOT EXISTS run_id TEXT;
+
+-- Add live status columns to machines (what bots are running, last screenshot)
+ALTER TABLE machines ADD COLUMN IF NOT EXISTS run_id TEXT;
+ALTER TABLE machines ADD COLUMN IF NOT EXISTS bots_running JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE machines ADD COLUMN IF NOT EXISTS screenshot TEXT;
+ALTER TABLE machines ADD COLUMN IF NOT EXISTS screenshot_at TIMESTAMPTZ;
+
 CREATE INDEX IF NOT EXISTS idx_bot_commands_status ON bot_commands(status);
 CREATE INDEX IF NOT EXISTS idx_bot_commands_created ON bot_commands(created_at);
+CREATE INDEX IF NOT EXISTS idx_runs_machine ON runs(machine_id);
+CREATE INDEX IF NOT EXISTS idx_runs_status ON runs(status);
+CREATE INDEX IF NOT EXISTS idx_sessions_run ON sessions(run_id);
 
 CREATE INDEX IF NOT EXISTS idx_events_session ON events(session_id);
 CREATE INDEX IF NOT EXISTS idx_events_bot ON events(bot_name);
@@ -96,6 +121,7 @@ ALTER TABLE login_attempts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE daily_stats ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bot_commands ENABLE ROW LEVEL SECURITY;
 ALTER TABLE machines ENABLE ROW LEVEL SECURITY;
+ALTER TABLE runs ENABLE ROW LEVEL SECURITY;
 
 -- Use DO block so CREATE POLICY is idempotent (safe to re-run even if policies already exist)
 DO $$
@@ -107,4 +133,5 @@ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='daily_stats'    AND policyname='anon_all_daily_stats')    THEN CREATE POLICY "anon_all_daily_stats"    ON daily_stats    FOR ALL USING (true) WITH CHECK (true); END IF;
   IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='bot_commands'   AND policyname='anon_all_bot_commands')   THEN CREATE POLICY "anon_all_bot_commands"   ON bot_commands   FOR ALL USING (true) WITH CHECK (true); END IF;
   IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='machines'       AND policyname='anon_all_machines')       THEN CREATE POLICY "anon_all_machines"       ON machines       FOR ALL USING (true) WITH CHECK (true); END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='runs'          AND policyname='anon_all_runs')          THEN CREATE POLICY "anon_all_runs"          ON runs          FOR ALL USING (true) WITH CHECK (true); END IF;
 END $$;

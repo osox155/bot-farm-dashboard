@@ -85,6 +85,10 @@
     <div class="panel" id="ctrl-panel">
       <div class="panel-header">
         <h3>🎮 Bot Control</h3>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button class="btn btn-sm btn-outline" onclick="doGitPull()" title="Run git pull on the remote PC">⬇ Git Pull</button>
+          <button class="btn btn-sm btn-outline" onclick="doScreenshot()" title="Take a screenshot of the remote PC">📷 Screenshot</button>
+        </div>
       </div>
       <div id="machine-status" style="margin-bottom: 14px; font-size: 12px; color: var(--text2); padding: 8px 12px; background: var(--surface2); border-radius: 8px; border: 1px solid var(--border);">
         Loading PC status…
@@ -110,6 +114,18 @@
       <button class="btn btn-outline btn-sm" onclick="closeLogsModal()">✕ Close</button>
     </div>
     <pre class="logs-pre" id="logsModalPre">Loading…</pre>
+  </div>
+</div>
+
+<div class="logs-modal-overlay" id="screenshotModal" style="display:none;">
+  <div class="logs-modal-box" style="max-width:90vw;width:auto;">
+    <div class="logs-modal-header">
+      <h3 id="screenshotModalTitle">Screenshot</h3>
+      <button class="btn btn-outline btn-sm" onclick="closeScreenshotModal()">✕ Close</button>
+    </div>
+    <div id="screenshotContent" style="text-align:center;padding:8px;">
+      <p style="color:var(--text2);">Loading…</p>
+    </div>
   </div>
 </div>
 
@@ -499,29 +515,106 @@ function closeLogsModal() {
   setTimeout(function() { modal.style.display = 'none'; }, 250);
 }
 
+var _activeMachineId = null;
+
 function _updateMachineStatus(machines) {
   var el = document.getElementById('machine-status');
   if (!el) return;
+  _activeMachineId = machines && machines.length ? machines[0].machine_id : null;
   if (!machines || machines.length === 0) {
     el.innerHTML = '<span style="color:var(--red);">⚠ No active PC broker detected</span> — is <code>start-bots.bat</code> running on your PC?';
     return;
   }
   var parts = machines.map(function(m) {
     var ts = m.last_seen ? fmtDateTime(m.last_seen) : '?';
+    var bots = (m.bots_running || []);
+    var botBadges = bots.length
+      ? bots.map(function(b) { return '<span style="background:var(--green-bg);color:var(--green);border:1px solid var(--green);border-radius:4px;padding:1px 6px;font-size:10px;margin-left:4px;">' + esc(b) + '</span>'; }).join('')
+      : '<span style="color:var(--text3);margin-left:4px;font-size:10px;">no bots running</span>';
+    var scBtn = m.screenshot_at
+      ? '<button class="btn btn-sm btn-outline" style="margin-left:8px;font-size:10px;padding:2px 6px;" onclick="viewScreenshot(\'' + esc(m.machine_id) + '\')">📷 ' + fmtDateTime(m.screenshot_at) + '</button>'
+      : '';
     return '<b style="color:var(--green);">✓ ' + esc(m.machine_id) + '</b>' +
-           ' <small style="color:var(--text3);">(last seen ' + ts + ')</small>';
+           ' <small style="color:var(--text3);">(seen ' + ts + ')</small>' +
+           botBadges + scBtn;
   });
-  el.innerHTML = '🖥 Active PC: ' + parts.join(' &nbsp;·&nbsp; ');
+  el.innerHTML = '🖥 PC: ' + parts.join('<br>');
 }
 
 function _updateCtrlGridFromDash(d) {
-  var activeNames = [];
-  (d.accounts || []).forEach(function(a) {
-    if ((a.status === 'active' || a.status === 'running') && activeNames.indexOf(a.bot_name) === -1) {
-      activeNames.push(a.bot_name);
-    }
+  var machineBotsRunning = [];
+  (d.machines || []).forEach(function(m) {
+    (m.bots_running || []).forEach(function(b) {
+      if (machineBotsRunning.indexOf(b) === -1) machineBotsRunning.push(b);
+    });
   });
+  // Fall back to account-status heuristic if broker hasn't scanned yet
+  var activeNames = machineBotsRunning.length ? machineBotsRunning : [];
+  if (!activeNames.length) {
+    (d.accounts || []).forEach(function(a) {
+      if ((a.status === 'active' || a.status === 'running') && activeNames.indexOf(a.bot_name) === -1) {
+        activeNames.push(a.bot_name);
+      }
+    });
+  }
   renderCtrlGrid(activeNames);
+}
+
+function doGitPull() {
+  showModal('Git Pull', 'Run git pull on the remote PC? This will update the bot code.', function() {
+    var body = _activeMachineId ? JSON.stringify({machine_id: _activeMachineId}) : '{}';
+    fetch('/api/control/git-pull', { method: 'POST', headers: {'Content-Type':'application/json'}, body: body })
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        toast(d.ok ? (d.message || 'Done') : (d.error || 'Failed'), d.ok ? 'success' : 'error');
+        if (d.ok) pollCommandStatus();
+      })
+      .catch(function() { toast('Network error', 'error'); });
+  });
+}
+
+function doScreenshot() {
+  var body = _activeMachineId ? JSON.stringify({machine_id: _activeMachineId}) : '{}';
+  fetch('/api/control/screenshot', { method: 'POST', headers: {'Content-Type':'application/json'}, body: body })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      toast(d.ok ? 'Screenshot queued — check back in ~15s' : (d.error || 'Failed'), d.ok ? 'success' : 'error');
+      if (d.ok) {
+        setTimeout(function() {
+          if (_activeMachineId) viewScreenshot(_activeMachineId);
+        }, 15000);
+      }
+    })
+    .catch(function() { toast('Network error', 'error'); });
+}
+
+function viewScreenshot(machineId) {
+  var modal = document.getElementById('screenshotModal');
+  var content = document.getElementById('screenshotContent');
+  document.getElementById('screenshotModalTitle').textContent = 'Screenshot — ' + machineId;
+  content.innerHTML = '<p style="color:var(--text2);">Loading…</p>';
+  modal.style.display = 'flex';
+  setTimeout(function() { modal.classList.add('show'); }, 10);
+  fetch('/api/screenshot/' + encodeURIComponent(machineId))
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (d.ok && d.screenshot) {
+        var ts = d.screenshot_at ? (' — ' + fmtDateTime(d.screenshot_at)) : '';
+        content.innerHTML = '<p style="color:var(--text3);font-size:11px;margin-bottom:8px;">Captured' + ts + '</p>' +
+          '<img src="' + d.screenshot + '" style="max-width:100%;border-radius:8px;border:1px solid var(--border);">';
+      } else {
+        content.innerHTML = '<p style="color:var(--red);">No screenshot available yet. Click "📷 Screenshot" to capture one.</p>';
+      }
+    })
+    .catch(function() {
+      content.innerHTML = '<p style="color:var(--red);">Failed to load screenshot.</p>';
+    });
+}
+
+function closeScreenshotModal() {
+  var modal = document.getElementById('screenshotModal');
+  modal.classList.remove('show');
+  setTimeout(function() { modal.style.display = 'none'; }, 250);
 }
 
 renderCtrlGrid([]);

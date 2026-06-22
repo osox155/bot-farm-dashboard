@@ -138,28 +138,26 @@ class StatsTracker:
         self._accounts = []
         self._running = False
 
-    def start_session(self, bot_name=None, accounts=None):
+    def start_session(self, bot_name=None, accounts=None, run_id=None):
         if bot_name:
             self._bot_name = bot_name
         self._session_id = datetime.now().strftime("%Y%m%d_%H%M%S_") + str(int(time.time() * 1000))[-6:]
         self._accounts = accounts or []
         self._running = True
+        self._run_id = run_id
 
         ts = _iso_now()
         with _lock:
-            # Do NOT pre-register the account roster here. Only accounts that
-            # are actually launched should appear, and they create their own
-            # rows the moment they act: log_login_success -> "active",
-            # log_login_failure -> "logged_out", end_session flips active ->
-            # "idle". Pre-seeding every known cookie file as "idle" made the
-            # dashboard report accounts that were never launched this run.
-            _supa_post("sessions", {
+            row = {
                 "session_id": self._session_id,
                 "bot_name": self._bot_name,
                 "started_at": ts,
                 "accounts_count": len(self._accounts),
-                "status": "running"
-            })
+                "status": "running",
+            }
+            if run_id:
+                row["run_id"] = run_id
+            _supa_post("sessions", row)
         return self._session_id
 
     def end_session(self, status="completed"):
@@ -606,13 +604,20 @@ class StatsTracker:
         else:
             _supa_delete("bot_commands", {"id": "gte.0"})
 
-    def register_machine(self, machine_id):
+    def register_machine(self, machine_id, run_id=None, bots_running=None,
+                          screenshot=None, screenshot_at=None):
         """Broker heartbeat: upsert this PC's hostname + current timestamp so the
         dashboard can show which machine(s) are currently running the broker."""
-        _supa_upsert("machines", {
-            "machine_id": machine_id,
-            "last_seen": _iso_now(),
-        }, on_conflict="machine_id")
+        row = {"machine_id": machine_id, "last_seen": _iso_now()}
+        if run_id is not None:
+            row["run_id"] = run_id
+        if bots_running is not None:
+            row["bots_running"] = bots_running
+        if screenshot is not None:
+            row["screenshot"] = screenshot
+        if screenshot_at is not None:
+            row["screenshot_at"] = screenshot_at
+        _supa_upsert("machines", row, on_conflict="machine_id")
 
     def get_active_machines(self, stale_seconds=300):
         """Return machines that checked in within the last stale_seconds."""
@@ -622,6 +627,34 @@ class StatsTracker:
             "last_seen": f"gte.{cutoff}",
             "order": "last_seen.desc",
         })
+
+    def start_run(self, run_id, machine_id, hostname=None):
+        """Broker startup: record a new RDP run in Supabase."""
+        _supa_upsert("runs", {
+            "run_id": run_id,
+            "machine_id": machine_id,
+            "hostname": hostname or machine_id,
+            "started_at": _iso_now(),
+            "status": "running",
+        }, on_conflict="run_id")
+
+    def end_run(self, run_id):
+        """Mark a run as ended (called on clean broker shutdown)."""
+        _supa_patch("runs", {"status": "ended", "ended_at": _iso_now()},
+                    {"run_id": f"eq.{run_id}"})
+
+    def close_stale_runs(self, machine_id):
+        """On broker startup, close any 'running' runs left over from a previous
+        session on this machine (e.g. after an RDP disconnect / crash)."""
+        _supa_patch("runs", {"status": "ended", "ended_at": _iso_now()},
+                    {"machine_id": f"eq.{machine_id}", "status": "eq.running"})
+
+    def get_runs(self, machine_id=None, limit=20):
+        """Return recent runs, most recent first."""
+        params = {"order": "started_at.desc", "limit": str(limit)}
+        if machine_id:
+            params["machine_id"] = f"eq.{machine_id}"
+        return _supa_get("runs", params)
 
 tracker = StatsTracker()
 

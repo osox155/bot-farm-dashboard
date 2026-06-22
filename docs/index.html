@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bot Farm — Live Monitor</title>
+<style>
+/* ── Config: set DASH_PASS (below in JS) to your desired password ── */
+:root {
+  --bg: #0f0f13; --surface: #1a1a24; --surface2: #22223a;
+  --border: #2a2a3a; --text: #e2e8f0; --text2: #94a3b8; --text3: #64748b;
+  --green: #10b981; --green-bg: rgba(16,185,129,.12);
+  --red: #ef4444; --red-bg: rgba(239,68,68,.1);
+  --blue: #6366f1; --yellow: #f59e0b;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; min-height: 100vh; }
+a { color: var(--blue); text-decoration: none; }
+
+/* login */
+#login-screen { display: flex; align-items: center; justify-content: center; height: 100vh; }
+.login-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 40px; width: 340px; text-align: center; }
+.login-box h2 { font-size: 22px; margin-bottom: 8px; }
+.login-box p { color: var(--text2); font-size: 13px; margin-bottom: 24px; }
+.login-box input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 10px 14px; font-size: 14px; outline: none; margin-bottom: 12px; }
+.login-box button { width: 100%; background: var(--blue); border: none; border-radius: 8px; color: #fff; padding: 11px; font-size: 14px; font-weight: 600; cursor: pointer; }
+.login-box .err { color: var(--red); font-size: 12px; margin-top: 8px; display: none; }
+
+/* main */
+#main-screen { display: none; max-width: 1100px; margin: 0 auto; padding: 24px 20px; }
+.header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+.header h1 { font-size: 20px; font-weight: 700; }
+.header .meta { font-size: 12px; color: var(--text2); }
+.btn-sm { background: transparent; border: 1px solid var(--border); border-radius: 6px; color: var(--text2); padding: 5px 12px; font-size: 12px; cursor: pointer; }
+.btn-sm:hover { border-color: var(--blue); color: var(--blue); }
+
+/* cards */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; }
+.card .label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+.card .value { font-size: 26px; font-weight: 800; }
+.card .sub { font-size: 11px; color: var(--text3); margin-top: 4px; }
+.green { color: var(--green); } .blue { color: var(--blue); } .red { color: var(--red); }
+
+/* panels */
+.panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+.panel-title { font-size: 13px; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; }
+.badge { display: inline-block; border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: 600; }
+.badge-green { background: var(--green-bg); color: var(--green); border: 1px solid var(--green); }
+.badge-red { background: var(--red-bg); color: var(--red); border: 1px solid var(--red); }
+.badge-gray { background: var(--surface2); color: var(--text3); border: 1px solid var(--border); }
+
+/* machine row */
+.machine-row { padding: 10px 14px; background: var(--surface2); border-radius: 8px; margin-bottom: 8px; display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+.dot-green { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.dot-gray { background: var(--text3); }
+
+/* runs */
+.run-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.run-tab { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; font-size: 11px; cursor: pointer; color: var(--text2); }
+.run-tab.active { border-color: var(--blue); color: var(--blue); background: rgba(99,102,241,.1); }
+
+/* table */
+.tbl-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); color: var(--text3); font-weight: 600; font-size: 11px; white-space: nowrap; }
+td { padding: 8px 10px; border-bottom: 1px solid var(--border); color: var(--text2); }
+td:first-child { color: var(--text3); font-family: monospace; font-size: 10px; }
+tr:last-child td { border-bottom: none; }
+.empty { text-align: center; color: var(--text3); padding: 24px; }
+
+/* toast */
+.toast { position: fixed; bottom: 24px; right: 24px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 18px; font-size: 13px; opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 9999; }
+.toast.show { opacity: 1; }
+
+/* refresh indicator */
+.refresh-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); display: inline-block; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1}50%{opacity:.3} }
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN ── -->
+<div id="login-screen">
+  <div class="login-box">
+    <div style="font-size:36px;margin-bottom:12px;">🤖</div>
+    <h2>Bot Farm Monitor</h2>
+    <p>Read-only live view</p>
+    <input type="password" id="pass-input" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button onclick="doLogin()">Enter Dashboard</button>
+    <div class="err" id="login-err">Incorrect password</div>
+  </div>
+</div>
+
+<!-- ── MAIN ── -->
+<div id="main-screen">
+  <div class="header">
+    <div>
+      <h1>🤖 Bot Farm Monitor</h1>
+      <div class="meta" id="last-update">Loading…</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <span class="refresh-dot" title="Auto-refresh every 30s"></span>
+      <button class="btn-sm" onclick="refresh()">↻ Refresh</button>
+      <button class="btn-sm" onclick="logout()">Sign out</button>
+    </div>
+  </div>
+
+  <!-- stat cards -->
+  <div class="cards" id="cards">
+    <div class="card"><div class="label">Active Accounts</div><div class="value green" id="c-active">—</div></div>
+    <div class="card"><div class="label">Replies Today</div><div class="value blue" id="c-replies">—</div></div>
+    <div class="card"><div class="label">Messages Today</div><div class="value blue" id="c-messages">—</div></div>
+    <div class="card"><div class="label">Failures Today</div><div class="value red" id="c-failures">—</div></div>
+  </div>
+
+  <!-- machine status -->
+  <div class="panel">
+    <div class="panel-title">🖥 PC Status <span id="machine-count" style="font-size:11px;color:var(--text3);"></span></div>
+    <div id="machines-list"><div class="empty">Loading…</div></div>
+  </div>
+
+  <!-- runs -->
+  <div class="panel">
+    <div class="panel-title">🕒 RDP Runs <span style="font-size:11px;color:var(--text3);">click a run to filter sessions</span></div>
+    <div class="run-tabs" id="run-tabs"></div>
+    <div id="run-details" style="font-size:12px;color:var(--text3);"></div>
+  </div>
+
+  <!-- sessions -->
+  <div class="panel">
+    <div class="panel-title">📋 Bot Sessions <span id="session-count" style="font-size:11px;color:var(--text3);"></span></div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>Session ID</th><th>Bot</th><th>Started</th><th>Ended</th>
+          <th>Duration</th><th>Accts</th><th>Replies</th><th>Messages</th><th>Status</th>
+        </tr></thead>
+        <tbody id="sessions-tbody"><tr><td colspan="9" class="empty">Loading…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG — edit these two lines ──────────────────────────────────────────
+const SUPA_URL  = 'https://stfrmlgckxnzlmvietcx.supabase.co';
+const SUPA_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0ZnJtbGdja3huemxtdmlldGN4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3Nzc4MjEsImV4cCI6MjA5NjM1MzgyMX0.tHsvi_i8ZLKOgpHhlri3_1-Wh-WCKgp8DFNd49lLMy4';
+const DASH_PASS = 'botfarm';   // ← change to your own password
+// ────────────────────────────────────────────────────────────────────────────
+
+const STALE_S = 300;
+var _selectedRun = '';
+var _runsData = [];
+
+// ── Auth ──────────────────────────────────────────────────────────────────
+function doLogin() {
+  var p = document.getElementById('pass-input').value;
+  if (p === DASH_PASS) {
+    sessionStorage.setItem('bf_auth', '1');
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-screen').style.display = 'block';
+    refresh();
+    setInterval(refresh, 30000);
+  } else {
+    document.getElementById('login-err').style.display = 'block';
+  }
+}
+function logout() {
+  sessionStorage.removeItem('bf_auth');
+  location.reload();
+}
+if (sessionStorage.getItem('bf_auth') === '1') {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('main-screen').style.display = 'block';
+  refresh();
+  setInterval(refresh, 30000);
+}
+
+// ── Supabase helpers ──────────────────────────────────────────────────────
+function supa(table, params) {
+  var url = SUPA_URL + '/rest/v1/' + table + '?' + new URLSearchParams(params).toString();
+  return fetch(url, { headers: {
+    'apikey': SUPA_KEY,
+    'Authorization': 'Bearer ' + SUPA_KEY,
+    'Accept': 'application/json'
+  }}).then(function(r) { return r.json(); });
+}
+
+// ── Formatting ────────────────────────────────────────────────────────────
+function fmtDt(s) {
+  if (!s) return '—';
+  try { return new Date(s).toLocaleString([], {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}); }
+  catch(e) { return s; }
+}
+function dur(a, b) {
+  if (!a) return '—';
+  var s = new Date(a), e = b ? new Date(b) : new Date();
+  var d = Math.floor((e - s) / 1000);
+  if (isNaN(d) || d < 0) return '—';
+  if (d < 60) return d + 's';
+  if (d < 3600) return Math.floor(d/60) + 'm';
+  return Math.floor(d/3600) + 'h ' + Math.floor((d%3600)/60) + 'm';
+}
+function esc(s) {
+  if (s == null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function toast(msg, type) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.borderColor = type === 'error' ? 'var(--red)' : 'var(--green)';
+  el.classList.add('show');
+  setTimeout(function() { el.classList.remove('show'); }, 3000);
+}
+
+// ── Main refresh ──────────────────────────────────────────────────────────
+function refresh() {
+  document.getElementById('last-update').textContent = 'Refreshing…';
+  Promise.all([
+    supa('machines', { order: 'last_seen.desc' }),
+    supa('runs', { order: 'started_at.desc', limit: '25' }),
+    buildSessionParams(),
+    supa('daily_stats', { date: 'eq.' + new Date().toISOString().slice(0,10), select: 'total_replies,total_messages,total_failures' }),
+    supa('accounts', { status: 'in.(active,running)', select: 'name' }),
+  ]).then(function(results) {
+    var machines = results[0];
+    var runs = results[1];
+    var sessions = results[2];
+    var daily = results[3];
+    var activeAccts = results[4];
+
+    renderMachines(machines || []);
+    renderRuns(runs || []);
+    renderSessions(sessions || []);
+    renderStats(daily || [], (activeAccts || []).length);
+
+    document.getElementById('last-update').innerHTML = 'Last updated: ' + new Date().toLocaleTimeString();
+  }).catch(function(e) {
+    toast('Refresh failed: ' + e, 'error');
+    document.getElementById('last-update').textContent = 'Refresh failed';
+  });
+}
+
+function buildSessionParams() {
+  var p = { order: 'started_at.desc', limit: '50' };
+  if (_selectedRun) p.run_id = 'eq.' + _selectedRun;
+  return supa('sessions', p);
+}
+
+// ── Render: machines ──────────────────────────────────────────────────────
+function renderMachines(machines) {
+  var now = Date.now();
+  var active = machines.filter(function(m) {
+    if (!m.last_seen) return false;
+    return (now - new Date(m.last_seen)) < STALE_S * 1000;
+  });
+  document.getElementById('machine-count').textContent = active.length + ' active';
+
+  if (!machines.length) {
+    document.getElementById('machines-list').innerHTML = '<div class="empty" style="color:var(--red);">⚠ No PC broker detected — start-bots.bat not running</div>';
+    return;
+  }
+  var html = '';
+  machines.forEach(function(m) {
+    var isActive = (now - new Date(m.last_seen)) < STALE_S * 1000;
+    var bots = m.bots_running || [];
+    var botBadges = bots.length
+      ? bots.map(function(b) { return '<span class="badge badge-green">' + esc(b) + '</span>'; }).join(' ')
+      : '<span style="color:var(--text3);font-size:11px;">no bots detected</span>';
+    var runBadge = m.run_id ? '<span class="badge badge-gray">' + esc(m.run_id) + '</span>' : '';
+    html += '<div class="machine-row">' +
+      '<span class="dot ' + (isActive ? 'dot-green' : 'dot-gray') + '"></span>' +
+      '<div style="flex:1;">' +
+        '<div style="font-weight:700;font-size:13px;">' + esc(m.machine_id) + ' ' + runBadge + '</div>' +
+        '<div style="font-size:11px;color:var(--text3);margin:3px 0;">Last seen: ' + fmtDt(m.last_seen) + (isActive ? '' : ' <span style="color:var(--red);">(offline)</span>') + '</div>' +
+        '<div>' + botBadges + '</div>' +
+      '</div>' +
+    '</div>';
+  });
+  document.getElementById('machines-list').innerHTML = html;
+}
+
+// ── Render: runs ──────────────────────────────────────────────────────────
+function renderRuns(runs) {
+  _runsData = runs;
+  var html = '<div class="run-tab' + (_selectedRun === '' ? ' active' : '') + '" onclick="setRun(\'\')">All runs</div>';
+  runs.forEach(function(r) {
+    var live = r.status === 'running';
+    html += '<div class="run-tab' + (_selectedRun === r.run_id ? ' active' : '') + '" onclick="setRun(\'' + esc(r.run_id) + '\')" title="' + esc(r.run_id) + '">' +
+      (live ? '🟢 ' : '⚪ ') + esc(r.hostname || r.machine_id || r.run_id) + ' ' + fmtDt(r.started_at) + ' (' + dur(r.started_at, r.ended_at) + ')' +
+    '</div>';
+  });
+  document.getElementById('run-tabs').innerHTML = html || '<span style="color:var(--text3);font-size:12px;">No runs yet</span>';
+
+  if (_selectedRun) {
+    var cur = runs.filter(function(r) { return r.run_id === _selectedRun; })[0];
+    if (cur) {
+      document.getElementById('run-details').textContent =
+        'Machine: ' + (cur.machine_id || '?') + '  |  Start: ' + fmtDt(cur.started_at) +
+        (cur.ended_at ? '  |  End: ' + fmtDt(cur.ended_at) : '  |  Still running') +
+        '  |  Duration: ' + dur(cur.started_at, cur.ended_at);
+    }
+  } else {
+    document.getElementById('run-details').textContent = '';
+  }
+}
+
+function setRun(runId) {
+  _selectedRun = runId;
+  renderRuns(_runsData);
+  buildSessionParams().then(renderSessions).catch(function() {});
+}
+
+// ── Render: sessions ──────────────────────────────────────────────────────
+function renderSessions(sessions) {
+  document.getElementById('session-count').textContent = sessions.length + ' sessions';
+  if (!sessions.length) {
+    document.getElementById('sessions-tbody').innerHTML = '<tr><td colspan="9" class="empty">No sessions found</td></tr>';
+    return;
+  }
+  document.getElementById('sessions-tbody').innerHTML = sessions.map(function(s) {
+    var statusColor = s.status === 'running' ? 'var(--green)' : (s.status === 'completed' ? 'var(--text2)' : 'var(--red)');
+    return '<tr>' +
+      '<td>' + esc((s.session_id || '').slice(0, 20)) + '</td>' +
+      '<td style="color:var(--text);font-weight:600;">' + esc(s.bot_name || '—') + '</td>' +
+      '<td>' + fmtDt(s.started_at) + '</td>' +
+      '<td>' + fmtDt(s.ended_at) + '</td>' +
+      '<td>' + dur(s.started_at, s.ended_at) + '</td>' +
+      '<td>' + (s.accounts_count || 0) + '</td>' +
+      '<td>' + (s.total_replies || 0) + '</td>' +
+      '<td>' + (s.total_messages || 0) + '</td>' +
+      '<td><span style="color:' + statusColor + ';">' + esc(s.status || '—') + '</span></td>' +
+    '</tr>';
+  }).join('');
+}
+
+// ── Render: stat cards ────────────────────────────────────────────────────
+function renderStats(daily, activeCount) {
+  var replies = 0, messages = 0, failures = 0;
+  daily.forEach(function(r) {
+    replies   += r.total_replies   || 0;
+    messages  += r.total_messages  || 0;
+    failures  += r.total_failures  || 0;
+  });
+  document.getElementById('c-active').textContent   = activeCount;
+  document.getElementById('c-replies').textContent  = replies;
+  document.getElementById('c-messages').textContent = messages;
+  document.getElementById('c-failures').textContent = failures;
+}
+</script>
+</body>
+</html>

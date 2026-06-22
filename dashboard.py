@@ -214,7 +214,14 @@ def api_sessions():
     response.content_type = 'application/json'
     try:
         bot = request.query.get("bot") or None
-        sessions = tracker.get_sessions(limit=50, bot_name=bot)
+        run = request.query.get("run") or None
+        from stats_tracker import _supa_get
+        params = {"order": "started_at.desc", "limit": "100"}
+        if bot:
+            params["bot_name"] = f"eq.{bot}"
+        if run:
+            params["run_id"] = f"eq.{run}"
+        sessions = _supa_get("sessions", params)
         for s in sessions:
             s["started_at"] = _fmt_ts(s["started_at"])
             s["ended_at"] = _fmt_ts(s["ended_at"])
@@ -328,7 +335,74 @@ def api_machines():
         machines = tracker.get_active_machines()
         for m in machines:
             m["last_seen"] = _fmt_ts(m.get("last_seen"))
+            m["screenshot_at"] = _fmt_ts(m.get("screenshot_at"))
+            # Omit screenshot bytes from the list endpoint to keep payloads small
+            m.pop("screenshot", None)
         return json.dumps({"ok": True, "machines": machines})
+    except Exception as e:
+        return json.dumps({"ok": False, "error": str(e)})
+
+@app.route('/api/runs')
+def api_runs():
+    """All RDP runs, most recent first."""
+    response.content_type = 'application/json'
+    try:
+        limit = int(request.query.get("limit", 30))
+        machine = request.query.get("machine") or None
+        runs = tracker.get_runs(machine_id=machine, limit=limit)
+        for r in runs:
+            r["started_at"] = _fmt_ts(r.get("started_at"))
+            r["ended_at"] = _fmt_ts(r.get("ended_at"))
+        return json.dumps({"ok": True, "runs": runs})
+    except Exception as e:
+        return json.dumps({"ok": False, "error": str(e)})
+
+@app.route('/api/control/git-pull', method='POST')
+def api_control_git_pull():
+    response.content_type = 'application/json'
+    try:
+        body = json.loads(request.body.read().decode() or "{}")
+        machine_id = body.get("machine_id") or None
+        if not machine_id:
+            # target whichever machine is online
+            machines = tracker.get_active_machines()
+            machine_id = machines[0]["machine_id"] if machines else None
+        tracker.enqueue_command("git-pull", machine_id=machine_id)
+        return json.dumps({"ok": True, "message": "git pull command queued — broker will run it on the PC."})
+    except Exception as e:
+        return json.dumps({"ok": False, "error": str(e)})
+
+@app.route('/api/control/screenshot', method='POST')
+def api_control_screenshot():
+    response.content_type = 'application/json'
+    try:
+        body = json.loads(request.body.read().decode() or "{}")
+        machine_id = body.get("machine_id") or None
+        if not machine_id:
+            machines = tracker.get_active_machines()
+            machine_id = machines[0]["machine_id"] if machines else None
+        tracker.enqueue_command("screenshot", machine_id=machine_id)
+        return json.dumps({"ok": True, "message": "Screenshot command queued — broker will capture and upload it."})
+    except Exception as e:
+        return json.dumps({"ok": False, "error": str(e)})
+
+@app.route('/api/screenshot/<machine_id>')
+def api_get_screenshot(machine_id):
+    """Return the latest screenshot stored for a machine."""
+    response.content_type = 'application/json'
+    try:
+        from stats_tracker import _supa_get
+        rows = _supa_get("machines", {"machine_id": f"eq.{machine_id}",
+                                       "select": "machine_id,screenshot,screenshot_at"})
+        if not rows:
+            return json.dumps({"ok": False, "error": "Machine not found"})
+        m = rows[0]
+        return json.dumps({
+            "ok": True,
+            "machine_id": m.get("machine_id"),
+            "screenshot": m.get("screenshot"),
+            "screenshot_at": _fmt_ts(m.get("screenshot_at")),
+        })
     except Exception as e:
         return json.dumps({"ok": False, "error": str(e)})
 

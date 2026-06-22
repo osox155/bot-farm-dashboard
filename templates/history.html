@@ -43,6 +43,14 @@
   </div>
 
   <div class="main-content">
+    <div class="panel" id="runs-panel" style="margin-bottom:20px;">
+      <div class="panel-header">
+        <h3>🖥 RDP Runs</h3>
+        <span style="font-size:11px;color:var(--text3);">Each ~5h RDP session is one run — sessions below nest inside the selected run</span>
+      </div>
+      <div id="runs-list" style="display:flex;flex-wrap:wrap;gap:8px;">Loading runs…</div>
+    </div>
+
     <div class="panel">
       <div class="panel-header">
         <div style="display: flex; gap: 8px;">
@@ -133,11 +141,61 @@ function calcDuration(started, ended) {
   }
 }
 
+var _selectedRun = '';
+
+function calcRunDuration(started, ended) {
+  if (!started) return '-';
+  try {
+    var s = new Date(started), e = ended ? new Date(ended) : new Date();
+    var diff = Math.floor((e - s) / 1000);
+    if (isNaN(diff) || diff < 0) return '-';
+    if (diff < 3600) return Math.floor(diff / 60) + 'm';
+    return Math.floor(diff / 3600) + 'h ' + Math.floor((diff % 3600) / 60) + 'm';
+  } catch (e) {
+    return '-';
+  }
+}
+
+function loadRuns() {
+  fetch('/api/runs?limit=30')
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (!d.ok) {
+        document.getElementById('runs-list').innerHTML = '<span class="e">Failed to load runs</span>';
+        return;
+      }
+      var runs = d.runs || [];
+      if (!runs.length) {
+        document.getElementById('runs-list').innerHTML = '<span style="color:var(--text3);font-size:12px;">No runs recorded yet — the broker creates one on startup.</span>';
+        return;
+      }
+      var html = '<div class="chart-tab' + (_selectedRun === '' ? ' active' : '') + '" data-run="" onclick="setRunFilter(\'\')">All runs</div>';
+      runs.forEach(function(r) {
+        var live = r.status === 'running';
+        var label = (live ? '🟢 ' : '⚪ ') + esc(r.machine_id || r.hostname || r.run_id) + ' · ' + fmtDateTime(r.started_at) + ' (' + calcRunDuration(r.started_at, r.ended_at) + ')';
+        html += '<div class="chart-tab' + (_selectedRun === r.run_id ? ' active' : '') + '" data-run="' + esc(r.run_id) + '" onclick="setRunFilter(\'' + esc(r.run_id) + '\')" title="run_id: ' + esc(r.run_id) + '">' + label + '</div>';
+      });
+      document.getElementById('runs-list').innerHTML = html;
+    })
+    .catch(function() {
+      document.getElementById('runs-list').innerHTML = '<span class="e">Network error loading runs</span>';
+    });
+}
+
+function setRunFilter(runId) {
+  _selectedRun = runId;
+  loadRuns();
+  loadSessions();
+}
+
 function loadSessions() {
   var bot = document.getElementById('bot-filter').value;
   var url = '/api/sessions';
-  if (bot) url += '?bot=' + encodeURIComponent(bot);
-  
+  var qs = [];
+  if (bot) qs.push('bot=' + encodeURIComponent(bot));
+  if (_selectedRun) qs.push('run=' + encodeURIComponent(_selectedRun));
+  if (qs.length) url += '?' + qs.join('&');
+
   fetch(url)
     .then(function(r) { return r.json(); })
     .then(function(d) {
@@ -200,10 +258,11 @@ function loadBots() {
 
 document.getElementById('menu-history').classList.add('active');
 initTheme();
+loadRuns();
 loadSessions();
 loadBots();
 loadSidebarBots('');
-setInterval(loadSessions, 15000);
+setInterval(function() { loadRuns(); loadSessions(); }, 15000);
 </script>
 </body>
 </html>
