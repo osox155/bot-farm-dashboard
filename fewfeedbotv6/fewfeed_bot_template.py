@@ -4776,16 +4776,14 @@ def launch_account(account_id, detach_after_post=False, manual_mode=False):
 
         # --- Automation Flow ---
         cookie_path = os.path.join(ACCOUNTS_DIR, f"{account_id}_cookies.json")
-        cookies = []
-        # 1) Prefer local cookie file if exists
-        if os.path.exists(cookie_path):
+        # Always refresh from Google Sheet first so updated cookies are picked up
+        cookies = refresh_cookies_from_sheet(account_id)
+        # Fall back to local file only if sheet returned nothing
+        if not cookies and os.path.exists(cookie_path):
+            acc_log(account_id, "Sheet fetch returned nothing; using local cookie file as fallback.", silent=True)
             with open(cookie_path, 'r', encoding='utf-8') as f:
                 with contextlib.suppress(Exception):
                     cookies = json.load(f)
-        # 2) If none, try fetch from Google Sheet CSV
-        if not cookies:
-            acc_log(account_id, "No local cookies or file empty. Fetching from Google Sheet...", silent=True)
-            cookies = refresh_cookies_from_sheet(account_id)
         # 3) Attempt injection if we have any
         if cookies and inject_cookies(driver, cookies):
             acc_log(account_id, f"Cookies injected ({len(cookies)} entries). Navigating to Facebook Settings...", silent=True)

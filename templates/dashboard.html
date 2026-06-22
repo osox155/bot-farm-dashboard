@@ -101,6 +101,16 @@
       <div class="bot-ctrl-grid" id="bot-ctrl-grid"></div>
     </div>
 
+    <div class="panel" id="cmd-log-panel" style="margin-top:20px;">
+      <div class="panel-header">
+        <h3>📋 Command Log</h3>
+        <span id="cmd-log-hint" style="font-size:11px;color:var(--text3);">Shows whether the PC broker picked up your commands</span>
+      </div>
+      <div id="cmd-log-body" style="font-size:12px;">
+        <span style="color:var(--text3);">No commands sent yet.</span>
+      </div>
+    </div>
+
     <div style="display: flex; justify-content: flex-end; margin-top: 24px; padding-bottom: 24px;">
       <button class="btn btn-danger" onclick="confirmResetAll()">⚠ Reset All History</button>
     </div>
@@ -617,13 +627,46 @@ function closeScreenshotModal() {
   setTimeout(function() { modal.style.display = 'none'; }, 250);
 }
 
+function loadCommandLog() {
+  fetch('/api/control/commands')
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      var el = document.getElementById('cmd-log-body');
+      if (!el) return;
+      if (!d.ok || !(d.commands || []).length) {
+        el.innerHTML = '<span style="color:var(--text3);">No commands sent yet.</span>';
+        return;
+      }
+      var cmds = d.commands || [];
+      var rows = cmds.map(function(c) {
+        var stColor = c.status === 'done' ? 'var(--green)' : c.status === 'error' ? 'var(--red)' : 'var(--text2)';
+        var stIcon  = c.status === 'done' ? '✓' : c.status === 'error' ? '✕' : '⏳';
+        var age = c.created_at ? (' · ' + c.created_at) : '';
+        var res = c.result ? (' <span style="color:var(--text3);">→ ' + esc(c.result) + '</span>') : '';
+        var botPart = c.bot_name ? (' <b>' + esc(c.bot_name) + '</b>') : '';
+        return '<div style="display:flex;align-items:baseline;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);">' +
+          '<span style="color:' + stColor + ';min-width:14px;">' + stIcon + '</span>' +
+          '<span style="font-weight:600;color:var(--text1);">' + esc(c.action) + '</span>' +
+          botPart +
+          '<span style="color:' + stColor + ';font-size:11px;">' + esc(c.status) + '</span>' +
+          '<span style="color:var(--text3);font-size:11px;flex:1;">' + age + '</span>' +
+          res +
+          '</div>';
+      });
+      el.innerHTML = rows.join('');
+    })
+    .catch(function() {});
+}
+
 renderCtrlGrid([]);
 
 document.getElementById('menu-overview').classList.add('active');
 initTheme();
 loadOverview();
+loadCommandLog();
 loadSidebarBots('');
 setupRefresh();
+setInterval(loadCommandLog, 5000);
 </script>
 </body>
 </html>

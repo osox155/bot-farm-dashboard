@@ -2552,8 +2552,8 @@ def refresh_account_cookies(fname, accounts_dir, config, logger=None):
                     logger.error(f"Google Sheets API error for {fname}: {type(ge).__name__}: {ge}")
                 # fall through to other methods
         
-        # 2) Try Google Sheets (published CSV) if enabled
-        if gs.get('enabled') and (gs.get('mode') == 'published_csv'):
+        # 2) Try Google Sheets (published CSV) if enabled — also runs as fallback when API mode failed
+        if gs.get('enabled') and gs.get('published_csv_url') and (gs.get('mode') in ('published_csv', 'api')):
             url = gs.get('published_csv_url')
             account_col = gs.get('account_column', 'account_file')
             json_col = gs.get('json_column', 'cookies_json')
@@ -2583,11 +2583,11 @@ def refresh_account_cookies(fname, accounts_dir, config, logger=None):
                     # Robust header matching for CSV (tolerant to spaces/case)
                     norm_acct_target = account_col.strip().lower()
                     norm_json_target = json_col.strip().lower()
-                    
+
                     acct_key = None
                     json_key = None
-                    
-                    for h in fieldnames:
+
+                    for h in (reader.fieldnames or []):
                         h_norm = str(h).strip().lower()
                         if h_norm == norm_acct_target or h_norm in ['account_file', 'account', 'accountfile']:
                             acct_key = h
@@ -3792,7 +3792,7 @@ def run_account(fname, reply_message, accounts_dir, x, y, w, h, config, win_mode
     # Pre-sync cookies from Google Sheets before first login to avoid stale local cookies
     try:
         gs_cfg = (config or {}).get('google_sheets') or {}
-        if gs_cfg.get('enabled') and gs_cfg.get('published_csv_url'):
+        if gs_cfg.get('enabled') and (gs_cfg.get('published_csv_url') or gs_cfg.get('mode') == 'api'):
             refresh_account_cookies(fname, accounts_dir, config, logger)
     except Exception:
         pass
